@@ -1,0 +1,1710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portfolio — Jayden Kim</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;600;700&family=Space+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    @font-face {
+      font-family: 'COTN';
+      src: url('Cotn3-Regular.ttf') format('truetype');
+      font-weight: normal;
+      font-style: normal;
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #050008;
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+
+    /* ── SCENE ── */
+    #scene-view { position: fixed; inset: 0; }
+    #scene-svg  { width: 100%; height: 100%; }
+
+
+    /* panel text hover float */
+    .panel-text {
+      animation: panelFloat 3.6s ease-in-out infinite;
+    }
+    .panel-text-sub {
+      animation: panelFloat 3.6s ease-in-out infinite;
+      animation-delay: 0.4s;
+    }
+    @keyframes panelFloat {
+      0%, 100% { transform: translateY(0px); }
+      50%       { transform: translateY(-3px); }
+    }
+
+    /* lamp flicker */
+    .lamp-flicker { animation: lflicker 9s ease-in-out infinite; }
+    @keyframes lflicker {
+      0%,93%,100% { opacity: 1; }
+      94% { opacity: 0.7; }
+      96% { opacity: 0.9; }
+    }
+
+    /* display glow pulse */
+    .glow-pulse {
+      animation: glowPulse 2.8s ease-in-out infinite;
+    }
+    .floor-pulse {
+      animation: glowPulse 3.4s ease-in-out infinite;
+      animation-delay: 0.6s;
+    }
+    @keyframes glowPulse {
+      0%, 100% { opacity: 0.18; }
+      50%       { opacity: 0.40; }
+    }
+
+    /* star twinkle */
+    .star {
+      animation: twinkle var(--dur) ease-in-out infinite;
+      animation-delay: var(--dly);
+    }
+    @keyframes twinkle {
+      0%, 100% { opacity: var(--lo); }
+      50%       { opacity: var(--hi); }
+    }
+
+    /* city window — static, no flicker */
+    .city-win { opacity: var(--hi); }
+
+    /* rooftop dot — static */
+    .roof-blink { opacity: 0.85; }
+
+    /* ── FRONT VIEW (first-person SVG scene) ── */
+    #front-view {
+      position: fixed;
+      inset: 0;
+      z-index: 60;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    #front-view.visible { opacity: 1; pointer-events: all; }
+    #front-svg { width: 100%; height: 100%; }
+
+    /* back button */
+    #back-btn {
+      position: absolute;
+      top: 1.6rem; left: 1.8rem;
+      display: flex; align-items: center; gap: 0.4rem;
+      color: rgba(200, 220, 235, 0.6);
+      font-family: 'COTN', sans-serif;
+      font-size: 1rem; letter-spacing: 0.12em;
+      background: none; border: none; cursor: pointer;
+      padding: 0.35rem 0.55rem; border-radius: 3px;
+      transition: color 0.2s, background 0.2s;
+      z-index: 2;
+    }
+    #back-btn:hover  { color: rgba(220, 238, 255, 1); background: rgba(150,200,235,0.1); }
+    #back-btn:focus-visible { outline: 1px solid rgba(200,220,240,0.4); outline-offset: 3px; }
+    #back-btn:active { color: #fff; }
+
+    /* ── VM MACHINE — styled like image.jpg ── */
+    .vm-wrap {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      width: min(480px, 88vw);
+      max-height: 92vh;
+      overflow: hidden;
+      background: #8e9888;
+      border-radius: 4px 4px 2px 2px;
+      box-shadow:
+        0 0 0 2px #5c6658,
+        0 0 0 4px #3c4438,
+        0 0 150px rgba(130,195,255,0.35),
+        0 28px 130px rgba(0,0,0,0.99);
+      z-index: 1;
+    }
+
+    /* top brand strip — matches gray-green body */
+    .vm-header {
+      background: #7c8877;
+      border-bottom: 3px solid #4c5448;
+      padding: 0.5rem 1rem 0.45rem;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+    }
+    .vm-header-jp {
+      font-family: 'Noto Serif JP', serif;
+      font-size: 1.1rem;
+      color: rgba(222, 242, 255, 0.93);
+      letter-spacing: 0.4em;
+      text-shadow: 0 0 22px rgba(150,210,255,0.8);
+    }
+    .vm-header-en {
+      font-family: 'COTN', sans-serif;
+      font-size: 0.72rem;
+      color: rgba(175,200,215,0.60);
+      letter-spacing: 0.18em;
+    }
+
+    /* dark metal display bezel */
+    .vm-display-outer {
+      background: #3c4440;
+      padding: 9px 11px;
+      flex-shrink: 0;
+      border-top: 2px solid #282e2c;
+      border-bottom: 2px solid #282e2c;
+    }
+
+    /* backlit display — bright white-cyan like image.jpg */
+    .vm-display-inner {
+      background: linear-gradient(180deg, #cceaf8 0%, #a8d4ec 55%, #92c4e0 100%);
+      border-radius: 2px;
+      overflow: visible;
+      box-shadow:
+        inset 0 0 55px rgba(190,235,255,0.6),
+        inset 0 0 18px rgba(255,255,255,0.5),
+        0 0 40px rgba(110,185,255,0.45);
+    }
+
+    /* product rows */
+    .vm-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 4px;
+      padding: 5px 5px 0;
+    }
+    .vm-row:last-child { padding-bottom: 5px; }
+
+    /* metallic shelf divider */
+    .vm-row-divider {
+      height: 9px;
+      background: linear-gradient(180deg, #38403c 0%, #2c3430 55%, #202826 100%);
+      margin: 2px 0;
+      box-shadow: 0 1px 0 rgba(255,255,255,0.06), inset 0 1px 0 rgba(0,0,0,0.5);
+    }
+
+    /* individual drink slot */
+    .vm-slot {
+      border-radius: 3px;
+      overflow: hidden;
+      cursor: pointer;
+      position: relative;
+      transition: transform 0.14s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.14s ease;
+      border: 1px solid rgba(0,0,0,0.28);
+    }
+    .vm-slot:hover {
+      transform: scale(1.07) translateY(-4px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.65), 0 0 14px rgba(180,225,255,0.25);
+      z-index: 2;
+    }
+    .vm-slot:focus-visible { outline: 2px solid rgba(180,220,255,0.75); outline-offset: 2px; }
+    .vm-slot:active { transform: scale(0.97); }
+
+    /* glass-case light reflection */
+    .vm-slot::after {
+      content: '';
+      position: absolute;
+      top: 0; bottom: 0; left: 0; width: 32%;
+      background: linear-gradient(90deg, rgba(255,255,255,0.26) 0%, transparent 100%);
+      pointer-events: none;
+      border-radius: 3px 0 0 3px;
+    }
+
+    .vm-row-1 .vm-slot { height: 118px; }
+    .vm-row-2 .vm-slot { height: 88px; }
+    .vm-row-3 .vm-slot { height: 88px; }
+
+    /* artwork name label at slot bottom */
+    .slot-label {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      padding: 0.16rem 0.25rem;
+      font-size: 0.46rem;
+      letter-spacing: 0.09em;
+      color: rgba(235, 248, 255, 0.92);
+      background: rgba(0,0,0,0.74);
+      text-align: center;
+      border-top: 1px solid rgba(255,255,255,0.05);
+    }
+
+    /* below display: cork board + control panel */
+    .vm-below {
+      display: grid;
+      grid-template-columns: 56% 44%;
+      background: #8e9888;
+      border-top: 2px solid #4c5448;
+      flex-shrink: 0;
+    }
+
+    /* cork notice board — tan/amber like image.jpg */
+    .vm-notice {
+      background: #8e9888;
+      padding: 8px 10px;
+      border-right: 2px solid #5c6658;
+    }
+    .vm-notice-paper {
+      background: #c4a03c;
+      border-radius: 3px;
+      padding: 7px 9px;
+      border: 1px solid #9a7e28;
+      box-shadow: inset 0 0 12px rgba(0,0,0,0.30), 0 1px 0 rgba(255,255,255,0.04);
+    }
+    .vm-notice-line {
+      height: 2px;
+      background: #5c4016;
+      border-radius: 1px;
+      margin-bottom: 5px;
+      opacity: 0.55;
+    }
+    .vm-notice-line:last-child { margin-bottom: 0; width: 58%; }
+    .vm-notice-title {
+      font-size: 0.6rem;
+      color: #3a2406;
+      letter-spacing: 0.12em;
+      font-family: 'Noto Serif JP', serif;
+      margin-bottom: 5px;
+    }
+
+    /* right control panel — dark metal */
+    .vm-ctrl-panel {
+      background: #28302c;
+      padding: 8px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      align-items: flex-start;
+    }
+    .vm-ctrl-black {
+      width: 100%;
+      height: 30px;
+      background: #0a0e0c;
+      border-radius: 2px;
+      border: 1px solid #181e1a;
+      box-shadow: inset 0 0 10px rgba(0,0,0,0.9);
+    }
+    .vm-ctrl-slot {
+      width: 62%;
+      height: 4px;
+      background: #060a08;
+      border-radius: 2px;
+    }
+
+    /* bottom section */
+    .vm-bottom {
+      background: #28302c;
+      border-top: 3px solid #181e1a;
+      padding: 7px 10px;
+      flex-shrink: 0;
+    }
+    .vm-btn-row {
+      display: flex;
+      gap: 5px;
+      margin-bottom: 6px;
+    }
+    .vm-btn {
+      flex: 1;
+      height: 13px;
+      background: #181e1a;
+      border-radius: 2px;
+      border: 1px solid #222a24;
+    }
+    .vm-coin-row {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      margin-bottom: 5px;
+    }
+    .vm-coin-slot {
+      flex: 1;
+      height: 4px;
+      background: #060a08;
+      border-radius: 2px;
+    }
+    .vm-indicator-lights { display: flex; gap: 4px; }
+    .vm-dot { width: 5px; height: 5px; border-radius: 50%; }
+    .vm-dot-g { background: #3af014; box-shadow: 0 0 7px rgba(58,240,20,1); }
+    .vm-dot-r { background: #ff2055; box-shadow: 0 0 7px rgba(255,32,85,1); }
+    .vm-dispense-housing {
+      background: #0a0e0c;
+      border-radius: 3px;
+      padding: 4px 6px;
+      border: 1px solid #181e1a;
+    }
+    .vm-dispense-slot {
+      width: 100%;
+      height: 14px;
+      background: #040608;
+      border-radius: 2px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════ -->
+<!-- SCENE VIEW                              -->
+<!-- ════════════════════════════════════════ -->
+<div id="scene-view">
+<svg id="scene-svg" viewBox="0 0 1200 675" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <!-- Sky atmosphere — deep navy/indigo base + vivid magenta nebula -->
+  <radialGradient id="sg1" cx="50%" cy="35%" r="65%">
+    <stop offset="0%" stop-color="#e040a0" stop-opacity="0.72"/>
+    <stop offset="100%" stop-color="#0a0418" stop-opacity="0"/>
+  </radialGradient>
+  <radialGradient id="sg2" cx="38%" cy="22%" r="55%">
+    <stop offset="0%" stop-color="#c020c8" stop-opacity="0.50"/>
+    <stop offset="100%" stop-color="#0a0418" stop-opacity="0"/>
+  </radialGradient>
+  <radialGradient id="sg3" cx="65%" cy="18%" r="48%">
+    <stop offset="0%" stop-color="#d030b0" stop-opacity="0.40"/>
+    <stop offset="100%" stop-color="#0a0418" stop-opacity="0"/>
+  </radialGradient>
+  <radialGradient id="sg4" cx="25%" cy="50%" r="42%">
+    <stop offset="0%" stop-color="#4a1080" stop-opacity="0.55"/>
+    <stop offset="100%" stop-color="#0a0418" stop-opacity="0"/>
+  </radialGradient>
+  <!-- Blue / indigo nebula clouds -->
+  <radialGradient id="sg5" cx="88%" cy="28%" r="40%">
+    <stop offset="0%" stop-color="#1a40c8" stop-opacity="0.38"/>
+    <stop offset="100%" stop-color="#0a0418" stop-opacity="0"/>
+  </radialGradient>
+  <radialGradient id="sg6" cx="12%" cy="38%" r="36%">
+    <stop offset="0%" stop-color="#2030a8" stop-opacity="0.30"/>
+    <stop offset="100%" stop-color="#0a0418" stop-opacity="0"/>
+  </radialGradient>
+  <radialGradient id="sg7" cx="55%" cy="8%" r="38%">
+    <stop offset="0%" stop-color="#3050e0" stop-opacity="0.22"/>
+    <stop offset="100%" stop-color="#0a0418" stop-opacity="0"/>
+  </radialGradient>
+
+  <!-- Ground — pink/magenta sky reflection near horizon, dark below -->
+  <linearGradient id="groundG" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%"   stop-color="#2a0830"/>
+    <stop offset="30%"  stop-color="#180620"/>
+    <stop offset="100%" stop-color="#060410"/>
+  </linearGradient>
+
+  <!-- Road/sidewalk — cool purple-slate -->
+  <linearGradient id="roadG" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%"   stop-color="#1e1a3a"/>
+    <stop offset="50%"  stop-color="#181430"/>
+    <stop offset="100%" stop-color="#121028"/>
+  </linearGradient>
+
+  <!-- VM display illumination -->
+  <radialGradient id="vmDispGlow" cx="50%" cy="50%" r="50%">
+    <stop offset="0%" stop-color="#a8ccd8" stop-opacity="0.2"/>
+    <stop offset="100%" stop-color="#a8ccd8" stop-opacity="0"/>
+  </radialGradient>
+
+  <!-- VM floor glow -->
+  <radialGradient id="vmFloorG" cx="50%" cy="50%" r="50%">
+    <stop offset="0%" stop-color="#88b8cc" stop-opacity="0.35"/>
+    <stop offset="100%" stop-color="#88b8cc" stop-opacity="0"/>
+  </radialGradient>
+
+  <!-- lamp halos -->
+  <radialGradient id="lh1" cx="50%" cy="50%" r="50%">
+    <stop offset="0%" stop-color="#ff9944" stop-opacity="0.28"/>
+    <stop offset="100%" stop-color="#ff9944" stop-opacity="0"/>
+  </radialGradient>
+  <radialGradient id="lh2" cx="50%" cy="50%" r="50%">
+    <stop offset="0%" stop-color="#ff9944" stop-opacity="0.2"/>
+    <stop offset="100%" stop-color="#ff9944" stop-opacity="0"/>
+  </radialGradient>
+  <radialGradient id="lh3" cx="50%" cy="50%" r="50%">
+    <stop offset="0%" stop-color="#ff9944" stop-opacity="0.14"/>
+    <stop offset="100%" stop-color="#ff9944" stop-opacity="0"/>
+  </radialGradient>
+  <radialGradient id="lh4" cx="50%" cy="50%" r="50%">
+    <stop offset="0%" stop-color="#ff9944" stop-opacity="0.09"/>
+    <stop offset="100%" stop-color="#ff9944" stop-opacity="0"/>
+  </radialGradient>
+
+  <!-- Atmosphere fog -->
+  <linearGradient id="fogG" x1="0" y1="1" x2="0" y2="0">
+    <stop offset="0%" stop-color="#080418" stop-opacity="0.45"/>
+    <stop offset="22%" stop-color="#080418" stop-opacity="0.1"/>
+    <stop offset="100%" stop-color="#080418" stop-opacity="0"/>
+  </linearGradient>
+
+  <!-- Vignette -->
+  <radialGradient id="vigG" cx="50%" cy="55%" r="72%">
+    <stop offset="0%"   stop-color="#080418" stop-opacity="0"/>
+    <stop offset="60%"  stop-color="#080418" stop-opacity="0.12"/>
+    <stop offset="100%" stop-color="#080418" stop-opacity="0.80"/>
+  </radialGradient>
+
+  <!-- City background glow -->
+  <radialGradient id="cityGlowG" cx="50%" cy="50%" r="50%">
+    <stop offset="0%" stop-color="#c040c0" stop-opacity="0.30"/>
+    <stop offset="100%" stop-color="#c040c0" stop-opacity="0"/>
+  </radialGradient>
+
+  <!-- Moonlight wash from upper-left -->
+  <radialGradient id="moonlightG" cx="15%" cy="12%" r="85%">
+    <stop offset="0%"   stop-color="#c8a8ff" stop-opacity="0.22"/>
+    <stop offset="55%"  stop-color="#c8a8ff" stop-opacity="0.06"/>
+    <stop offset="100%" stop-color="#c8a8ff" stop-opacity="0"/>
+  </radialGradient>
+
+  <!-- Ground purple ambient from moonlight -->
+  <radialGradient id="groundAmbG" cx="20%" cy="10%" r="80%">
+    <stop offset="0%"   stop-color="#7030b0" stop-opacity="0.22"/>
+    <stop offset="100%" stop-color="#7030b0" stop-opacity="0"/>
+  </radialGradient>
+
+  <!-- Pink/magenta sky reflection on ground -->
+  <linearGradient id="pinkReflG" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%"   stop-color="#e030a0" stop-opacity="0.32"/>
+    <stop offset="40%"  stop-color="#c02090" stop-opacity="0.12"/>
+    <stop offset="100%" stop-color="#c02090" stop-opacity="0"/>
+  </linearGradient>
+
+  <!-- Moonlight shadow from vending machine -->
+  <linearGradient id="vmShadowG" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0%"   stop-color="#000000" stop-opacity="0.38"/>
+    <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+  </linearGradient>
+
+  <!-- Road wet-reflection sheen -->
+  <linearGradient id="roadShineG" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%"   stop-color="#8050cc" stop-opacity="0.18"/>
+    <stop offset="100%" stop-color="#8050cc" stop-opacity="0.04"/>
+  </linearGradient>
+
+  <!-- Shutter pattern: horizontal metal strips -->
+  <pattern id="shutterP" x="0" y="0" width="300" height="18" patternUnits="userSpaceOnUse">
+    <rect width="300" height="9"  fill="#0c0e0c"/>
+    <rect y="9" width="300" height="9" fill="#0f110f"/>
+    <line x1="0" y1="8.5"  x2="300" y2="8.5"  stroke="#080a08" stroke-width="1.5"/>
+    <line x1="0" y1="17.5" x2="300" y2="17.5" stroke="#080a08" stroke-width="1.5"/>
+    <!-- subtle 3D ridge highlight -->
+    <line x1="0" y1="1" x2="300" y2="1" stroke="#111310" stroke-width="0.5" opacity="0.5"/>
+    <line x1="0" y1="10" x2="300" y2="10" stroke="#111310" stroke-width="0.5" opacity="0.5"/>
+  </pattern>
+
+  <!-- VM display inner gradient -->
+  <linearGradient id="vmDisplayG" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="#a0c4d4"/>
+    <stop offset="100%" stop-color="#88b0c4"/>
+  </linearGradient>
+
+  <!-- Filters -->
+  <filter id="blur8"  x="-60%" y="-60%"   width="220%" height="220%"><feGaussianBlur stdDeviation="8"/></filter>
+  <filter id="grainF" x="0%" y="0%" width="100%" height="100%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.85 0.35" numOctaves="4" seed="9"/>
+    <feColorMatrix type="matrix" values="0 0 0 0 0.10  0 0 0 0 0.05  0 0 0 0 0.18  0 0 0 0.45 0"/>
+  </filter>
+  <filter id="blur20" x="-120%" y="-120%" width="340%" height="340%"><feGaussianBlur stdDeviation="20"/></filter>
+  <filter id="blur40" x="-200%" y="-200%" width="500%" height="500%"><feGaussianBlur stdDeviation="40"/></filter>
+  <filter id="tealGlow" x="-80%" y="-80%" width="260%" height="260%">
+    <feGaussianBlur in="SourceGraphic" stdDeviation="5" result="b5"/>
+    <feGaussianBlur in="SourceGraphic" stdDeviation="2" result="b2"/>
+    <feMerge><feMergeNode in="b5"/><feMergeNode in="b2"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  <filter id="textShadow" x="-20%" y="-20%" width="140%" height="140%">
+    <feDropShadow dx="2" dy="3" stdDeviation="3" flood-color="#000000" flood-opacity="0.55"/>
+  </filter>
+  <filter id="glow5"  x="-60%" y="-60%"   width="220%" height="220%">
+    <feGaussianBlur stdDeviation="5" result="b"/>
+    <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  <filter id="dustGlow" x="-150%" y="-150%" width="400%" height="400%">
+    <feGaussianBlur in="SourceGraphic" stdDeviation="9" result="b9"/>
+    <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="b3"/>
+    <feMerge><feMergeNode in="b9"/><feMergeNode in="b9"/><feMergeNode in="b3"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  <filter id="coreGlow" x="-100%" y="-100%" width="300%" height="300%">
+    <feGaussianBlur in="SourceGraphic" stdDeviation="5" result="b5"/>
+    <feGaussianBlur in="SourceGraphic" stdDeviation="1.5" result="b1"/>
+    <feMerge><feMergeNode in="b5"/><feMergeNode in="b1"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+
+  <clipPath id="clip"><rect width="1200" height="675"/></clipPath>
+  <clipPath id="moonRaysClip"><rect width="1200" height="322"/></clipPath>
+</defs>
+
+<g clip-path="url(#clip)">
+
+<!-- ── SKY — photo background ── -->
+<rect width="1200" height="318" fill="#08001a"/>
+<image x="0" y="0" width="1200" height="318" href="sky/sky-scene.png" preserveAspectRatio="xMidYMid slice" style="filter:brightness(1.6) saturate(1.4)"/>
+<!-- ── MOON ── -->
+<ellipse cx="180" cy="80" rx="280" ry="280" fill="#e8e8ff" opacity="0.08" filter="url(#blur40)"/>
+<ellipse cx="180" cy="80" rx="200" ry="200" fill="#f0f0ff" opacity="0.14" filter="url(#blur40)"/>
+<ellipse cx="180" cy="80" rx="130" ry="130" fill="#f8f8ff" opacity="0.24" filter="url(#blur40)"/>
+<ellipse cx="180" cy="80" rx="82"  ry="82"  fill="#ffffff" opacity="0.30" filter="url(#blur20)"/>
+<ellipse cx="180" cy="80" rx="52"  ry="52"  fill="#ffffff" opacity="0.50" filter="url(#blur8)"/>
+<ellipse cx="180" cy="80" rx="34"  ry="34"  fill="#ffffff" opacity="0.70" filter="url(#blur8)"/>
+<circle  cx="180" cy="80" r="28"   fill="#ffffff"/>
+<circle  cx="183" cy="82" r="26"   fill="#f5f5ff" opacity="0.10"/>
+<circle  cx="172" cy="72" r="5.5"  fill="#e8e8ee" opacity="0.22"/>
+<circle  cx="185" cy="82" r="3.5"  fill="#e8e8ee" opacity="0.18"/>
+<circle  cx="175" cy="88" r="2.5"  fill="#e8e8ee" opacity="0.16"/>
+<circle  cx="174" cy="72" r="12"   fill="#ffffff" opacity="0.60"/>
+<circle  cx="171" cy="69" r="6"    fill="#ffffff" opacity="0.80"/>
+<ellipse cx="180" cy="80" rx="24"  ry="24" fill="#ffffff" opacity="0.35" filter="url(#blur8)"/>
+<line x1="180" y1="30"  x2="180" y2="130" stroke="#ffffff" stroke-width="1.2" opacity="0.22"/>
+<line x1="130" y1="80"  x2="230" y2="80"  stroke="#ffffff" stroke-width="1.2" opacity="0.22"/>
+<!-- moon halo ring -->
+<ellipse cx="180" cy="80" rx="46" ry="46" fill="none" stroke="#f0f0ff" stroke-width="1.5" opacity="0.18" filter="url(#blur8)"/>
+<ellipse cx="180" cy="80" rx="62" ry="62" fill="none" stroke="#ececff" stroke-width="1"   opacity="0.10" filter="url(#blur8)"/>
+
+<!-- ── GOD RAYS from moon (upper-left) ── -->
+<g clip-path="url(#moonRaysClip)" filter="url(#blur20)" opacity="0.10">
+  <polygon points="180,80 355,322 320,322" fill="#e8d8ff"/>
+  <polygon points="180,80 510,322 482,322" fill="#d8c8ff"/>
+  <polygon points="180,80 680,322 658,322" fill="#e0d0ff"/>
+  <polygon points="180,80 850,322 833,322" fill="#d4c4f8"/>
+  <polygon points="180,80 1020,322 1006,322" fill="#ccc0f4"/>
+  <polygon points="180,80 1170,322 1158,322" fill="#c8bcf0"/>
+  <polygon points="180,80 440,322 410,322" fill="#f0e4ff"/>
+  <polygon points="180,80 600,322 572,322" fill="#e4d6ff"/>
+  <polygon points="180,80 780,322 758,322" fill="#daccff"/>
+</g>
+
+<!-- ── BLINKING STARS (JS-generated, see script below) ── -->
+
+<!-- ── STARS / DUST (JS injection disabled) ── -->
+<g id="stars"/>
+<g id="dust"      filter="url(#dustGlow)"/>
+<g id="dust-core" filter="url(#coreGlow)"/>
+
+<!-- ── CITY BACKGROUND GLOW ── -->
+<ellipse cx="600" cy="310" rx="700" ry="100" fill="url(#cityGlowG)" filter="url(#blur40)" opacity="0.9"/>
+<!-- warm purple atmospheric bloom just above skyline -->
+<ellipse cx="600" cy="308" rx="700" ry="60"  fill="#9020c0" opacity="0.22" filter="url(#blur20)"/>
+<ellipse cx="600" cy="316" rx="500" ry="38"  fill="#cc40e0" opacity="0.12" filter="url(#blur20)"/>
+
+<!-- ── CITY BUILDINGS + WINDOWS (JS injected) ── -->
+<g id="city-buildings"/>
+<g id="city-windows"/>
+<!-- purple/violet sky-light wash on building faces -->
+<rect x="0" y="120" width="1200" height="200" fill="#6018a8" opacity="0.10" filter="url(#blur20)" pointer-events="none"/>
+
+<!-- ── CITY BASE ── -->
+<rect x="0" y="308" width="1200" height="55" fill="#0a0818"/>
+<!-- city street-level glow strip -->
+<rect x="0" y="310" width="1200" height="18" fill="#8833cc" opacity="0.06" filter="url(#blur20)"/>
+
+<!-- ── GROUND PLANE ── -->
+<rect x="0" y="318" width="1200" height="357" fill="url(#groundG)"/>
+<!-- Moonlight wash on ground -->
+<rect width="1200" height="675" fill="url(#moonlightG)" pointer-events="none"/>
+<!-- Purple ambient from sky reflection on ground -->
+<rect x="0" y="318" width="1200" height="357" fill="url(#groundAmbG)" pointer-events="none" opacity="0.9"/>
+
+<!-- ── GROUND TEXTURE ── -->
+<!-- noise grain -->
+<rect x="0" y="318" width="1200" height="357" filter="url(#grainF)"/>
+<!-- perspective seam lines radiating from VP (875,318) across sidewalks -->
+<g stroke="#2a1f4a" stroke-width="0.8" opacity="0.55">
+  <line x1="875" y1="318" x2="0"    y2="475"/>
+  <line x1="875" y1="318" x2="0"    y2="575"/>
+  <line x1="875" y1="318" x2="55"   y2="675"/>
+  <line x1="875" y1="318" x2="195"  y2="675"/>
+  <line x1="875" y1="318" x2="1200" y2="445"/>
+  <line x1="875" y1="318" x2="1200" y2="558"/>
+  <line x1="875" y1="318" x2="985"  y2="675"/>
+  <line x1="875" y1="318" x2="1105" y2="675"/>
+</g>
+<!-- horizontal cross-seams clipped to sidewalk edges -->
+<g stroke="#2a1f4a" stroke-width="0.5" opacity="0.40">
+  <line x1="0" y1="400" x2="478"  y2="400"/>  <line x1="736"  y1="400" x2="1200" y2="400"/>
+  <line x1="0" y1="465" x2="565"  y2="465"/>  <line x1="767"  y1="465" x2="1200" y2="465"/>
+  <line x1="0" y1="535" x2="666"  y2="535"/>  <line x1="802"  y1="535" x2="1200" y2="535"/>
+  <line x1="0" y1="608" x2="767"  y2="608"/>  <line x1="837"  y1="608" x2="1200" y2="608"/>
+</g>
+
+<!-- ── ROAD / SIDEWALK ──
+     VP ≈ (875, 318)
+     Left edge:  (360, 675) → (875, 318)
+     Right edge: (695, 675) → (875, 318) -->
+<polygon points="360,675 875,318 695,675" fill="url(#roadG)"/>
+
+<!-- Road surface detail - perspective lines -->
+<g stroke="#2a2550" stroke-width="0.8" opacity="0.7">
+  <line x1="380" y1="645" x2="685" y2="645"/>
+  <line x1="405" y1="612" x2="674" y2="612"/>
+  <line x1="435" y1="574" x2="661" y2="574"/>
+  <line x1="470" y1="532" x2="646" y2="532"/>
+  <line x1="510" y1="488" x2="629" y2="488"/>
+  <line x1="553" y1="444" x2="611" y2="444"/>
+</g>
+<!-- Road edges -->
+<line x1="360" y1="675" x2="875" y2="318" stroke="#4a3880" stroke-width="2" opacity="0.85"/>
+<line x1="695" y1="675" x2="875" y2="318" stroke="#4a3880" stroke-width="2" opacity="0.85"/>
+<!-- Road edge glow -->
+<line x1="360" y1="675" x2="875" y2="318" stroke="#8060cc" stroke-width="4" opacity="0.18" filter="url(#blur8)"/>
+<line x1="695" y1="675" x2="875" y2="318" stroke="#8060cc" stroke-width="4" opacity="0.18" filter="url(#blur8)"/>
+<!-- ── WET ROAD REFLECTIONS ── -->
+<!-- Sky/nebula reflection: purple sheen across whole road -->
+<polygon points="360,675 875,318 695,675" fill="#7030c0" opacity="0.22"/>
+<!-- Central shimmer strip — brightest toward VP -->
+<polygon points="490,675 875,318 640,675" fill="#c080ff" opacity="0.16" filter="url(#blur8)"/>
+<!-- Lamp 1 reflection — warm orange streak below lamp (t=0.04 on right edge, base 702,661) -->
+<ellipse cx="622" cy="655" rx="28" ry="7" fill="#ff9944" opacity="0.28" filter="url(#blur8)"/>
+<!-- Lamp 5 reflection (t=0.49, base 783,500) -->
+<ellipse cx="680" cy="528" rx="16" ry="4" fill="#ff9944" opacity="0.18" filter="url(#blur8)"/>
+<!-- Lamp 8 reflection (t=0.71, base 823,422) -->
+<ellipse cx="720" cy="444" rx="10" ry="3" fill="#ff9944" opacity="0.12" filter="url(#blur8)"/>
+<!-- Moonlight reflection streak — runs center of road toward VP -->
+<polygon points="510,675 875,318 595,675" fill="#d8c0ff" opacity="0.07" filter="url(#blur8)"/>
+<!-- VM blue glow reflection on road -->
+<ellipse cx="650" cy="530" rx="70" ry="12" fill="#2288ff" opacity="0.12" filter="url(#blur8)"/>
+
+<!-- ── PUDDLE REFLECTIONS on sidewalks ── -->
+<!-- left sidewalk puddles -->
+<ellipse cx="175" cy="558" rx="52" ry="10" fill="#cc30a8" opacity="0.30" filter="url(#blur8)" transform="rotate(-4 175 558)"/>
+<ellipse cx="175" cy="558" rx="44" ry="7"  fill="#ff44ee" opacity="0.14" filter="url(#blur8)" transform="rotate(-4 175 558)"/>
+<ellipse cx="90"  cy="628" rx="38" ry="7"  fill="#8030c0" opacity="0.26" filter="url(#blur8)" transform="rotate(6 90 628)"/>
+<ellipse cx="310" cy="610" rx="30" ry="6"  fill="#e030a0" opacity="0.22" filter="url(#blur8)" transform="rotate(-2 310 610)"/>
+<!-- right sidewalk puddles -->
+<ellipse cx="960" cy="540" rx="48" ry="9"  fill="#2040d0" opacity="0.28" filter="url(#blur8)" transform="rotate(5 960 540)"/>
+<ellipse cx="960" cy="540" rx="38" ry="6"  fill="#6080ff" opacity="0.16" filter="url(#blur8)" transform="rotate(5 960 540)"/>
+<ellipse cx="1090" cy="598" rx="36" ry="7" fill="#cc30a8" opacity="0.24" filter="url(#blur8)" transform="rotate(-5 1090 598)"/>
+<ellipse cx="830"  cy="620" rx="28" ry="5" fill="#8030c0" opacity="0.20" filter="url(#blur8)" transform="rotate(3 830 620)"/>
+
+<!-- ── LITTER / DEBRIS ── -->
+<g fill="#0c0a18" opacity="0.70">
+  <!-- left edge -->
+  <rect x="18"  y="652" width="14" height="4" rx="1" transform="rotate(12 25 654)"/>
+  <rect x="55"  y="668" width="9"  height="3" rx="1" transform="rotate(-8 60 670)"/>
+  <polygon points="95,672 108,669 106,675 93,675"/>
+  <rect x="140" y="658" width="11" height="3" rx="1" transform="rotate(18 146 660)"/>
+  <polygon points="195,665 204,662 202,668"/>
+  <rect x="240" y="670" width="8"  height="2" rx="1" transform="rotate(-5 244 671)"/>
+  <!-- right edge -->
+  <rect x="1148" y="648" width="14" height="4" rx="1" transform="rotate(-10 1155 650)"/>
+  <polygon points="1100,662 1112,658 1110,665"/>
+  <rect x="1060" y="670" width="10" height="3" rx="1" transform="rotate(7 1065 672)"/>
+  <polygon points="1170,672 1183,668 1181,675 1168,675"/>
+  <rect x="1030" y="658" width="8"  height="2" rx="1" transform="rotate(-14 1034 659)"/>
+</g>
+
+<!-- Ground RIGHT of road -->
+<polygon points="695,675 875,318 1200,318 1200,675" fill="#060408" opacity="0.88"/>
+<!-- Ground LEFT of road -->
+<polygon points="0,675 0,318 875,318 360,675" fill="#060408" opacity="0.78"/>
+<!-- Pink/magenta sky reflection on all ground -->
+<polygon points="695,675 875,318 1200,318 1200,675" fill="url(#pinkReflG)" pointer-events="none"/>
+<polygon points="0,675 0,318 875,318 360,675"       fill="url(#pinkReflG)" pointer-events="none"/>
+<polygon points="360,675 875,318 695,675"           fill="url(#pinkReflG)" pointer-events="none" opacity="0.7"/>
+
+<!-- ── SKY GLOW REFLECTIONS ON GROUND ── -->
+<!-- Wide neon magenta band reflection -->
+<ellipse cx="400" cy="500" rx="540" ry="70"  transform="rotate(10 400 500)"  fill="#ee00bb" opacity="0.38" filter="url(#blur40)" pointer-events="none"/>
+<ellipse cx="420" cy="490" rx="360" ry="40"  transform="rotate(10 420 490)"  fill="#ff22cc" opacity="0.42" filter="url(#blur20)" pointer-events="none"/>
+<ellipse cx="440" cy="483" rx="200" ry="18"  transform="rotate(10 440 483)"  fill="#ff88ee" opacity="0.50" filter="url(#blur20)" pointer-events="none"/>
+<ellipse cx="450" cy="480" rx="100" ry="8"   transform="rotate(10 450 480)"  fill="#ffffff"  opacity="0.18" filter="url(#blur8)"  pointer-events="none"/>
+<!-- Blue/indigo nebula reflection right side -->
+<ellipse cx="950" cy="460" rx="380" ry="55"  fill="#1a3ad0" opacity="0.35" filter="url(#blur40)" pointer-events="none"/>
+<ellipse cx="980" cy="450" rx="220" ry="28"  fill="#2040e8" opacity="0.40" filter="url(#blur20)" pointer-events="none"/>
+<ellipse cx="1000" cy="444" rx="110" ry="12" fill="#6080ff" opacity="0.35" filter="url(#blur8)"  pointer-events="none"/>
+<!-- Pink nebula glow center-left -->
+<ellipse cx="280" cy="440" rx="340" ry="55"  fill="#e030a8" opacity="0.32" filter="url(#blur40)" pointer-events="none"/>
+<ellipse cx="300" cy="432" rx="180" ry="28"  fill="#ff44cc" opacity="0.36" filter="url(#blur20)" pointer-events="none"/>
+<!-- Wet-ground shimmer streaks toward VP -->
+<polygon points="260,675 875,318 500,675" fill="#cc00ff" opacity="0.18" filter="url(#blur20)" pointer-events="none"/>
+<polygon points="680,675 875,318 980,675" fill="#2040e8" opacity="0.16" filter="url(#blur20)" pointer-events="none"/>
+<!-- Horizon edge glow where sky meets ground -->
+<rect x="0" y="316" width="1200" height="12" fill="#ff00cc" opacity="0.22" filter="url(#blur8)" pointer-events="none"/>
+<rect x="0" y="316" width="1200" height="6"  fill="#ffffff"  opacity="0.08" pointer-events="none"/>
+
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!-- STREET LAMPS — RIGHT road edge, tall poles           -->
+<!-- Right edge (695,675)→(875,318). Arms point left.    -->
+<!-- ══════════════════════════════════════════════════════ -->
+
+<!-- Halos (behind poles) — lamps 1,5,8,10,11,12,13,14 -->
+<ellipse cx="660" cy="410" rx="128" ry="84"  fill="url(#lh1)" filter="url(#blur40)" class="lamp-flicker"/>
+<ellipse cx="765" cy="363" rx="65"  ry="43"  fill="url(#lh2)" filter="url(#blur40)" class="lamp-flicker"/>
+<ellipse cx="814" cy="337" rx="32"  ry="21"  fill="url(#lh3)" filter="url(#blur40)" class="lamp-flicker"/>
+<ellipse cx="836" cy="326" rx="18"  ry="12"  fill="url(#lh4)" filter="url(#blur40)" class="lamp-flicker"/>
+<ellipse cx="845" cy="322" rx="13"  ry="9"   fill="url(#lh4)" filter="url(#blur40)" class="lamp-flicker"/>
+<ellipse cx="853" cy="319" rx="10"  ry="7"   fill="url(#lh4)" filter="url(#blur40)" class="lamp-flicker"/>
+<ellipse cx="860" cy="316" rx="7"   ry="5"   fill="url(#lh4)" filter="url(#blur40)" class="lamp-flicker"/>
+<ellipse cx="867" cy="314" rx="5"   ry="3"   fill="url(#lh4)" filter="url(#blur40)" class="lamp-flicker"/>
+
+<!-- LAMP 1  t=0.04  base(702,661) pole→(702,413) arm→(660,413) -->
+<line x1="702" y1="661" x2="702" y2="412" stroke="#131028" stroke-width="5.5"/>
+<path d="M 702 412 Q 681 408 660 413" stroke="#131028" stroke-width="4.5" fill="none"/>
+<rect x="650" y="409" width="20" height="8" rx="3.5" fill="#181228"/>
+<ellipse cx="660" cy="413" rx="9" ry="4.5" fill="#ffaa55" opacity="0.90" filter="url(#glow5)" class="lamp-flicker"/>
+
+<!-- LAMP 5  t=0.49  base(783,500) pole→(783,367) arm→(765,367) -->
+<line x1="783" y1="500" x2="783" y2="366" stroke="#131028" stroke-width="2.7"/>
+<path d="M 783 366 Q 774 362 765 367" stroke="#131028" stroke-width="2.3" fill="none"/>
+<rect x="759" y="363" width="11" height="5" rx="1.5" fill="#181228"/>
+<ellipse cx="765" cy="367" rx="4" ry="2" fill="#ffaa55" opacity="0.81" filter="url(#glow5)" class="lamp-flicker"/>
+
+<!-- LAMP 8  t=0.71  base(823,422) pole→(823,341) arm→(814,341) -->
+<line x1="823" y1="422" x2="823" y2="340" stroke="#131028" stroke-width="1.6"/>
+<path d="M 823 340 Q 819 336 814 341" stroke="#131028" stroke-width="1.4" fill="none"/>
+<rect x="809" y="337" width="8" height="4" rx="0.9" fill="#181228"/>
+<ellipse cx="814" cy="341" rx="2" ry="1" fill="#ffaa55" opacity="0.68" filter="url(#glow5)" class="lamp-flicker"/>
+
+<!-- LAMP 10 t=0.82  base(843,382) pole→(843,330) arm→(836,330) -->
+<line x1="843" y1="382" x2="843" y2="329" stroke="#131028" stroke-width="1.2"/>
+<path d="M 843 329 Q 840 325 836 330" stroke="#131028" stroke-width="1.0" fill="none"/>
+<rect x="832" y="326" width="6" height="3" rx="0.7" fill="#181228"/>
+<ellipse cx="836" cy="330" rx="1.2" ry="0.6" fill="#ffaa55" opacity="0.57" filter="url(#glow5)" class="lamp-flicker"/>
+
+<!-- LAMP 11 t=0.86  base(850,368) pole→(850,326) arm→(845,326) -->
+<line x1="850" y1="368" x2="850" y2="325" stroke="#131028" stroke-width="1.0"/>
+<path d="M 850 325 Q 847 321 845 326" stroke="#131028" stroke-width="0.9" fill="none"/>
+<rect x="841" y="322" width="5" height="3" rx="0.6" fill="#181228"/>
+<ellipse cx="845" cy="326" rx="1.0" ry="0.5" fill="#ffaa55" opacity="0.51" filter="url(#glow5)" class="lamp-flicker"/>
+
+<!-- LAMP 12 t=0.90  base(857,354) pole→(857,322) arm→(853,322) -->
+<line x1="857" y1="354" x2="857" y2="321" stroke="#131028" stroke-width="0.8"/>
+<path d="M 857 321 Q 855 317 853 322" stroke="#131028" stroke-width="0.7" fill="none"/>
+<ellipse cx="853" cy="322" rx="0.8" ry="0.4" fill="#ffaa55" opacity="0.45" filter="url(#glow5)" class="lamp-flicker"/>
+
+<!-- LAMP 13 t=0.93  base(862,343) pole→(862,318) arm→(860,318) -->
+<line x1="862" y1="343" x2="862" y2="317" stroke="#131028" stroke-width="0.7"/>
+<ellipse cx="860" cy="318" rx="0.6" ry="0.3" fill="#ffaa55" opacity="0.38" filter="url(#glow5)" class="lamp-flicker"/>
+
+<!-- LAMP 14 t=0.96  base(868,332) pole→(868,315) arm→(867,315) -->
+<line x1="868" y1="332" x2="868" y2="314" stroke="#131028" stroke-width="0.5"/>
+<ellipse cx="867" cy="315" rx="0.4" ry="0.2" fill="#ffaa55" opacity="0.30" filter="url(#glow5)" class="lamp-flicker"/>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!-- VENDING MACHINE — t≈0.42 on left road edge           -->
+<!-- Road at t=0.42: x=576, y=525. Machine beside road.   -->
+<!-- VP=(875,318).                                         -->
+<!-- Side face:  A(501,331) B(576,331) C(576,525) D(501,525) -->
+<!-- Top face:   A(501,331) B(576,331) E(616,329) G(541,330) -->
+<!-- Front face: B(576,331) E(616,329) F(616,497) C(576,525) -->
+<!-- ══════════════════════════════════════════════════════ -->
+<!-- VM shadow — moon is upper-left, shadow falls lower-right -->
+<polygon points="490,522 626,492 768,648 628,675" fill="#03010a" opacity="0.60" filter="url(#blur8)"/>
+
+<g id="vm-group" style="pointer-events:none">
+
+  <!-- blue floor glow in front of machine (road side) -->
+  <ellipse cx="660" cy="524" rx="120" ry="32" fill="#2299ff" opacity="0.20" filter="url(#blur40)" class="floor-pulse"/>
+  <!-- wider ambient pool on road in front -->
+  <ellipse cx="680" cy="528" rx="180" ry="50" fill="#1166cc" opacity="0.10" filter="url(#blur40)" class="floor-pulse"/>
+
+  <!-- ═══ TOP FACE ═══ A(501,331) B(576,331) E(616,329) G(541,330) -->
+  <polygon points="501,331 576,331 616,329 541,330" fill="#111311"/>
+  <line x1="501" y1="331" x2="576" y2="331" stroke="#1c1e1c" stroke-width="1.2"/>
+
+  <!-- ═══ SIDE FACE ═══ A(501,331) B(576,331) C(576,525) D(501,525) -->
+  <polygon points="501,331 576,331 576,525 501,525" fill="#161b16"/>
+  <polygon points="546,331 576,331 576,525 546,525" fill="#ffffff" opacity="0.016"/>
+
+  <!-- Fluorescent strip top -->
+  <rect x="504" y="333" width="69" height="7"  fill="#c8edd8" opacity="0.62"/>
+  <rect x="504" y="340" width="69" height="14" fill="#88c8a0" opacity="0.07" filter="url(#blur8)"/>
+
+  <!-- Large notice board -->
+  <rect x="505" y="348" width="49" height="90" fill="#202420"/>
+  <rect x="507" y="350" width="45" height="86" fill="#2d2c1e"/>
+  <rect x="507" y="350" width="45" height="11" fill="#7a0e0e"/>
+  <rect x="507" y="361" width="5"  height="75" fill="#5a0a0a" opacity="0.62"/>
+  <rect x="515" y="367" width="33" height="1.8" fill="#5a5238" rx="1" opacity="0.80"/>
+  <rect x="515" y="372" width="27" height="1.8" fill="#5a5238" rx="1" opacity="0.72"/>
+  <rect x="515" y="377" width="31" height="1.8" fill="#5a5238" rx="1" opacity="0.65"/>
+  <rect x="515" y="382" width="24" height="1.8" fill="#5a5238" rx="1" opacity="0.58"/>
+  <rect x="515" y="387" width="29" height="1.8" fill="#5a5238" rx="1" opacity="0.52"/>
+  <rect x="515" y="392" width="25" height="1.8" fill="#5a5238" rx="1" opacity="0.46"/>
+  <rect x="515" y="397" width="32" height="1.8" fill="#5a5238" rx="1" opacity="0.40"/>
+  <rect x="515" y="402" width="22" height="1.8" fill="#5a5238" rx="1" opacity="0.35"/>
+  <rect x="515" y="407" width="28" height="1.8" fill="#5a5238" rx="1" opacity="0.30"/>
+  <rect x="515" y="412" width="26" height="1.8" fill="#5a5238" rx="1" opacity="0.25"/>
+  <rect x="515" y="417" width="30" height="1.8" fill="#5a5238" rx="1" opacity="0.20"/>
+  <rect x="515" y="422" width="20" height="1.8" fill="#5a5238" rx="1" opacity="0.16"/>
+  <rect x="515" y="427" width="27" height="1.5" fill="#5a5238" rx="1" opacity="0.12"/>
+
+  <!-- Second notice board -->
+  <rect x="505" y="444" width="49" height="44" fill="#1b1f19"/>
+  <rect x="507" y="446" width="45" height="40" fill="#26281e"/>
+  <rect x="510" y="452" width="36" height="1.8" fill="#484838" rx="1" opacity="0.68"/>
+  <rect x="510" y="457" width="30" height="1.8" fill="#484838" rx="1" opacity="0.60"/>
+  <rect x="510" y="462" width="34" height="1.8" fill="#484838" rx="1" opacity="0.53"/>
+  <rect x="510" y="467" width="26" height="1.8" fill="#484838" rx="1" opacity="0.46"/>
+  <rect x="510" y="472" width="32" height="1.8" fill="#484838" rx="1" opacity="0.39"/>
+  <rect x="510" y="477" width="24" height="1.8" fill="#484838" rx="1" opacity="0.32"/>
+
+  <!-- Panel seam -->
+  <line x1="558" y1="333" x2="558" y2="519" stroke="#0e120e" stroke-width="1.2" opacity="0.62"/>
+
+  <!-- Right panel details -->
+  <rect x="560" y="349" width="13" height="35" fill="#101310" opacity="0.78"/>
+  <rect x="561" y="353" width="10" height="1.5" fill="#282818" rx="1"/>
+  <rect x="561" y="357" width="8"  height="1.5" fill="#282818" rx="1"/>
+  <rect x="561" y="361" width="9"  height="1.5" fill="#282818" rx="1"/>
+  <rect x="561" y="365" width="7"  height="1.5" fill="#282818" rx="1"/>
+  <rect x="561" y="369" width="9"  height="1.5" fill="#282818" rx="1"/>
+
+  <!-- Indicator lights -->
+  <circle cx="561" cy="394" r="2.2" fill="#00bb44" opacity="0.92" filter="url(#glow5)"/>
+  <circle cx="568" cy="394" r="2.2" fill="#880000" opacity="0.85"/>
+
+  <!-- Vent slots -->
+  <rect x="560" y="403" width="15" height="1.5" fill="#0c0e0c" rx="1"/>
+  <rect x="560" y="407" width="15" height="1.5" fill="#0c0e0c" rx="1"/>
+  <rect x="560" y="411" width="15" height="1.5" fill="#0c0e0c" rx="1"/>
+  <rect x="560" y="415" width="15" height="1.5" fill="#0c0e0c" rx="1"/>
+  <rect x="560" y="419" width="15" height="1.5" fill="#0c0e0c" rx="1"/>
+
+  <!-- Lower dispense panel (side) -->
+  <rect x="505" y="494" width="67" height="28" fill="#101210"/>
+  <line x1="505" y1="494" x2="572" y2="494" stroke="#0c0e0c" stroke-width="1.2"/>
+  <rect x="508" y="501" width="28" height="2"  fill="#080a08" rx="1"/>
+  <rect x="508" y="506" width="28" height="2"  fill="#080a08" rx="1"/>
+
+  <!-- Side face outline -->
+  <polygon points="501,331 576,331 576,525 501,525" fill="none" stroke="#232623" stroke-width="1"/>
+
+  <!-- ═══ FRONT FACE ═══ B(576,331) E(616,329) F(616,497) C(576,525) -->
+  <polygon points="576,331 616,329 616,497 576,525" fill="#161818"/>
+
+  <!-- Front top trim -->
+  <polygon points="576,331 616,329 616,337 576,340" fill="#191b19"/>
+
+  <!-- Display frame — perspective-correct (right side converges higher) -->
+  <polygon points="578,340 614,337 614,452 578,470" fill="#0e1010"/>
+  <!-- Inner display -->
+  <polygon points="580,342 612,339 612,451 580,467" fill="url(#vmDisplayG)" opacity="0.78"/>
+  <polygon points="580,342 612,339 612,451 580,467"
+           fill="none" stroke="rgba(160,200,220,0.14)" stroke-width="0.8"/>
+  <polygon points="580,342 612,339 612,350 580,356" fill="rgba(200,230,240,0.05)"/>
+
+  <!-- Product rows – perspective-correct: slope increases from ~-3px (top) to ~-16px (bottom) -->
+  <polygon points="580,345 612,342 612,351 580,355" fill="#1e4818"/>
+  <polygon points="580,357 612,353 612,362 580,367" fill="#b04010"/>
+  <polygon points="580,369 612,363 612,372 580,379" fill="#0a3070"/>
+  <polygon points="580,381 612,374 612,383 580,391" fill="#3a6888"/>
+  <polygon points="580,392 612,384 612,387 580,396" fill="#3a4a55"/>
+  <polygon points="580,397 612,388 612,395 580,405" fill="#c83400"/>
+  <polygon points="580,407 612,397 612,404 580,415" fill="#a08800"/>
+  <polygon points="580,417 612,406 612,413 580,425" fill="#145820"/>
+  <polygon points="580,427 612,415 612,422 580,435" fill="#082460"/>
+  <polygon points="580,436 612,423 612,427 580,440" fill="#3a4a55"/>
+  <polygon points="580,441 612,427 612,435 580,449" fill="#1e2820"/>
+  <polygon points="580,451 612,436 612,444 580,459" fill="#881010"/>
+  <polygon points="580,461 612,445 612,449 580,465" fill="#0e4870"/>
+
+  <!-- Control panel — perspective-correct -->
+  <polygon points="578,470 614,452 614,473 578,495" fill="#101212"/>
+  <polygon points="580,474 612,457 612,472 580,491" fill="#080a0a"/>
+  <!-- Coin slots – perspective-correct -->
+  <polygon points="582,478 600,468 600,470 582,480" fill="#060808"/>
+  <polygon points="582,482 600,472 600,474 582,484" fill="#060808"/>
+  <!-- Buttons – perspective-correct -->
+  <polygon points="582,486 587,483 587,486 582,489" fill="#1a1e1e"/>
+  <polygon points="590,486 595,483 595,486 590,489" fill="#1a1e1e"/>
+  <polygon points="598,486 603,483 603,486 598,489" fill="#1a1e1e"/>
+
+  <!-- Dispense slot — perspective-correct -->
+  <polygon points="578,495 614,473 614,480 578,502" fill="#0a0c0c"/>
+
+  <!-- Outlines -->
+  <polygon points="576,331 616,329 616,497 576,525" fill="none" stroke="#202424" stroke-width="0.8"/>
+  <polygon points="501,331 576,331 616,329 541,330" fill="none" stroke="#1a1c1a" stroke-width="0.7"/>
+
+  <!-- Moonlight shadow — cast from upper-left moon, falls right across ground/road -->
+  <!-- Near edge: machine base (501,525)→(616,500). Far tips projected from top corners. -->
+  <polygon points="501,525 616,500 960,550 749,580"
+           fill="url(#vmShadowG)" opacity="0.7" filter="url(#blur8)" pointer-events="none"/>
+
+  <!-- Blue display glow on front face -->
+  <polygon points="580,342 612,340 612,465 580,467" fill="#33aaff" opacity="0.25" filter="url(#blur8)" class="glow-pulse"/>
+  <!-- blue haze projecting forward (rightward) from front face only -->
+  <ellipse cx="650" cy="430" rx="90" ry="100" fill="#1188ff" opacity="0.08" filter="url(#blur40)" class="floor-pulse"/>
+
+  <!-- Hit area -->
+  <polygon id="vm-hit" points="501,329 616,329 616,500 576,525 501,525"
+           fill="rgba(0,0,0,0.002)"
+           pointer-events="all"
+           style="cursor:pointer"/>
+</g>
+
+
+<!-- ── ATMOSPHERE ── -->
+<rect width="1200" height="675" fill="url(#fogG)" pointer-events="none"/>
+<rect width="1200" height="675" fill="url(#vigG)" pointer-events="none"/>
+<!-- haze in distance -->
+<rect x="360" y="270" width="840" height="150" fill="#080418" opacity="0.22" filter="url(#blur20)" pointer-events="none"/>
+
+<!-- ── LEFT PANEL TEXT ── -->
+<g class="panel-text" filter="url(#textShadow)">
+  <text x="52" y="408" font-family="'COTN', sans-serif" font-size="52" fill="#52c3d1" filter="url(#tealGlow)">Jayden Kim's</text>
+  <text x="52" y="470" font-family="'COTN', sans-serif" font-size="52" fill="#52c3d1" filter="url(#tealGlow)">Art Portfolio</text>
+</g>
+<g class="panel-text-sub" filter="url(#textShadow)">
+  <text x="58" y="518" font-family="'COTN', sans-serif" font-size="22" fill="#52c3d1" opacity="0.60" filter="url(#tealGlow)">click the vending machine</text>
+</g>
+<!-- ── LEFT PANEL TEXT REFLECTION ── -->
+<g opacity="0.20" filter="url(#blur8)" transform="translate(0, 1050) scale(1, -1)">
+  <text x="52" y="408" font-family="'COTN', sans-serif" font-size="52" fill="#52c3d1">Jayden Kim's</text>
+  <text x="52" y="470" font-family="'COTN', sans-serif" font-size="52" fill="#52c3d1">Art Portfolio</text>
+  <text x="58" y="518" font-family="'COTN', sans-serif" font-size="22" fill="#52c3d1">click the vending machine</text>
+</g>
+</g>
+</svg>
+
+</div><!-- end #scene-view -->
+
+<!-- ════════════════════════════════════════ -->
+<!-- FRONT VIEW: first-person scene         -->
+<!-- ════════════════════════════════════════ -->
+<div id="front-view">
+
+  <button id="back-btn">
+    <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true">
+      <path d="M8.5 2L4 6.5L8.5 11" stroke="currentColor" stroke-width="1.4"
+            stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    return to night
+  </button>
+
+  <!-- ── IMMERSIVE FIRST-PERSON SCENE ── -->
+  <!-- viewBox: machine (x=460-740) centered, visible y≈-160 to 440 -->
+  <svg id="front-svg" viewBox="174 -120 853 600" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Sky atmosphere — same stop colors as main scene, coords in user-space for correct placement -->
+    <radialGradient id="fsg1" cx="600" cy="0"   r="600" gradientUnits="userSpaceOnUse">
+      <stop offset="0%"   stop-color="#e040a0" stop-opacity="0.72"/>
+      <stop offset="100%" stop-color="#0a0418" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="fsg2" cx="530" cy="-60" r="500" gradientUnits="userSpaceOnUse">
+      <stop offset="0%"   stop-color="#c020c8" stop-opacity="0.50"/>
+      <stop offset="100%" stop-color="#0a0418" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="fsg3" cx="720" cy="-80" r="450" gradientUnits="userSpaceOnUse">
+      <stop offset="0%"   stop-color="#d030b0" stop-opacity="0.40"/>
+      <stop offset="100%" stop-color="#0a0418" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="fsg4" cx="430" cy="100" r="380" gradientUnits="userSpaceOnUse">
+      <stop offset="0%"   stop-color="#4a1080" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#0a0418" stop-opacity="0"/>
+    </radialGradient>
+    <!-- Blue / indigo atmosphere — user-space so they land in the correct positions -->
+    <radialGradient id="fsg5" cx="1050" cy="120" r="480" gradientUnits="userSpaceOnUse">
+      <stop offset="0%"   stop-color="#1a40c8" stop-opacity="0.38"/>
+      <stop offset="100%" stop-color="#0a0418" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="fsg6" cx="100" cy="150" r="430" gradientUnits="userSpaceOnUse">
+      <stop offset="0%"   stop-color="#2030a8" stop-opacity="0.30"/>
+      <stop offset="100%" stop-color="#0a0418" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="fsg7" cx="660" cy="60" r="380" gradientUnits="userSpaceOnUse">
+      <stop offset="0%"   stop-color="#3050e0" stop-opacity="0.22"/>
+      <stop offset="100%" stop-color="#0a0418" stop-opacity="0"/>
+    </radialGradient>
+    <!-- VM display gradient -->
+    <linearGradient id="fDispG" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#cce8f8"/>
+      <stop offset="55%"  stop-color="#a8d4ec"/>
+      <stop offset="100%" stop-color="#90c2e0"/>
+    </linearGradient>
+    <!-- Vignette centred on visible viewport -->
+    <radialGradient id="fVigG" cx="600" cy="100" r="440" gradientUnits="userSpaceOnUse">
+      <stop offset="0%"   stop-color="#000000" stop-opacity="0"/>
+      <stop offset="60%"  stop-color="#000000" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0.55"/>
+    </radialGradient>
+    <filter id="fglow5" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="5" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="fb8"  x="-60%"  y="-60%"  width="220%" height="220%"><feGaussianBlur stdDeviation="8"/></filter>
+    <filter id="fb20" x="-120%" y="-120%" width="340%" height="340%"><feGaussianBlur stdDeviation="20"/></filter>
+    <filter id="fb40" x="-200%" y="-200%" width="500%" height="500%"><feGaussianBlur stdDeviation="40"/></filter>
+    <filter id="fdGlow" x="-150%" y="-150%" width="400%" height="400%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="9" result="b9"/>
+      <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="b3"/>
+      <feMerge><feMergeNode in="b9"/><feMergeNode in="b9"/><feMergeNode in="b3"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="fcoreGlow" x="-100%" y="-100%" width="300%" height="300%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="5" result="b5"/>
+      <feGaussianBlur in="SourceGraphic" stdDeviation="1.5" result="b1"/>
+      <feMerge><feMergeNode in="b5"/><feMergeNode in="b1"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- ══ SKY — photo background ══ -->
+  <rect x="0" y="-500" width="1200" height="1500" fill="#08001a"/>
+  <image x="174" y="-120" width="853" height="600" href="sky/sky-front.png" preserveAspectRatio="xMidYMid slice" style="filter:saturate(1.6)"/>
+  <!-- ══ BLINKING STARS (JS-generated, see script below) ══ -->
+
+  <!-- ══ STARS / DUST (JS injection disabled) ══ -->
+  <defs>
+    <clipPath id="fSkyClip"><rect x="0" y="-500" width="1200" height="790"/></clipPath>
+  </defs>
+  <g id="front-dust"/>
+  <g id="front-dust-core"/>
+  <g id="front-stars"/>
+
+  <!-- ══ CITY SKYLINE (sides of machine, horizon ≈ y 340) ══ -->
+  <!-- Left side x=174–460 -->
+  <rect x="180" y="290" width="52"  height="200" fill="#080a0d"/>
+  <rect x="238" y="268" width="45"  height="222" fill="#080a0d"/>
+  <rect x="289" y="302" width="38"  height="188" fill="#080a0d"/>
+  <rect x="333" y="274" width="55"  height="216" fill="#080a0d"/>
+  <rect x="394" y="286" width="48"  height="204" fill="#080a0d"/>
+  <rect x="448" y="308" width="42"  height="182" fill="#080a0d"/>
+  <rect x="210" y="310" width="18"  height="180" fill="#090b0e"/>
+  <rect x="368" y="295" width="14"  height="195" fill="#090b0e"/>
+  <!-- Right side x=740–1026 -->
+  <rect x="740" y="288" width="50"  height="202" fill="#080a0d"/>
+  <rect x="796" y="270" width="46"  height="220" fill="#080a0d"/>
+  <rect x="848" y="300" width="56"  height="190" fill="#080a0d"/>
+  <rect x="910" y="276" width="42"  height="214" fill="#080a0d"/>
+  <rect x="958" y="292" width="50"  height="198" fill="#080a0d"/>
+  <rect x="1014" y="310" width="40" height="180" fill="#080a0d"/>
+  <rect x="770" y="308" width="18"  height="182" fill="#090b0e"/>
+  <rect x="983" y="296" width="14"  height="194" fill="#090b0e"/>
+  <!-- Horizon glow behind skyline -->
+  <ellipse cx="320"  cy="345" rx="200" ry="55" fill="#9020c8" opacity="0.18" filter="url(#fb20)"/>
+  <ellipse cx="880"  cy="345" rx="200" ry="55" fill="#9020c8" opacity="0.18" filter="url(#fb20)"/>
+  <ellipse cx="600"  cy="345" rx="620" ry="80" fill="#c040c0" opacity="0.10" filter="url(#fb40)"/>
+  <!-- Building windows (JS injected) -->
+  <g id="front-wins"/>
+  <!-- Ground plane -->
+  <rect x="0" y="340" width="1200" height="400" fill="#0c0a12"/>
+  <rect x="0" y="340" width="1200" height="400" fill="url(#fsg4)" opacity="0.3"/>
+  <!-- Pink ground reflection near horizon -->
+  <rect x="0" y="340" width="1200" height="60" fill="#e030a0" opacity="0.06"/>
+  <!-- VM floor glow on ground -->
+  <ellipse cx="600" cy="350" rx="220" ry="30" fill="#88ccff" opacity="0.12" filter="url(#fb20)"/>
+
+  <!-- ══ VM DISPLAY ILLUMINATION ══ -->
+  <ellipse cx="600" cy="220" rx="310" ry="260" fill="#88ccff" opacity="0.16" filter="url(#fb40)"/>
+  <ellipse cx="600" cy="165" rx="165" ry="135" fill="#aaddff" opacity="0.11" filter="url(#fb20)"/>
+
+  <!-- ══ VENDING MACHINE (x=460-740, y=50-630, 280×580px) ══ -->
+  <!-- Body -->
+  <rect x="460" y="50"  width="280" height="580" rx="3"  fill="#8e9888"/>
+  <rect x="460" y="50"  width="7"   height="580" rx="3"  fill="#7a8475"/>
+  <rect x="733" y="50"  width="7"   height="580" rx="3"  fill="#7a8475"/>
+  <rect x="460" y="50"  width="280" height="4"   rx="2"  fill="#6e7870"/>
+
+  <!-- Header -->
+  <rect x="460" y="54"  width="280" height="46"          fill="#7c8877"/>
+  <rect x="460" y="99"  width="280" height="3"           fill="#4c5448"/>
+  <text x="600" y="81"  text-anchor="middle" font-family="'Noto Serif JP',serif" font-size="19" fill="rgba(222,242,255,0.93)" letter-spacing="8">作品集</text>
+  <text x="600" y="95"  text-anchor="middle" font-family="monospace,sans-serif"   font-size="7.5" fill="rgba(175,200,215,0.50)" letter-spacing="2">ART PORTFOLIO · JADYEN KIM</text>
+
+  <!-- Display bezel -->
+  <rect x="460" y="102" width="280" height="286"          fill="#3c4440"/>
+  <rect x="466" y="108" width="268" height="274" rx="1"   fill="#2e3432"/>
+  <!-- Display window -->
+  <rect x="468" y="110" width="264" height="272"          fill="url(#fDispG)"/>
+  <rect x="468" y="110" width="264" height="272"          fill="rgba(200,240,255,0.18)" filter="url(#fb8)"/>
+
+  <!-- ROW 1: tall bottles (y=114-192) -->
+  <rect x="472" y="114" width="61" height="78" rx="2" fill="#5a3010"/>  <rect x="472" y="114" width="61" height="9"  rx="2" fill="#7a4820"/>  <rect x="472" y="125" width="61" height="34"       fill="#d8c8a0"/>  <rect x="472" y="114" width="12" height="78" rx="2" fill="rgba(255,255,255,0.22)"/>
+  <rect x="537" y="114" width="61" height="78" rx="2" fill="#a02010"/>  <rect x="537" y="114" width="61" height="9"  rx="2" fill="#c83018"/>  <rect x="537" y="125" width="61" height="34"       fill="#f8e8e2"/>  <rect x="537" y="114" width="12" height="78" rx="2" fill="rgba(255,255,255,0.22)"/>
+  <rect x="602" y="114" width="61" height="78" rx="2" fill="#3060a8"/>  <rect x="602" y="114" width="61" height="9"  rx="2" fill="#608cc8"/>  <rect x="602" y="125" width="61" height="34"       fill="#d8ecf8"/>  <rect x="602" y="114" width="12" height="78" rx="2" fill="rgba(255,255,255,0.22)"/>
+  <rect x="667" y="114" width="61" height="78" rx="2" fill="#1e5c18"/>  <rect x="667" y="114" width="61" height="9"  rx="2" fill="#3a8030"/>  <rect x="667" y="125" width="61" height="34"       fill="#d0e8c4"/>  <rect x="667" y="114" width="12" height="78" rx="2" fill="rgba(255,255,255,0.22)"/>
+  <!-- Shelf 1 -->
+  <rect x="472" y="192" width="256" height="8" fill="#2a3230"/><rect x="472" y="192" width="256" height="1" fill="rgba(255,255,255,0.07)"/>
+
+  <!-- ROW 2: cans (y=200-257) -->
+  <rect x="472" y="200" width="61" height="57" rx="2" fill="#176020"/>  <rect x="472" y="200" width="61" height="7"  rx="2" fill="#228030"/>  <rect x="472" y="209" width="61" height="24"       fill="#e0f0e0"/>  <rect x="472" y="250" width="61" height="7"  rx="2" fill="#0a4814"/>  <rect x="472" y="200" width="12" height="57" rx="2" fill="rgba(255,255,255,0.20)"/>
+  <rect x="537" y="200" width="61" height="57" rx="2" fill="#a07808"/>  <rect x="537" y="200" width="61" height="7"  rx="2" fill="#c89810"/>  <rect x="537" y="209" width="61" height="24"       fill="#f8f0c0"/>  <rect x="537" y="250" width="61" height="7"  rx="2" fill="#785808"/>  <rect x="537" y="200" width="12" height="57" rx="2" fill="rgba(255,255,255,0.20)"/>
+  <rect x="602" y="200" width="61" height="57" rx="2" fill="#0c22a0"/>  <rect x="602" y="200" width="61" height="7"  rx="2" fill="#2848c8"/>  <rect x="602" y="209" width="61" height="24"       fill="#d0d8f8"/>  <rect x="602" y="250" width="61" height="7"  rx="2" fill="#081880"/>  <rect x="602" y="200" width="12" height="57" rx="2" fill="rgba(255,255,255,0.20)"/>
+  <rect x="667" y="200" width="61" height="57" rx="2" fill="#880c0c"/>  <rect x="667" y="200" width="61" height="7"  rx="2" fill="#b81818"/>  <rect x="667" y="209" width="61" height="24"       fill="#f8e0e0"/>  <rect x="667" y="250" width="61" height="7"  rx="2" fill="#600808"/>  <rect x="667" y="200" width="12" height="57" rx="2" fill="rgba(255,255,255,0.20)"/>
+  <!-- Shelf 2 -->
+  <rect x="472" y="257" width="256" height="8" fill="#2a3230"/><rect x="472" y="257" width="256" height="1" fill="rgba(255,255,255,0.07)"/>
+
+  <!-- ROW 3: cans/bottles (y=265-322) -->
+  <rect x="472" y="265" width="61" height="57" rx="2" fill="#1e4e18"/>  <rect x="472" y="265" width="61" height="7"  rx="2" fill="#306828"/>  <rect x="472" y="274" width="61" height="24"       fill="#d8e8c8"/>  <rect x="472" y="315" width="61" height="7"  rx="2" fill="#123010"/>  <rect x="472" y="265" width="12" height="57" rx="2" fill="rgba(255,255,255,0.20)"/>
+  <rect x="537" y="265" width="61" height="57" rx="2" fill="#940c0c"/>  <rect x="537" y="265" width="61" height="7"  rx="2" fill="#c41414"/>  <rect x="537" y="274" width="61" height="24"       fill="#f8dede"/>  <rect x="537" y="315" width="61" height="7"  rx="2" fill="#640808"/>  <rect x="537" y="265" width="12" height="57" rx="2" fill="rgba(255,255,255,0.20)"/>
+  <rect x="602" y="265" width="61" height="57" rx="2" fill="#6c7888"/>  <rect x="602" y="265" width="61" height="9"  rx="2" fill="#8898a8"/>  <rect x="602" y="276" width="61" height="24"       fill="#e8ecf0"/>  <rect x="602" y="315" width="61" height="7"  rx="2" fill="#525860"/>  <rect x="602" y="265" width="12" height="57" rx="2" fill="rgba(255,255,255,0.22)"/>
+  <rect x="667" y="265" width="61" height="57" rx="2" fill="#0c1460"/>  <rect x="667" y="265" width="61" height="7"  rx="2" fill="#1a2278"/>  <rect x="667" y="274" width="61" height="24"       fill="#ccd0f0"/>  <rect x="667" y="315" width="61" height="7"  rx="2" fill="#060c44"/>  <rect x="667" y="265" width="12" height="57" rx="2" fill="rgba(255,255,255,0.20)"/>
+
+  <!-- Display bottom panel -->
+  <rect x="468" y="322" width="264" height="60" fill="#182028"/>
+  <rect x="472" y="328" width="61"  height="20" rx="2" fill="#1e2c34"/>
+  <rect x="537" y="328" width="61"  height="20" rx="2" fill="#1e2c34"/>
+  <rect x="602" y="328" width="61"  height="20" rx="2" fill="#1e2c34"/>
+  <rect x="667" y="328" width="61"  height="20" rx="2" fill="#1e2c34"/>
+  <rect x="480" y="332" width="8"   height="8"  rx="1" fill="#0e1618"/>
+  <rect x="492" y="332" width="8"   height="8"  rx="1" fill="#0e1618"/>
+  <circle cx="548" cy="336" r="2.5" fill="#39ff14" opacity="0.9"/>
+  <rect x="609" y="332" width="8"   height="8"  rx="1" fill="#0e1618"/>
+  <rect x="674" y="332" width="8"   height="8"  rx="1" fill="#0e1618"/>
+  <rect x="472" y="354" width="256" height="12" rx="1" fill="#141e22"/>
+  <rect x="472" y="370" width="256" height="10" rx="1" fill="#0e1618"/>
+
+  <!-- BELOW DISPLAY: cork board (left) + control panel (right) -->
+  <rect x="460" y="388" width="168" height="86" fill="#8e9888"/>
+  <rect x="467" y="395" width="154" height="74" rx="3" fill="#c4a03c"/>
+  <rect x="467" y="395" width="154" height="74" rx="3" fill="#b89030" opacity="0.26"/>
+  <rect x="472" y="400" width="102" height="64" rx="2" fill="#f0ead0"/>
+  <rect x="478" y="397" width="22"  height="7"  rx="1" fill="rgba(218,212,198,0.78)" transform="rotate(-4 489 400)"/>
+  <rect x="540" y="397" width="22"  height="7"  rx="1" fill="rgba(218,212,198,0.78)" transform="rotate(5  551 400)"/>
+  <text x="523" y="417" text-anchor="middle" font-family="'Noto Serif JP',serif" font-size="9" fill="#3a2408" opacity="0.82">作品集</text>
+  <rect x="477" y="423" width="92"  height="2"  rx="1" fill="#9a8860" opacity="0.55"/>
+  <rect x="477" y="429" width="78"  height="2"  rx="1" fill="#9a8860" opacity="0.45"/>
+  <rect x="477" y="435" width="86"  height="2"  rx="1" fill="#9a8860" opacity="0.38"/>
+  <rect x="477" y="441" width="62"  height="2"  rx="1" fill="#9a8860" opacity="0.32"/>
+  <rect x="477" y="447" width="74"  height="2"  rx="1" fill="#9a8860" opacity="0.26"/>
+  <rect x="628" y="388" width="112" height="86" fill="#28302c"/>
+  <rect x="635" y="395" width="98"  height="40" rx="2" fill="#0a0e0c"/>
+  <rect x="643" y="427" width="58"  height="4"  rx="2" fill="#060a08"/>
+  <circle cx="690" cy="408" r="3.5" fill="#3af014" opacity="0.90"/>
+  <circle cx="700" cy="408" r="3.5" fill="#ff2055" opacity="0.85"/>
+  <rect x="718" y="399" width="8"   height="30" rx="3" fill="#141a18"/>
+  <rect x="718" y="408" width="8"   height="8"  rx="2" fill="#2a3430"/>
+
+  <!-- BUTTON ROW -->
+  <rect x="460" y="474" width="280" height="31" fill="#28302c"/>
+  <rect x="460" y="474" width="280" height="2"  fill="#141a18"/>
+  <rect x="467" y="481" width="38"  height="18" rx="2" fill="#181e1a"/>
+  <rect x="509" y="481" width="38"  height="18" rx="2" fill="#181e1a"/>
+  <rect x="551" y="481" width="38"  height="18" rx="2" fill="#181e1a"/>
+  <rect x="593" y="481" width="38"  height="18" rx="2" fill="#181e1a"/>
+  <rect x="635" y="481" width="38"  height="18" rx="2" fill="#181e1a"/>
+  <rect x="677" y="481" width="38"  height="18" rx="2" fill="#181e1a"/>
+  <circle cx="486" cy="490" r="2.5" fill="#2a3430"/>
+  <circle cx="528" cy="490" r="2.5" fill="#2a3430"/>
+  <circle cx="570" cy="490" r="2.5" fill="#2a3430"/>
+  <circle cx="612" cy="490" r="2.5" fill="#2a3430"/>
+  <circle cx="654" cy="490" r="2.5" fill="#2a3430"/>
+  <circle cx="696" cy="490" r="2.5" fill="#2a3430"/>
+
+  <!-- COIN SLOTS -->
+  <rect x="460" y="505" width="280" height="25" fill="#28302c"/>
+  <rect x="467" y="511" width="108" height="10" rx="4" fill="#060a08"/>
+  <rect x="581" y="511" width="108" height="10" rx="4" fill="#060a08"/>
+  <circle cx="708" cy="516" r="3.5" fill="#3af014" opacity="0.90"/>
+
+  <!-- DISPENSE TRAY -->
+  <rect x="460" y="530" width="280" height="42" rx="2" fill="#0a0e0c"/>
+  <rect x="460" y="530" width="280" height="3"  fill="#141a18"/>
+  <rect x="467" y="537" width="266" height="28" rx="1" fill="#040608"/>
+  <rect x="467" y="558" width="266" height="2"  fill="#141a18"/>
+
+  <!-- BASE TRIM -->
+  <rect x="460" y="572" width="280" height="58" fill="#7c8877"/>
+  <rect x="460" y="572" width="280" height="3"  fill="#4c5448"/>
+  <rect x="460" y="625" width="280" height="5"  fill="#5c6655"/>
+  <rect x="468" y="580" width="264" height="3"  rx="1" fill="#6c7668" opacity="0.55"/>
+  <rect x="468" y="587" width="264" height="3"  rx="1" fill="#6c7668" opacity="0.55"/>
+  <rect x="468" y="594" width="264" height="3"  rx="1" fill="#6c7668" opacity="0.55"/>
+  <rect x="468" y="601" width="264" height="3"  rx="1" fill="#6c7668" opacity="0.55"/>
+  <rect x="468" y="608" width="264" height="3"  rx="1" fill="#6c7668" opacity="0.55"/>
+  <rect x="468" y="615" width="264" height="3"  rx="1" fill="#6c7668" opacity="0.55"/>
+  <rect x="470" y="624" width="52"  height="6"  rx="2" fill="#5c6655"/>
+  <rect x="678" y="624" width="52"  height="6"  rx="2" fill="#5c6655"/>
+  <!-- Outline -->
+  <rect x="460" y="50"  width="280" height="580" rx="3" fill="none" stroke="#5c6655" stroke-width="1.5"/>
+
+  <!-- ══ DISPLAY ILLUMINATION (drawn on top of machine) ══ -->
+  <!-- Screen bloom — soft blue halo over the display face -->
+  <rect x="468" y="110" width="264" height="272" fill="#88d8ff" opacity="0.13" filter="url(#fb8)" class="glow-pulse"/>
+  <!-- Bezel edge glow -->
+  <rect x="462" y="104" width="276" height="284" rx="2" fill="none" stroke="#70c8f8" stroke-width="6" opacity="0.22" filter="url(#fb8)" class="glow-pulse"/>
+  <!-- Cast light bleeding onto left body panel -->
+  <rect x="460" y="108" width="12" height="276" fill="#70c8ff" opacity="0.32" filter="url(#fb8)" class="glow-pulse"/>
+  <!-- Cast light bleeding onto right body panel -->
+  <rect x="728" y="108" width="12" height="276" fill="#70c8ff" opacity="0.32" filter="url(#fb8)" class="glow-pulse"/>
+  <!-- Upward bloom from display top edge -->
+  <ellipse cx="600" cy="110" rx="130" ry="40" fill="#88d8ff" opacity="0.18" filter="url(#fb20)" class="glow-pulse"/>
+  <!-- Floor light pool — wide ambient -->
+  <ellipse cx="600" cy="365" rx="310" ry="45" fill="#66bbff" opacity="0.20" filter="url(#fb20)" class="floor-pulse"/>
+  <!-- Floor light pool — tight bright core -->
+  <ellipse cx="600" cy="358" rx="180" ry="22" fill="#aae4ff" opacity="0.18" filter="url(#fb8)" class="floor-pulse"/>
+  <!-- Green LED glow (control panel) -->
+  <ellipse cx="690" cy="408" rx="22" ry="14" fill="#3af014" opacity="0.30" filter="url(#fb8)"/>
+  <!-- Red LED glow (control panel) -->
+  <ellipse cx="700" cy="408" rx="22" ry="14" fill="#ff2055" opacity="0.26" filter="url(#fb8)"/>
+  <!-- Green LED glow (coin slot) -->
+  <ellipse cx="708" cy="516" rx="18" ry="11" fill="#3af014" opacity="0.28" filter="url(#fb8)"/>
+
+  <!-- ══ ATMOSPHERE / VIGNETTE ══ -->
+  <rect x="0" y="-500" width="1200" height="1500" fill="url(#fVigG)"/>
+  </svg>
+
+</div><!-- front-view -->
+
+<script>
+// ── STAR GENERATION + MILKY WAY ──
+(function () {
+  const g  = document.getElementById('stars');
+  const ns = 'http://www.w3.org/2000/svg';
+  function mkStar(x, y, r, fill, lo, hi) {
+    const dur = (Math.random() * 4 + 2).toFixed(1) + 's';
+    const dly = (Math.random() * 7).toFixed(1) + 's';
+    const c = document.createElementNS(ns, 'circle');
+    c.setAttribute('cx', x); c.setAttribute('cy', y); c.setAttribute('r', r);
+    c.setAttribute('fill', fill); c.setAttribute('class', 'star');
+    c.style.setProperty('--dur', dur); c.style.setProperty('--dly', dly);
+    c.style.setProperty('--lo', lo);   c.style.setProperty('--hi', hi);
+    g.appendChild(c);
+  }
+  // background stars
+  const pal = ['#ffffff','#ffeeff','#ffddff','#ffccff','#eeddff','#ffffff','#ffffff','#fffaff'];
+  for (let i = 0; i < 520; i++) {
+    const x = Math.random() * 1200;
+    const y = Math.random() * 310;
+    const big = Math.random() < 0.14;
+    const r = big ? Math.random() * 1.6 + 1.0 : Math.random() * 0.8 + 0.2;
+    const fill = pal[Math.floor(Math.random() * pal.length)];
+    mkStar(x, y, r, fill, (Math.random()*0.18+0.08).toFixed(2), (Math.random()*0.65+0.45).toFixed(2));
+  }
+  // milky way cluster — denser bright pink-white stars along the band
+  // band centerline: (0,295)→(1200,75), parametric: cx=t*1200, cy=295-t*220
+  const mwPal = ['#ffffff','#ffeeFF','#ffddff','#ffe8ff','#ffffff'];
+  for (let i = 0; i < 380; i++) {
+    const t  = Math.random();
+    const bx = t * 1200;
+    const by = 295 - t * 220;
+    const spread = 52;
+    const x = bx + (Math.random() - 0.5) * spread * 2;
+    const y = by + (Math.random() - 0.5) * spread;
+    if (y < 0 || y > 310) continue;
+    const r    = Math.random() < 0.12 ? Math.random() * 1.4 + 0.8 : Math.random() * 0.7 + 0.15;
+    const fill = mwPal[Math.floor(Math.random() * mwPal.length)];
+    mkStar(x, y, r, fill, (Math.random()*0.22+0.12).toFixed(2), (Math.random()*0.70+0.50).toFixed(2));
+  }
+})();
+
+// ── FRONT VIEW STARS (disabled) ──
+/* (function () {
+  const g  = document.getElementById('front-stars');
+  const ns = 'http://www.w3.org/2000/svg';
+  const pal   = ['#ffffff','#ffeeff','#ffddff','#ffccff','#eeddff','#ffffff','#fffaff'];
+  const mwPal = ['#ffffff','#ffeeFF','#ffddff','#ffe8ff','#ffffff'];
+  function mk(x, y, r, fill, lo, hi) {
+    const dur = (Math.random() * 4 + 2).toFixed(1) + 's';
+    const dly = (Math.random() * 7).toFixed(1) + 's';
+    const c = document.createElementNS(ns, 'circle');
+    c.setAttribute('cx', x); c.setAttribute('cy', y); c.setAttribute('r', r);
+    c.setAttribute('fill', fill); c.setAttribute('class', 'star');
+    c.style.setProperty('--dur', dur); c.style.setProperty('--dly', dly);
+    c.style.setProperty('--lo', lo);   c.style.setProperty('--hi', hi);
+    g.appendChild(c);
+  }
+  // background stars — same coordinate space as main scene (y < 310)
+  for (let i = 0; i < 520; i++) {
+    const x = Math.random() * 1200;
+    const y = Math.random() * 310;
+    const big = Math.random() < 0.14;
+    const r = big ? Math.random() * 1.6 + 1.0 : Math.random() * 0.8 + 0.2;
+    const fill = pal[Math.floor(Math.random() * pal.length)];
+    mk(x, y, r, fill, (Math.random()*0.18+0.08).toFixed(2), (Math.random()*0.65+0.45).toFixed(2));
+  }
+  // milky way cluster — same band as main scene: (0,295)→(1200,75)
+  for (let i = 0; i < 380; i++) {
+    const t  = Math.random();
+    const bx = t * 1200;
+    const by = 295 - t * 220;
+    const spread = 52;
+    const x = bx + (Math.random() - 0.5) * spread * 2;
+    const y = by + (Math.random() - 0.5) * spread;
+    if (y < 0 || y > 310) continue;
+    const r    = Math.random() < 0.12 ? Math.random() * 1.4 + 0.8 : Math.random() * 0.7 + 0.15;
+    const fill = mwPal[Math.floor(Math.random() * mwPal.length)];
+    mk(x, y, r, fill, (Math.random()*0.22+0.12).toFixed(2), (Math.random()*0.70+0.50).toFixed(2));
+  }
+})(); */
+
+// ── COSMIC DUST (disabled) ──
+/* (function () {
+  const ns = 'http://www.w3.org/2000/svg';
+
+  function mkP(g, x, y, r, fill, lo, hi) {
+    const dur = (Math.random() * 3 + 1).toFixed(1) + 's';
+    const dly = (Math.random() * 6).toFixed(1) + 's';
+    const c = document.createElementNS(ns, 'circle');
+    c.setAttribute('cx', x); c.setAttribute('cy', y); c.setAttribute('r', r);
+    c.setAttribute('fill', fill); c.setAttribute('class', 'star');
+    c.style.setProperty('--dur', dur); c.style.setProperty('--dly', dly);
+    c.style.setProperty('--lo', lo.toFixed(2));
+    c.style.setProperty('--hi', hi.toFixed(2));
+    g.appendChild(c);
+  }
+
+  function bandPoint(spread) {
+    const t = Math.random();
+    return [
+      t * 1200 + (Math.random() - 0.5) * spread * 2,
+      (295 - t * 220) + (Math.random() - 0.5) * spread
+    ];
+  }
+
+  const outerPal = [
+    '#ff00cc','#ff22dd','#ee00bb','#dd00aa','#cc00ff',
+    '#aa00ee','#ff44cc','#ff88dd','#ffffff','#ffaaee',
+    '#ff00bb','#ff33cc','#ee22cc','#bb00cc','#ffffff'
+  ];
+  const corePal = [
+    '#ffffff','#ffffff','#ffffff','#ffe8ff',
+    '#ff88ff','#ff44ee','#ffccff','#ffffff'
+  ];
+
+  function populateBand(outer, core) {
+    for (let i = 0; i < 3000; i++) {
+      let x, y;
+      if (Math.random() < 0.80) {
+        const spread = Math.random() < 0.55 ? 40 : 95;
+        [x, y] = bandPoint(spread);
+      } else {
+        x = Math.random() * 1200;
+        y = Math.random() * 310;
+      }
+      if (y < 0 || y > 310) continue;
+      const big = Math.random() < 0.12;
+      const r   = big ? Math.random() * 2.0 + 1.0 : Math.random() * 1.0 + 0.25;
+      const fill = outerPal[Math.floor(Math.random() * outerPal.length)];
+      mkP(outer, x, y, r, fill, Math.random() * 0.2 + 0.35, Math.random() * 0.2 + 0.78);
+    }
+    for (let i = 0; i < 1200; i++) {
+      const spread = Math.random() < 0.65 ? 14 : 32;
+      const [x, y] = bandPoint(spread);
+      if (y < 0 || y > 310) continue;
+      const big = Math.random() < 0.18;
+      const r   = big ? Math.random() * 2.2 + 1.2 : Math.random() * 1.1 + 0.5;
+      const fill = corePal[Math.floor(Math.random() * corePal.length)];
+      mkP(core, x, y, r, fill, Math.random() * 0.1 + 0.60, Math.random() * 0.05 + 0.94);
+    }
+  }
+
+  const outer = document.getElementById('dust');
+  const core  = document.getElementById('dust-core');
+  if (outer && core) populateBand(outer, core);
+
+  const fouter = document.getElementById('front-dust');
+  const fcore  = document.getElementById('front-dust-core');
+  if (fouter && fcore) populateBand(fouter, fcore);
+})(); */
+
+// ── FRONT VIEW BUILDING WINDOWS ──
+(function () {
+  const ns = 'http://www.w3.org/2000/svg';
+  const g = document.getElementById('front-wins');
+  if (!g) return;
+  const warm = ['#f5d065','#ffe488','#f2b855','#fffaaa','#ffc85a','#e8c8ff','#d8b0ff','#fde8a0','#ffddaa'];
+  const blds = [
+    [180,290,52,200],[238,268,45,222],[289,302,38,188],[333,274,55,216],
+    [394,286,48,204],[448,308,42,182],[210,310,18,180],[368,295,14,195],
+    [740,288,50,202],[796,270,46,220],[848,300,56,190],[910,276,42,214],
+    [958,292,50,198],[1014,310,40,180],[770,308,18,182],[983,296,14,194],
+  ];
+  blds.forEach(([bx, by, bw, bh]) => {
+    const cols = Math.max(2, Math.floor(bw / 7));
+    const rows = Math.max(3, Math.floor(bh / 11));
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        if (Math.random() > 0.45) continue;
+        const wx = bx + 3 + c * (bw - 6) / Math.max(cols - 1, 1);
+        const wy = by + 4 + r * (bh - 8) / Math.max(rows - 1, 1);
+        if (wy >= 338) continue;
+        const el = document.createElementNS(ns, 'rect');
+        el.setAttribute('x', wx.toFixed(1));
+        el.setAttribute('y', wy.toFixed(1));
+        el.setAttribute('width',  Math.random() < 0.28 ? '3' : '2');
+        el.setAttribute('height', Math.random() < 0.28 ? '4' : '3');
+        el.setAttribute('fill', warm[Math.floor(Math.random() * warm.length)]);
+        el.setAttribute('class', 'star');
+        el.style.setProperty('--dur', (Math.random() * 5 + 2).toFixed(1) + 's');
+        el.style.setProperty('--dly', (Math.random() * 10).toFixed(1) + 's');
+        el.style.setProperty('--lo',  (Math.random() * 0.08 + 0.03).toFixed(2));
+        el.style.setProperty('--hi',  (Math.random() * 0.35 + 0.60).toFixed(2));
+        g.appendChild(el);
+      }
+    }
+  });
+})();
+
+// ── BLINKING STARS ──
+(function () {
+  const ns = 'http://www.w3.org/2000/svg';
+  const pal = ['#ffffff','#ffeeff','#ffddff','#ffccff','#ffffff','#fffaff','#ffffff'];
+  function fill(gId, count, x0, xw, y0, yh) {
+    const g = document.getElementById(gId);
+    if (!g) return;
+    for (let i = 0; i < count; i++) {
+      const c = document.createElementNS(ns, 'circle');
+      c.setAttribute('cx', (x0 + Math.random() * xw).toFixed(1));
+      c.setAttribute('cy', (y0 + Math.random() * yh).toFixed(1));
+      c.setAttribute('r',  (Math.random() * 1.2 + 0.3).toFixed(1));
+      c.setAttribute('fill', pal[Math.floor(Math.random() * pal.length)]);
+      c.setAttribute('class', 'star');
+      c.style.setProperty('--dur', (Math.random() * 3 + 2).toFixed(1) + 's');
+      c.style.setProperty('--dly', (Math.random() * 9).toFixed(1) + 's');
+      c.style.setProperty('--lo',  (Math.random() * 0.08 + 0.02).toFixed(2));
+      c.style.setProperty('--hi',  (Math.random() * 0.45 + 0.55).toFixed(2));
+      g.appendChild(c);
+    }
+  }
+  fill('stars',       100, 0,   1200, 0,   310);
+  fill('front-stars', 100, 174,  853, -100, 430);
+})();
+
+// ── CITY BUILDINGS + WINDOWS ──
+(function () {
+  const ns = 'http://www.w3.org/2000/svg';
+  const bldG = document.getElementById('city-buildings');
+  const winG = document.getElementById('city-windows');
+  const HORIZON = 318;
+
+  // [x, width, height]
+  const defs = [
+    // left extension x=0..275
+    [0,44,88],[48,58,122],[110,38,68],[152,50,105],[206,42,82],[250,36,60],
+    // original buildings
+    [275,52,118],[332,36,72],[373,58,132],[436,42,96],
+    [483,54,158],[542,40,106],[587,66,148],[658,46,84],
+    [709,50,122],[764,44,98],[813,60,134],[878,46,76],
+    [929,64,120],[998,50,90],[1053,56,114],[1114,54,92],[1173,46,70],
+    // narrower accent buildings (original)
+    [310,20,88],[358,16,62],[420,18,78],[466,18,68],
+    [620,22,105],[695,18,68],[742,24,68],[798,16,75],
+    [856,20,98],[918,18,58],[986,20,72],[1040,16,82],[1100,18,65],[1160,20,55],
+    // left accent fillers
+    [22,16,72],[80,18,95],[132,20,58],[178,16,68],[228,18,75],
+  ];
+
+  const warmPalette = ['#f5d065','#ffe488','#f2b855','#fffaaa','#ffc85a','#e8c8ff','#d8b0ff','#cc99ff','#fde8a0','#f0d8ff'];
+
+  function mk(tag) { return document.createElementNS(ns, tag); }
+
+  defs.forEach(([bx, bw, bh]) => {
+    const by = HORIZON - bh;
+
+    // building silhouette
+    const rect = mk('rect');
+    rect.setAttribute('x', bx); rect.setAttribute('y', by);
+    rect.setAttribute('width', bw); rect.setAttribute('height', bh);
+    rect.setAttribute('fill', '#090b0d');
+    bldG.appendChild(rect);
+
+    // slight purple top gradient suggestion
+    const topRect = mk('rect');
+    topRect.setAttribute('x', bx); topRect.setAttribute('y', by);
+    topRect.setAttribute('width', bw); topRect.setAttribute('height', Math.min(bh * 0.3, 30));
+    topRect.setAttribute('fill', '#0d0a14'); topRect.setAttribute('opacity', '0.6');
+    bldG.appendChild(topRect);
+
+    // windows — small, dense, distant-city look
+    const colSpacing = Math.max(5, Math.floor(bw / Math.max(3, Math.floor(bw / 8))));
+    const rowSpacing = Math.max(7, Math.floor(bh / Math.max(3, Math.floor(bh / 10))));
+    for (let wy = by + 3; wy < by + bh - 4; wy += rowSpacing) {
+      for (let wx = bx + 2; wx < bx + bw - 2; wx += colSpacing) {
+        if (Math.random() < 0.42) {
+          const ww = Math.random() < 0.25 ? 3 : 2;
+          const wh = Math.random() < 0.25 ? 4 : 3;
+          const fill = warmPalette[Math.floor(Math.random() * warmPalette.length)];
+          const op = (0.4 + Math.random() * 0.6).toFixed(2);
+          const w = mk('rect');
+          w.setAttribute('x', wx); w.setAttribute('y', wy);
+          w.setAttribute('width', ww); w.setAttribute('height', wh);
+          w.setAttribute('fill', fill); w.setAttribute('opacity', op);
+          if (Math.random() < 0.16) {
+            w.setAttribute('class', 'city-win');
+            const lo = (parseFloat(op) * 0.3).toFixed(2);
+            w.style.setProperty('--dur', (2 + Math.random() * 5).toFixed(1) + 's');
+            w.style.setProperty('--dly', (Math.random() * 9).toFixed(1) + 's');
+            w.style.setProperty('--lo', lo);
+            w.style.setProperty('--hi', op);
+          }
+          winG.appendChild(w);
+        }
+      }
+    }
+
+    // rooftop blink light (40% chance)
+    if (Math.random() < 0.4 && bh > 80) {
+      const dot = mk('circle');
+      dot.setAttribute('cx', bx + bw / 2);
+      dot.setAttribute('cy', by - 2);
+      dot.setAttribute('r', '2');
+      dot.setAttribute('fill', '#ff2222');
+      dot.setAttribute('class', 'roof-blink');
+      dot.style.setProperty('--dly', (Math.random() * 3).toFixed(1) + 's');
+      winG.appendChild(dot);
+    }
+  });
+})();
+
+// ── RANDOM STAR SHINE ──
+(function () {
+  const ns = 'http://www.w3.org/2000/svg';
+  function spawnShine(x, y, parentId) {
+    const svg = document.getElementById(parentId === 'stars' ? 'scene-svg' : 'front-svg');
+    if (!svg) return;
+    const star = document.createElementNS(ns, 'circle');
+    star.setAttribute('cx', x);
+    star.setAttribute('cy', y);
+    const r = Math.random() * 2.5 + 2.5;
+    star.setAttribute('r', r.toFixed(1));
+    star.setAttribute('fill', '#ffffff');
+    star.setAttribute('filter', 'url(#glow5)');
+    star.style.opacity = '0';
+    star.style.transition = 'opacity 0.35s ease-in-out';
+    svg.appendChild(star);
+    // 4-point cross rays
+    const cross = document.createElementNS(ns, 'g');
+    const len = Math.random() * 18 + 14;
+    [0, 90, 45, 135].forEach(angle => {
+      const line = document.createElementNS(ns, 'line');
+      const rad = angle * Math.PI / 180;
+      const thisLen = angle % 90 === 0 ? len : len * 0.55;
+      line.setAttribute('x1', (x - Math.cos(rad) * thisLen).toFixed(1));
+      line.setAttribute('y1', (y - Math.sin(rad) * thisLen).toFixed(1));
+      line.setAttribute('x2', (x + Math.cos(rad) * thisLen).toFixed(1));
+      line.setAttribute('y2', (y + Math.sin(rad) * thisLen).toFixed(1));
+      line.setAttribute('stroke', '#ffffff');
+      line.setAttribute('stroke-width', angle % 90 === 0 ? '1.2' : '0.7');
+      line.style.opacity = '0';
+      line.style.transition = 'opacity 0.35s ease-in-out';
+      cross.appendChild(line);
+    });
+    svg.appendChild(cross);
+    requestAnimationFrame(() => {
+      star.style.opacity = '1';
+      cross.querySelectorAll('line').forEach(l => l.style.opacity = '0.9');
+    });
+    setTimeout(() => {
+      star.style.opacity = '0';
+      cross.querySelectorAll('line').forEach(l => l.style.opacity = '0');
+      setTimeout(() => { star.remove(); cross.remove(); }, 400);
+    }, 700 + Math.random() * 500);
+  }
+
+  function scheduleShine() {
+    const delay = 1500 + Math.random() * 3000;
+    setTimeout(() => {
+      const x = (Math.random() * 1150 + 25).toFixed(1);
+      const y = (Math.random() * 290 + 10).toFixed(1);
+      spawnShine(x, y, 'stars');
+      scheduleShine();
+    }, delay);
+  }
+  scheduleShine();
+})();
+
+// ── SHOOTING STARS ──
+(function () {
+  const ns = 'http://www.w3.org/2000/svg';
+  let gradId = 0;
+
+  // cfg: { svgId, groupId, glowFilter, x0, xw, y0, yh }
+  function spawnShootingStar(cfg) {
+    const svg = document.getElementById(cfg.svgId);
+    if (!svg) return;
+
+    const angleDeg = 28 + Math.random() * 22;
+    const tailLen  = 90  + Math.random() * 110;
+    const dist     = 220 + Math.random() * 280;
+    const duration = 700 + Math.random() * 500;
+
+    const sx = cfg.x0 + Math.random() * cfg.xw;
+    const sy = cfg.y0 + Math.random() * cfg.yh;
+    const dx = Math.cos(angleDeg * Math.PI / 180);
+    const dy = Math.sin(angleDeg * Math.PI / 180);
+
+    // Gradient fixed in local space — tail at (-tailLen,0), head at (0,0)
+    // userSpaceOnUse coords are in the element's local coordinate system,
+    // so they stay aligned with the line as the group moves.
+    const gid  = 'ssg' + (gradId++);
+    const defs = svg.querySelector('defs');
+    const grad = document.createElementNS(ns, 'linearGradient');
+    grad.setAttribute('id', gid);
+    grad.setAttribute('gradientUnits', 'userSpaceOnUse');
+    grad.setAttribute('x1', -tailLen); grad.setAttribute('y1', 0);
+    grad.setAttribute('x2', 0);        grad.setAttribute('y2', 0);
+    const s0 = document.createElementNS(ns, 'stop');
+    s0.setAttribute('offset', '0%'); s0.setAttribute('stop-color', '#ffffff'); s0.setAttribute('stop-opacity', '0');
+    const s1 = document.createElementNS(ns, 'stop');
+    s1.setAttribute('offset', '100%'); s1.setAttribute('stop-color', '#ffffff'); s1.setAttribute('stop-opacity', '1');
+    grad.appendChild(s0); grad.appendChild(s1);
+    defs.appendChild(grad);
+
+    // Group holds line + head in local space; only its transform changes each frame
+    const container = document.getElementById(cfg.groupId) || svg;
+    const g = document.createElementNS(ns, 'g');
+
+    const line = document.createElementNS(ns, 'line');
+    line.setAttribute('x1', -tailLen); line.setAttribute('y1', 0);
+    line.setAttribute('x2', 0);        line.setAttribute('y2', 0);
+    line.setAttribute('stroke', 'url(#' + gid + ')');
+    line.setAttribute('stroke-width', '1.5');
+    line.setAttribute('stroke-linecap', 'round');
+    g.appendChild(line);
+
+    const head = document.createElementNS(ns, 'circle');
+    head.setAttribute('cx', 0); head.setAttribute('cy', 0); head.setAttribute('r', '2');
+    head.setAttribute('fill', '#ffffff');
+    head.setAttribute('filter', 'url(#' + cfg.glowFilter + ')');
+    g.appendChild(head);
+
+    container.appendChild(g);
+
+    // CSS animation handles opacity — zero JS overhead for fade
+    const fadeKf = [
+      { opacity: 0 },
+      { opacity: 1, offset: 0.08 },
+      { opacity: 1, offset: 0.75 },
+      { opacity: 0 }
+    ];
+    g.animate(fadeKf, { duration, fill: 'forwards', easing: 'linear' });
+
+    // Only 1 attribute change per frame: the group transform
+    const t0 = performance.now();
+    function tick(now) {
+      const p  = Math.min((now - t0) / duration, 1);
+      const hx = (sx + dx * dist * p).toFixed(1);
+      const hy = (sy + dy * dist * p).toFixed(1);
+      g.setAttribute('transform', `translate(${hx},${hy}) rotate(${angleDeg})`);
+      if (p < 1) { requestAnimationFrame(tick); }
+      else { g.remove(); grad.remove(); }
+    }
+    requestAnimationFrame(tick);
+  }
+
+  function makeScheduler(cfg) {
+    function run() {
+      const delay = 2000 + Math.random() * 4000;
+      setTimeout(() => { spawnShootingStar(cfg); run(); }, delay);
+    }
+    setTimeout(run, 1000 + Math.random() * 2000);
+  }
+
+  // Main scene sky: x 30–930, y 15–175
+  makeScheduler({ svgId: 'scene-svg', groupId: 'stars', glowFilter: 'glow5',
+                  x0: 30, xw: 900, y0: 15, yh: 160 });
+
+  // Front view sky: x 200–980, y -100 to 180 (above horizon ~310)
+  makeScheduler({ svgId: 'front-svg', groupId: 'front-stars', glowFilter: 'fglow5',
+                  x0: 200, xw: 780, y0: -100, yh: 280 });
+})();
+
+// ── VM CLICK HANDLING ──
+const vmHit    = document.getElementById('vm-hit');
+const frontView = document.getElementById('front-view');
+const backBtn   = document.getElementById('back-btn');
+
+function openVending() {
+  frontView.classList.add('visible');
+}
+
+function closeVending() {
+  frontView.classList.remove('visible');
+}
+
+vmHit.addEventListener('click',   openVending);
+vmHit.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openVending(); } });
+backBtn.addEventListener('click',    closeVending);
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeVending(); });
+</script>
+</body>
+</html>
