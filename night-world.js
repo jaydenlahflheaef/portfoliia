@@ -176,7 +176,7 @@
   if (matchMedia('(hover: hover) and (pointer: fine)').matches) {
     const cur = byId('cursor');
     const dot = cur.querySelector('.cursor-dot');
-    const ring = cur.querySelector('.cursor-ring');
+    const follow = cur.querySelector('.cursor-follow');
     const HOT = 'a, button, [role="button"], #vm-hit, input, select, textarea';
     let mx = innerWidth / 2, my = innerHeight / 2, rx = mx, ry = my, running = false;
     body.classList.add('has-cursor');
@@ -186,7 +186,7 @@
       rx += (mx - rx) * k;
       ry += (my - ry) * k;
       dot.style.transform = `translate3d(${mx}px, ${my}px, 0)`;
-      ring.style.transform = `translate3d(${rx}px, ${ry}px, 0)`;
+      follow.style.transform = `translate3d(${rx}px, ${ry}px, 0)`;
       // keep going only while the ring is still catching up
       if (Math.abs(mx - rx) > 0.1 || Math.abs(my - ry) > 0.1) requestAnimationFrame(tick);
       else running = false;

@@ -243,38 +243,69 @@ body[data-still="true"][data-view="street"] #machine-cue { opacity: .9; }
 #street-footnote { bottom: 4.8vh; }
 
 /* ── custom cursor ──
-   Dot follows the pointer exactly, ring eases behind it. Both are driven by a
-   single rAF writing translate3d only — never left/top, which would relayout
-   on every mouse move. Hidden entirely for touch/coarse pointers and when the
-   pointer leaves the window. */
+   A point of starlight with a halo trailing behind it. One rAF writes
+   translate3d on .cursor-dot and .cursor-follow only — never left/top, which
+   would relayout on every pointer event — so the ring's own scale/rotate
+   transforms stay free for hover.
+
+   No mix-blend-mode: the pointer crosses both the near-black sky and the pale
+   mint cabinet, and screen blending would wash the cursor out to nothing on
+   the machine. Instead the core carries a dark hairline that defines it on
+   light surfaces and a warm bloom that carries it on dark ones. */
 #cursor { position: fixed; inset: 0; z-index: 90; pointer-events: none;
-  opacity: 0; transition: opacity .35s ease; }
+  opacity: 0; transition: opacity .4s ease; }
 #cursor.awake { opacity: 1; }
-.cursor-dot, .cursor-ring {
-  position: absolute; top: 0; left: 0; border-radius: 50%;
-  will-change: transform; pointer-events: none;
-}
+.cursor-dot, .cursor-follow { position: absolute; top: 0; left: 0; will-change: transform; }
+
 .cursor-dot {
-  width: 6px; height: 6px; margin: -3px 0 0 -3px;
-  background: #fff4ff; box-shadow: 0 0 10px 2px rgba(247,196,255,.85);
+  width: 6px; height: 6px; margin: -3px 0 0 -3px; border-radius: 50%;
+  background: radial-gradient(closest-side, #fffdf6, #ffe9c9);
+  box-shadow: 0 0 0 1px rgba(38,18,58,.38),          /* reads on the pale cabinet */
+              0 0 7px 1px rgba(255,226,255,.9),      /* reads on the night sky */
+              0 0 18px 5px rgba(206,130,255,.42);
+  transition: width .3s cubic-bezier(.22,.7,.2,1), height .3s cubic-bezier(.22,.7,.2,1),
+              margin .3s cubic-bezier(.22,.7,.2,1);
 }
+/* the halo: a soft gradient band, no hard border to catch the eye */
 .cursor-ring {
-  width: 34px; height: 34px; margin: -17px 0 0 -17px;
-  border: 1px solid rgba(240,214,255,.55);
-  box-shadow: 0 0 18px rgba(190,120,255,.28), inset 0 0 14px rgba(190,120,255,.18);
-  transition: width .28s ease, height .28s ease, margin .28s ease,
-              border-color .28s ease, background-color .28s ease;
+  position: absolute; left: 0; top: 0; width: 38px; height: 38px;
+  margin: -19px 0 0 -19px; border-radius: 50%;
+  background: radial-gradient(closest-side,
+    rgba(228,196,255,0) 54%, rgba(228,196,255,.16) 70%,
+    rgba(236,208,255,.34) 84%, rgba(236,208,255,0) 100%);
+  transition: transform .38s cubic-bezier(.22,.7,.2,1), background .38s ease;
 }
-/* over anything interactive the ring opens up and warms */
+/* a four-point glint on interactive things — echoes the ✳ in the wordmark */
+.cursor-glint {
+  position: absolute; left: 0; top: 0; width: 56px; height: 56px;
+  margin: -28px 0 0 -28px; opacity: 0;
+  background:
+    linear-gradient(90deg, transparent 47.5%, rgba(255,236,199,.85) 50%, transparent 52.5%),
+    linear-gradient(180deg, transparent 47.5%, rgba(255,236,199,.85) 50%, transparent 52.5%);
+  -webkit-mask-image: radial-gradient(closest-side, #000 4%, rgba(0,0,0,.5) 34%, transparent 72%);
+          mask-image: radial-gradient(closest-side, #000 4%, rgba(0,0,0,.5) 34%, transparent 72%);
+  transform: rotate(-45deg) scale(.45);
+  transition: opacity .3s ease, transform .5s cubic-bezier(.22,.7,.2,1);
+}
+/* over anything interactive: halo blooms and warms, glint opens */
+#cursor.hot .cursor-dot { width: 4px; height: 4px; margin: -2px 0 0 -2px; }
 #cursor.hot .cursor-ring {
-  width: 58px; height: 58px; margin: -29px 0 0 -29px;
-  border-color: rgba(255,224,176,.85); background: rgba(255,224,176,.07);
+  transform: scale(1.55);
+  background: radial-gradient(closest-side,
+    rgba(255,224,176,0) 52%, rgba(255,224,176,.14) 68%,
+    rgba(255,232,196,.42) 84%, rgba(255,232,196,0) 100%);
 }
-#cursor.press .cursor-ring { width: 26px; height: 26px; margin: -13px 0 0 -13px; }
+#cursor.hot .cursor-glint { opacity: 1; transform: rotate(0deg) scale(1); }
+/* pressed: everything tightens */
+#cursor.press .cursor-ring { transform: scale(.72); }
+#cursor.press .cursor-glint { transform: rotate(0deg) scale(.7); opacity: .8; }
+
 /* keep the real cursor for anyone who needs it, but hide it where ours shows */
 @media (hover: hover) and (pointer: fine) {
   body.has-cursor, body.has-cursor a, body.has-cursor button,
   body.has-cursor #vm-hit { cursor: none; }
 }
 @media (hover: none), (pointer: coarse) { #cursor { display: none; } }
-@media (prefers-reduced-motion: reduce) { .cursor-ring { transition: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .cursor-ring, .cursor-glint, .cursor-dot { transition: none; }
+}
