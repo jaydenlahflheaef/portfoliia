@@ -94,6 +94,7 @@
   }
   paintings.forEach((painting, index) => painting.addEventListener('click', () => {
     showPainting(index);
+    remember(painting);
     artworkViewer.showModal();
   }));
   byId('close-artwork').addEventListener('click', () => artworkViewer.close());
@@ -205,6 +206,115 @@
     addEventListener('pointerleave',() => cur.classList.remove('awake'), { passive: true });
     addEventListener('blur',        () => cur.classList.remove('awake'));
   }
+
+  // ── the place remembers ──
+  // localStorage only: no account, no analytics, nothing leaves the machine.
+  // Every access is guarded — private windows and blocked site data throw.
+  const MEM_KEY = 'afterhours.v1';
+  const readMemory = () => { try { return JSON.parse(localStorage.getItem(MEM_KEY)) || {}; }
+                             catch { return {}; } };
+  const writeMemory = (m) => { try { localStorage.setItem(MEM_KEY, JSON.stringify(m)); } catch {} };
+
+  const mem = readMemory();
+  const lastSeen = Number(mem.lastSeen) || 0;
+  const sinceHours = lastSeen ? (Date.now() - lastSeen) / 36e5 : Infinity;
+  const visits = (Number(mem.visits) || 0) + 1;
+  const seen = Array.isArray(mem.seen) ? mem.seen : [];
+  writeMemory({ visits, seen, lastSeen: Date.now(), lastCode: mem.lastCode || null });
+
+  // the eyebrow is the one line that knows you
+  (function greet() {
+    const line = visits === 1            ? 'SOMEWHERE AFTER MIDNIGHT'
+               : sinceHours < 6          ? "YOU DIDN'T GET FAR"
+               : visits < 5              ? 'BACK AGAIN, THEN'
+               : visits < 10             ? 'THE USUAL'
+               :                           'YOU KNOW THE WAY';
+    const el = document.querySelector('.eyebrow');
+    if (el) el.lastChild.textContent = ' ' + line;
+  })();
+
+  // chalk tally on the pavement — one stroke a visit, five to a gate
+  (function tally() {
+    const svg = document.getElementById('scene-svg');
+    if (!svg || visits < 2) return;
+    const ns = 'http://www.w3.org/2000/svg';
+    const g = document.createElementNS(ns, 'g');
+    g.setAttribute('stroke', '#d9c9b4');
+    g.setAttribute('stroke-width', '1.6');
+    g.setAttribute('stroke-linecap', 'round');
+    g.setAttribute('opacity', '0.3');
+    const marks = Math.min(visits, 15);
+    for (let i = 0; i < marks; i++) {
+      const gate = (i / 5) | 0, within = i % 5;
+      const x = 940 + gate * 26 + within * 5, y = 566;   // right pavement, clear of both text blocks and the road
+      const l = document.createElementNS(ns, 'line');
+      if (within === 4) {                       // the strike across the gate
+        l.setAttribute('x1', x - 17); l.setAttribute('y1', y + 11);
+        l.setAttribute('x2', x + 2);  l.setAttribute('y2', y - 1);
+      } else {
+        l.setAttribute('x1', x); l.setAttribute('y1', y);
+        l.setAttribute('x2', x - 2.5); l.setAttribute('y2', y + 11);
+      }
+      g.appendChild(l);
+    }
+    svg.appendChild(g);
+  })();
+
+  // the machine remembers what you looked at last
+  if (mem.lastCode) { const lcd = byId('lcd-code'); if (lcd) lcd.textContent = mem.lastCode; }
+  seen.forEach(id => {
+    const el = front.querySelector(`.painting-selection[data-art-id="${id}"]`);
+    if (el) el.dataset.seen = 'true';
+  });
+  function remember(painting) {
+    const m = readMemory();
+    const list = Array.isArray(m.seen) ? m.seen : [];
+    if (!list.includes(painting.dataset.artId)) list.push(painting.dataset.artId);
+    m.seen = list; m.lastCode = painting.dataset.artId;
+    writeMemory(m);
+    painting.dataset.seen = 'true';
+  }
+
+  // ── ambient night events ──
+  // setTimeout, not a render loop: each event just sets a class and the
+  // compositor runs the animation. Nothing is scheduled while motion is off
+  // or the tab is hidden.
+  const rand = (lo, hi) => lo + Math.random() * (hi - lo);
+  const quiet = () => body.dataset.still === 'true' || document.hidden;
+
+  // Each event reschedules itself after its animation ends, so the gaps are
+  // between events rather than between starts, and a paused night never queues
+  // a backlog.
+  function schedule(el, gap, firstDelay) {
+    if (!el) return;
+    const run = () => {
+      if (quiet()) return void setTimeout(run, 4000);
+      el.classList.add('run');
+      el.addEventListener('animationend', () => {
+        el.classList.remove('run');
+        setTimeout(run, gap());
+      }, { once: true });
+    };
+    setTimeout(run, firstDelay);
+  }
+  const shoots = [...document.querySelectorAll('.ev-shoot')];
+  // frequent on purpose: a star every 12-26s from each of two tracks
+  schedule(shoots[0], () => rand(12000, 26000), 2500);
+  schedule(shoots[1], () => rand(12000, 26000), 9000);
+  schedule(document.querySelector('.ev-sat'), () => rand(30000, 55000), rand(9000, 16000));
+
+  // windows going out and coming back, every few seconds
+  (function windows() {
+    const next = () => setTimeout(windows, rand(3000, 8000));
+    if (quiet()) return next();
+    const wins = document.querySelectorAll('#city-windows .city-win');
+    if (!wins.length) return next();
+    for (let i = 0, n = 1 + ((Math.random() * 3) | 0); i < n; i++) {
+      const w = wins[(Math.random() * wins.length) | 0];
+      w.classList.toggle('win-out');
+    }
+    next();
+  })();
 
   document.addEventListener('visibilitychange', () => {
     body.dataset.pageHidden = String(document.hidden);

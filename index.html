@@ -118,6 +118,15 @@
 <!-- ════════════════════════════════════════ -->
 <div id="scene-view" aria-label="A quiet street beneath a spiral galaxy">
 <canvas id="galaxy-canvas" aria-hidden="true"></canvas>
+<!-- Ambient night events. Sits above the sky canvas and below #scene-svg
+     (z-index 1), so the skyline occludes anything that strays too low. Each
+     element animates on transform/opacity only and is triggered by a class,
+     so nothing runs per-frame. -->
+<div id="sky-events" aria-hidden="true">
+  <span class="ev-shoot" data-ev="shoot-a"></span>
+  <span class="ev-shoot" data-ev="shoot-b"></span>
+  <span class="ev-sat"></span>
+</div>
 <!-- Pre-sky: drifting glow that covers the engine's build. Animated purely on
      transform/opacity so the compositor keeps it moving while init blocks the
      main thread; cross-dissolves out as the live galaxy fades in. -->
