@@ -8,8 +8,55 @@ button:focus-visible, a:focus-visible { outline: 1px solid #f4d6a7; outline-offs
   content: ''; position: absolute; inset: 0; pointer-events: none;
   background: url('sky/arrival.svg') center / cover no-repeat;
 }
-#galaxy-canvas { opacity: 0; transition: opacity 1s ease; }
+#galaxy-canvas { opacity: 0; transition: opacity 1.6s cubic-bezier(.4,0,.3,1); }
 #galaxy-canvas[data-ready="true"] { opacity: 1; }
+
+/* ── PRE-SKY ──────────────────────────────────────────────────────────────
+   The galaxy engine's init blocks the main thread, so anything driven by JS,
+   layout or paint would freeze mid-load. These blooms animate ONLY transform
+   and opacity, which Chrome runs on the compositor — they keep drifting right
+   through the block. Sits above sky/arrival.svg and below #scene-svg (z-index
+   1), so the skyline and street still occlude it. */
+#sky-warmup {
+  position: absolute; inset: 0; pointer-events: none; overflow: hidden;
+  opacity: 1; transition: opacity 1.8s cubic-bezier(.4,0,.3,1);
+}
+/* screen blending ADDS light the way the engine's own 'lighter' compositing
+   does — normal alpha here just veils arrival.svg's starfield into flat fog.
+   Positions and the -11deg tilt mirror the real disc (PA = -11deg, centre
+   around 57%/17% of the viewport) so the live galaxy resolves out of this
+   shape instead of replacing it. */
+#sky-warmup i {
+  position: absolute; display: block; border-radius: 50%;
+  mix-blend-mode: screen; will-change: transform, opacity;
+  animation: warm-drift var(--dur, 19s) var(--delay, 0s) ease-in-out infinite alternate;
+}
+/* the band itself, tilted along the disc */
+#sky-warmup i:nth-child(1) { left: 27%; top: -10%; width: 62vw; height: 23vw; --rot: -11deg; --dur: 17s;
+  background: radial-gradient(closest-side, rgba(236,86,232,.60), rgba(236,86,232,0) 68%); }
+/* violet shoulder trailing to the left */
+#sky-warmup i:nth-child(2) { left: 13%; top: 0%; width: 30vw; height: 15vw; --rot: -11deg; --dur: 23s; --delay: -6s;
+  background: radial-gradient(closest-side, rgba(124,60,228,.50), rgba(124,60,228,0) 70%); }
+/* cool blue rim on the right so the band is not one flat colour */
+#sky-warmup i:nth-child(3) { left: 66%; top: -4%; width: 31vw; height: 16vw; --rot: -11deg; --dur: 21s; --delay: -11s;
+  background: radial-gradient(closest-side, rgba(60,66,205,.52), rgba(60,66,205,0) 70%); }
+/* faint pink haze hugging the skyline */
+#sky-warmup i:nth-child(4) { left: 33%; top: 17%; width: 40vw; height: 8vw; --dur: 26s; --delay: -3s;
+  background: radial-gradient(closest-side, rgba(226,128,240,.24), rgba(226,128,240,0) 76%); }
+/* the core, breathing where the real one ignites */
+#sky-warmup i:nth-child(5) { left: 51%; top: 9%; width: 15vw; height: 8.5vw; --rot: -11deg; --dur: 4.6s;
+  background: radial-gradient(closest-side, rgba(255,241,255,.62), rgba(255,214,252,.18) 45%, rgba(255,214,252,0) 74%);
+  animation-name: warm-breath; }
+@keyframes warm-drift {
+  from { transform: translate3d(-3%, 0, 0) rotate(var(--rot, 0deg)) scale(1);    opacity: .5; }
+  to   { transform: translate3d(3%, 2%, 0) rotate(var(--rot, 0deg)) scale(1.16); opacity: 1; }
+}
+@keyframes warm-breath {
+  from { transform: translate3d(0,0,0) rotate(var(--rot, 0deg)) scale(.8);  opacity: .32; }
+  to   { transform: translate3d(0,0,0) rotate(var(--rot, 0deg)) scale(1.18); opacity: .9; }
+}
+/* hand off: the pre-sky dissolves as the real galaxy comes up */
+#galaxy-canvas[data-ready="true"] + #sky-warmup { opacity: 0; }
 #vm-hit:focus-visible { outline: none; stroke: #ffe4b8; stroke-width: 2; }
 #vm-hit:hover { fill: rgba(225,239,255,.07); }
 #vm-hit:active { fill: rgba(225,239,255,.14); }

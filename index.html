@@ -366,6 +366,10 @@
 <!-- ════════════════════════════════════════ -->
 <div id="scene-view" aria-label="A quiet street beneath a spiral galaxy">
 <canvas id="galaxy-canvas" aria-hidden="true"></canvas>
+<!-- Pre-sky: drifting glow that covers the engine's build. Animated purely on
+     transform/opacity so the compositor keeps it moving while init blocks the
+     main thread; cross-dissolves out as the live galaxy fades in. -->
+<div id="sky-warmup" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
 <svg id="scene-svg" aria-label="Moonlit city, roadside billboard and glowing vending machine" viewBox="0 0 1200 675" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
 <defs>
   <!-- Sky atmosphere — deep navy/indigo base + vivid magenta nebula -->
