@@ -1,0 +1,130 @@
+(() => {
+  'use strict';
+  const body = document.body;
+  const byId = id => document.getElementById(id);
+  const front = byId('front-view');
+  const scene = byId('scene-view');
+  const arrival = byId('arrival');
+  const header = byId('night-header');
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+  let returnFocus = byId('explore-btn');
+  let chosenStill = null;
+
+  function setView(view, trigger) {
+    if (trigger) returnFocus = trigger;
+    body.dataset.view = view;
+    const vending = view === 'vending';
+    front.inert = !vending;
+    front.setAttribute('aria-hidden', String(!vending));
+    front.classList.toggle('visible', vending);
+    scene.inert = view !== 'street';
+    arrival.inert = view !== 'street';
+    header.inert = vending;
+    byId('machine-cue').inert = view !== 'street';
+    byId('street-footnote').setAttribute('aria-hidden', String(view !== 'street'));
+    if (vending) byId('back-btn').focus({ preventScroll: true });
+    else returnFocus.focus({ preventScroll: true });
+    document.dispatchEvent(new Event('night-motion-change'));
+  }
+  [byId('vm-hit'), byId('explore-btn'), byId('machine-cue')].forEach(el => {
+    el.addEventListener('click', () => setView('vending', el.id === 'machine-cue' ? byId('explore-btn') : el));
+  });
+  byId('vm-hit').addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setView('vending', e.currentTarget); }
+  });
+  byId('back-btn').addEventListener('click', () => setView('street'));
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && body.dataset.view !== 'street') setView('street');
+    // The scene dialog has one control; keep keyboard focus inside it.
+    if (e.key === 'Tab' && body.dataset.view === 'vending') { e.preventDefault(); byId('back-btn').focus(); }
+  });
+  byId('night-header').querySelector('a').addEventListener('click', e => {
+    e.preventDefault(); returnFocus = byId('explore-btn'); setView('street');
+  });
+
+  function positionScene() {
+    const scale = Math.max(innerWidth / 1200, innerHeight / 675);
+    const x = (innerWidth - 1200 * scale) / 2 + 570 * scale;
+    const y = (innerHeight - 675 * scale) / 2 + 326 * scale;
+    body.style.setProperty('--machine-x', x + 'px');
+    body.style.setProperty('--machine-y', y + 'px');
+    // Match the viewport ratio so both the machine header and tray stay visible.
+    const aspect = innerWidth / innerHeight;
+    const worldHeight = Math.max(810, 350 / aspect);
+    const worldWidth = worldHeight * aspect;
+    byId('front-svg').setAttribute('viewBox', `${600 - worldWidth / 2} -65 ${worldWidth} ${worldHeight}`);
+    byId('front-svg').setAttribute('preserveAspectRatio', 'xMidYMid meet');
+  }
+  positionScene();
+  addEventListener('resize', positionScene, { passive: true });
+
+  function syncMotion() {
+    const still = reduced.matches || chosenStill === true;
+    body.dataset.still = String(still);
+    byId('motion-btn').textContent = still ? 'Motion off' : 'Motion on';
+    byId('motion-btn').setAttribute('aria-pressed', String(!still));
+    byId('motion-btn').disabled = reduced.matches;
+    byId('motion-btn').title = reduced.matches ? 'Follows your reduced motion setting' : 'Pause or resume the night';
+    document.dispatchEvent(new Event('night-motion-change'));
+  }
+  byId('motion-btn').addEventListener('click', () => { chosenStill = body.dataset.still !== 'true'; syncMotion(); });
+  reduced.addEventListener('change', syncMotion);
+  syncMotion();
+
+  // A quiet, locally synthesized soundscape. No audio request until a click.
+  let audio, master;
+  let soundOn = false;
+  let soundBusy = false;
+  function buildSound() {
+    const Audio = window.AudioContext || window.webkitAudioContext;
+    if (!Audio) throw new Error('Audio is unavailable');
+    audio = new Audio();
+    master = audio.createGain();
+    master.gain.value = 0;
+    master.connect(audio.destination);
+    [110, 164.81, 220.4, 277.18].forEach((hz, i) => {
+      const tone = audio.createOscillator();
+      const gain = audio.createGain();
+      tone.type = 'sine'; tone.frequency.value = hz; gain.gain.value = .05 / (i + 1);
+      tone.connect(gain).connect(master); tone.start();
+    });
+    const noise = audio.createBuffer(1, audio.sampleRate * 4, audio.sampleRate);
+    const data = noise.getChannelData(0);
+    let previous = 0;
+    for (let i = 0; i < data.length; i++) { previous = (previous + (Math.random() * 2 - 1) * .02) / 1.02; data[i] = previous * 3.5; }
+    const breeze = audio.createBufferSource();
+    const filter = audio.createBiquadFilter();
+    const gain = audio.createGain();
+    breeze.buffer = noise; breeze.loop = true;
+    filter.type = 'lowpass'; filter.frequency.value = 450; gain.gain.value = .14;
+    breeze.connect(filter).connect(gain).connect(master); breeze.start();
+  }
+  byId('sound-btn').addEventListener('click', async () => {
+    if (soundBusy) return;
+    soundBusy = true;
+    try {
+      if (!audio) buildSound();
+      soundOn = !soundOn;
+      if (soundOn) {
+        await audio.resume();
+        master.gain.setTargetAtTime(.55, audio.currentTime, .6);
+      } else {
+        master.gain.setValueAtTime(0, audio.currentTime);
+        await audio.suspend();
+      }
+      byId('sound-btn').setAttribute('aria-pressed', String(soundOn));
+      byId('sound-label').textContent = soundOn ? 'Sound on' : 'Sound off';
+    } catch {
+      soundOn = false;
+      byId('sound-btn').setAttribute('aria-pressed', 'false');
+      byId('sound-label').textContent = 'Sound unavailable';
+      if (audio) await audio.close().catch(() => {});
+      audio = null;
+    } finally { soundBusy = false; }
+  });
+  document.addEventListener('visibilitychange', () => {
+    body.dataset.pageHidden = String(document.hidden);
+    if (!audio || !soundOn) return;
+    (document.hidden ? audio.suspend() : audio.resume()).catch(() => {});
+  });
+})();
