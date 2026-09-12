@@ -403,12 +403,15 @@
   <line x1="875" y1="318" x2="985"  y2="675"/>
   <line x1="875" y1="318" x2="1105" y2="675"/>
 </g>
-<!-- horizontal cross-seams clipped to sidewalk edges -->
+<!-- Horizontal cross-seams, stopped at the kerbs so they never cross the road.
+     Gaps are roadX(y) = [360 + 515t, 695 + 180t], t = (675 - y)/357, plus 4px
+     clearance. The old values widened going down while the road's left edge
+     actually moves left, so every seam laid a stray line across the tarmac. -->
 <g stroke="#2a1f4a" stroke-width="0.5" opacity="0.40">
-  <line x1="0" y1="400" x2="478"  y2="400"/>  <line x1="736"  y1="400" x2="1200" y2="400"/>
-  <line x1="0" y1="465" x2="565"  y2="465"/>  <line x1="767"  y1="465" x2="1200" y2="465"/>
-  <line x1="0" y1="535" x2="666"  y2="535"/>  <line x1="802"  y1="535" x2="1200" y2="535"/>
-  <line x1="0" y1="608" x2="767"  y2="608"/>  <line x1="837"  y1="608" x2="1200" y2="608"/>
+  <line x1="0" y1="400" x2="753"  y2="400"/>  <line x1="838"  y1="400" x2="1200" y2="400"/>
+  <line x1="0" y1="465" x2="659"  y2="465"/>  <line x1="805"  y1="465" x2="1200" y2="465"/>
+  <line x1="0" y1="535" x2="558"  y2="535"/>  <line x1="770"  y1="535" x2="1200" y2="535"/>
+  <line x1="0" y1="608" x2="453"  y2="608"/>  <line x1="733"  y1="608" x2="1200" y2="608"/>
 </g>
 <!-- weathering stains, cracks, mica glints (JS injected, perspective-scaled) -->
 <g id="ground-detail"/>
@@ -419,14 +422,17 @@
      Right edge: (695, 675) → (875, 318) -->
 <polygon points="360,675 875,318 695,675" fill="url(#roadG)"/>
 
-<!-- Road surface detail - perspective lines -->
+<!-- Road surface detail — perspective bands, inset 6% from each kerb.
+     Derived from roadX(y) = [360 + 515t, 695 + 180t], t = (675 - y)/357. The
+     old coordinates drifted left as they receded: the top two sat entirely on
+     the sidewalk, reading as stray lines floating beside the machine. -->
 <g stroke="#2a2550" stroke-width="0.8" opacity="0.7">
-  <line x1="380" y1="645" x2="685" y2="645"/>
-  <line x1="405" y1="612" x2="674" y2="612"/>
-  <line x1="435" y1="574" x2="661" y2="574"/>
-  <line x1="470" y1="532" x2="646" y2="532"/>
-  <line x1="510" y1="488" x2="629" y2="488"/>
-  <line x1="553" y1="444" x2="611" y2="444"/>
+  <line x1="422" y1="645" x2="692" y2="645"/>
+  <line x1="467" y1="612" x2="710" y2="612"/>
+  <line x1="520" y1="574" x2="732" y2="574"/>
+  <line x1="578" y1="532" x2="755" y2="532"/>
+  <line x1="639" y1="488" x2="780" y2="488"/>
+  <line x1="700" y1="444" x2="804" y2="444"/>
 </g>
 <!-- Road edges -->
 <line x1="360" y1="675" x2="875" y2="318" stroke="#4a3880" stroke-width="2" opacity="0.85"/>
