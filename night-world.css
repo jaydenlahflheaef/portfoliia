@@ -300,10 +300,22 @@ body[data-still="true"][data-view="street"] #machine-cue { opacity: .9; }
 #cursor.press .cursor-ring { transform: scale(.72); }
 #cursor.press .cursor-glint { transform: rotate(0deg) scale(.7); opacity: .8; }
 
-/* keep the real cursor for anyone who needs it, but hide it where ours shows */
+/* the machine's hit area still wants a pointer for anyone without our cursor */
+#vm-hit { cursor: pointer; }
+
+/* Hide the system pointer wherever ours is drawn. This has to be `!important`
+   and universal rather than a list of selectors: several rules set `cursor`
+   at ID specificity (#vm-hit, #machine-cue, #artwork-viewer button) and would
+   otherwise win, and #vm-hit carried an inline style, which only an important
+   declaration can override. */
 @media (hover: hover) and (pointer: fine) {
-  body.has-cursor, body.has-cursor a, body.has-cursor button,
-  body.has-cursor #vm-hit { cursor: none; }
+  body.has-cursor, body.has-cursor * { cursor: none !important; }
+  /* Exception: the artwork viewer is a native modal, so it renders in the
+     browser's top layer — above every z-index, including our cursor element.
+     We cannot draw over it, so leave the system pointer rather than show
+     nothing at all. */
+  body.has-cursor #artwork-viewer, body.has-cursor #artwork-viewer * { cursor: auto !important; }
+  body.has-cursor #artwork-viewer button { cursor: pointer !important; }
 }
 @media (hover: none), (pointer: coarse) { #cursor { display: none; } }
 @media (prefers-reduced-motion: reduce) {
