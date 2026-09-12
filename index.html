@@ -658,7 +658,7 @@
 function* startGalaxyEngine() {
   const canvas = document.getElementById('galaxy-canvas');
   if (!canvas || !canvas.getContext) return;
-  const BUILD = 48;                 // bump when sky changes — logged to console
+  const BUILD = 49;                 // bump when sky changes — logged to console
   // main display canvas stays GPU-accelerated; all HELPER canvases below are
   // created software-backed (willReadFrequently) — immune to the silent GPU
   // backing-store loss that was blanking the sky on retina/busy systems
@@ -1222,9 +1222,16 @@ function* startGalaxyEngine() {
     [690, 150, 620, 230, 'mag',  0.20],   // magenta bloom hugging the galaxy band
     [520,  80, 440, 180, 'vio',  0.22],   // violet spill along the band's sweep
     [880, 230, 420, 160, 'vio',  0.16],
-    [150,  80, 430, 210, 'blue', 0.28],   // deep blue around the moon / left sky
+    // The left had no warm tone at all: measured across six columns the
+    // 17-33% band was the coldest in the sky (red-minus-blue -0.43 against
+    // -0.32 for its mirror), and the far-left corner the darkest. Easing the
+    // blue back and adding magenta/violet spill balances it without competing
+    // with the galaxy, which still owns the centre-right.
+    [150,  80, 430, 210, 'blue', 0.20],   // deep blue around the moon / left sky
     [1080, 110, 400, 200, 'blue', 0.26],  // right corner stays cool
-    [300, 210, 520, 150, 'vio',  0.14],
+    [235, 120, 450, 205, 'mag',  0.13],   // magenta spill, left of the moon
+    [60,  195, 400, 185, 'vio',  0.16],   // lifts the far-left corner
+    [300, 210, 520, 150, 'vio',  0.20],
     [600, 300, 720, 62,  'ice',  0.30],   // pale glowing horizon haze
     [600, 309, 430, 34,  'ice',  0.22],
     [700, 150, 480, 190, 'pale', 0.06],   // soft white lift around the galaxy
@@ -1328,8 +1335,8 @@ function* startGalaxyEngine() {
     b.beginPath(); b.arc(MX + 5.5, MY + 5, 4, 0, 7); b.fill();
     b.beginPath(); b.arc(MX - 4, MY + 6.5, 2.9, 0, 7); b.fill();
     b.globalCompositeOperation = 'screen';
-    b.globalAlpha = 0.5;
-    b.drawImage(nebPink, 100, 10, 260, 260);
+    b.globalAlpha = 0.64;
+    b.drawImage(nebPink, 74, 16, 300, 300);   // spread further into the left sky
     b.globalAlpha = 0.45;
     b.drawImage(nebBlue, 960, 125, 240, 240);
     b.globalAlpha = 0.35;
