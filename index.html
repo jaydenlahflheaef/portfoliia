@@ -1487,12 +1487,23 @@
 function* startGalaxyEngine() {
   const canvas = document.getElementById('galaxy-canvas');
   if (!canvas || !canvas.getContext) return;
-  const BUILD = 44;                 // bump when sky changes — logged to console
+  const BUILD = 45;                 // bump when sky changes — logged to console
   // main display canvas stays GPU-accelerated; all HELPER canvases below are
   // created software-backed (willReadFrequently) — immune to the silent GPU
   // backing-store loss that was blanking the sky on retina/busy systems
   const ctx = canvas.getContext('2d');
-  const DPR = Math.min(window.devicePixelRatio || 1, 1.5); // soft glowy content — 1.5x is visually identical, ~44% fewer pixels than 2x
+  // Canvas memory and boot fill cost scale exactly with pixel count (measured:
+  // 4x fewer pixels => 4.06x faster sky bake), and this engine holds ~14 large
+  // offscreen canvases. On a big window a fixed 1.5 DPR means tens of MB of GPU
+  // memory, which drags the whole browser — not just this page. So cap total
+  // backing-store pixels instead of capping DPR, and recompute it on resize.
+  const PIXEL_BUDGET = 3.2e6;              // ~2200x1450 of backing store
+  let DPR = 1;
+  function pickDPR() {
+    const cap = Math.min(window.devicePixelRatio || 1, 1.5);
+    const fit = Math.sqrt(PIXEL_BUDGET / Math.max(1, innerWidth * innerHeight));
+    return Math.max(0.75, Math.min(cap, fit));
+  }
   const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // scene constants (SVG viewBox coordinates)
@@ -1743,6 +1754,7 @@ function* startGalaxyEngine() {
     return [ex * p.cb - ey * p.sb, ex * p.sb + ey * p.cb];
   }
   let gasTex, dustTex, coreSpr, starTex;
+  let skyCache = null;   // declared here so layout() can release it before its own `let` would run
   function buildDiscTextures() {
     // the faint disc/bulge stars, frozen into the rotating pattern layer.
     // starSpr sprites are already colour-graded, so this one is NOT re-graded.
@@ -2004,6 +2016,8 @@ function* startGalaxyEngine() {
     [600, 309, 430, 34,  'ice',  0.22],
     [700, 150, 480, 190, 'pale', 0.10],   // soft white lift around the galaxy
   ];
+  // hand a canvas's backing store back immediately rather than waiting for GC
+  function release(cv) { if (cv && cv.width) { cv.width = 0; cv.height = 0; } }
   // true if a canvas lost its backing store (draws no-op, pixels read as 0)
   function blankAt(cv, x, y) {
     try { return cv.getContext('2d', { willReadFrequently: true }).getImageData(x, y, 1, 1).data[3] === 0; }
@@ -2124,6 +2138,10 @@ function* startGalaxyEngine() {
   // the check then runs once on a later frame, and drawSkyBase's periodic
   // watchdog still covers a backing store that dies later.
   function layout(heal) {
+    DPR = pickDPR();
+    // drop the previous backing stores explicitly; leaving them to the GC keeps
+    // several MB of GPU memory alive across every resize
+    release(bg); release(skyCache); skyCache = null;
     canvas.width  = innerWidth * DPR;
     canvas.height = innerHeight * DPR;
     s = Math.max(canvas.width / VW, canvas.height / VH);
@@ -2159,8 +2177,21 @@ function* startGalaxyEngine() {
   setTimeout(() => {
     const hx = (canvas.width / 2) | 0, hy = ((SKY - 60) * s + offy) | 0;
     if (readbackOK() && blankAt(bg, hx, hy)) { console.warn('[galaxy] sky blank at boot — rebuilding'); layout(); }
-    else console.log('[galaxy] build', BUILD, '| DPR', DPR, '| canvas',
-                     canvas.width + 'x' + canvas.height, '| \u2705 sky healthy');
+    else console.log('[galaxy] build', BUILD, '| DPR', DPR.toFixed(2), '| canvas',
+                     canvas.width + 'x' + canvas.height,
+                     '| window', innerWidth + 'x' + innerHeight + '@' + (window.devicePixelRatio || 1),
+                     '| \u2705 sky healthy');
+    // rolling frame time, logged once so a real machine can be compared against
+    // headless numbers — open the console and send this line
+    let n = 0, prev = performance.now(); const d = [];
+    (function sample(t) {
+      d.push(t - prev); prev = t;
+      if (++n < 180) requestAnimationFrame(sample);
+      else { d.sort((a, b) => a - b);
+        console.log('[galaxy] fps median', (1000 / d[d.length >> 1]).toFixed(0),
+                    '| frame median', d[d.length >> 1].toFixed(1) + 'ms',
+                    'p95', d[Math.floor(d.length * .95)].toFixed(1) + 'ms'); }
+    })(performance.now());
   }, 1200);
 
   // ── state ──
@@ -2172,7 +2203,7 @@ function* startGalaxyEngine() {
 
   // sky base cache — bg + wisps composited only when the slow sway has moved,
   // turning 3 full-screen blits per frame into 1
-  let skyCache = null, skyCacheAt = -9, healAt = -9, healCount = 0;
+  let skyCacheAt = -9, healAt = -9, healCount = 0;   // skyCache itself is declared above layout()
   function drawSkyBase() {
     if (!skyCache || skyCache.width !== canvas.width || skyCache.height !== skyH) {
       skyCache = document.createElement('canvas');
@@ -2393,7 +2424,7 @@ setTimeout(bootGalaxy, 300);
       g.appendChild(c);
     }
   }
-  fill('stars',       100, 0,   1200, 0,   310);
+  fill('stars',        40, 0,   1200, 0,   310);   // canvas galaxy already carries the starfield
   fill('front-stars', 240, 174,  853, -100, 430);
 })();
 
