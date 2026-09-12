@@ -1467,10 +1467,14 @@
 // outer slow) and the pattern never winds up. Projected in 3D with
 // inclination, perspective, precession and mouse parallax; drawn with
 // additive blending so dense regions bloom white-hot like the reference.
-(function () {
+// Init is heavy (sprite/mip baking, 10k particles, full-screen sky bake) and
+// used to run synchronously during parse, so the browser could not paint for
+// ~20s. It now starts after the first frame: the static sky/arrival.svg
+// backdrop shows immediately and the galaxy fades in over it via [data-ready].
+function startGalaxyEngine() {
   const canvas = document.getElementById('galaxy-canvas');
   if (!canvas || !canvas.getContext) return;
-  const BUILD = 40;                 // bump when sky changes — logged to console
+  const BUILD = 42;                 // bump when sky changes — logged to console
   // main display canvas stays GPU-accelerated; all HELPER canvases below are
   // created software-backed (willReadFrequently) — immune to the silent GPU
   // backing-store loss that was blanking the sky on retina/busy systems
@@ -2310,7 +2314,20 @@
     if (!canvas.dataset.ready) canvas.dataset.ready = 'true';
   }
   requestAnimationFrame(loop);
-})();
+}
+// Start after the page has painted, but never depend on rAF alone to bootstrap:
+// a rAF registered during parsing may get no rendering opportunity at all (it
+// never fires under headless Chrome), and a sky that silently never builds is
+// the exact failure this engine already guards against. Two frames if we get
+// them, a timeout if we don't, whichever lands first.
+let galaxyStarted = false;
+function bootGalaxy() {
+  if (galaxyStarted) return;
+  galaxyStarted = true;
+  startGalaxyEngine();
+}
+requestAnimationFrame(() => requestAnimationFrame(bootGalaxy));
+setTimeout(bootGalaxy, 300);
 
 // ── BLINKING STARS ──
 (function () {
