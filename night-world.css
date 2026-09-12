@@ -182,7 +182,16 @@ body[data-view="street"] #machine-cue { animation: cue-arrival 1s 1.6s forwards;
 @keyframes cue-arrival { to { opacity: .9; } }
 [hidden] { display: none !important; }
 body[data-view="vending"] #scene-view { transform: scale(1.15); }
-body[data-view="vending"] .world-ui { opacity: 0; pointer-events: none; }
+/* The navbar stays up in the machine view — it is the way back to the street.
+   Everything else in the world UI still clears out. */
+body[data-view="vending"] .world-ui:not(#night-header) { opacity: 0; pointer-events: none; }
+/* above #front-view (z-index 60); the artwork dialog is in the top layer and
+   still covers it. The bar itself must not swallow clicks meant for the
+   cabinet underneath, so only its controls take pointer events. */
+#night-header { z-index: 70; pointer-events: none; }
+#night-header a, #night-header button { pointer-events: auto; }
+/* drop the machine's own toolbar clear of the bar so the two stack */
+body[data-view="vending"] #front-view { padding-top: 66px; }
 body #front-view { background: #0c1758; transition: opacity .9s ease; }
 body #back-btn { top: 30px; left: 32px; padding: 12px 6px; font: 11px/1.5 'Trebuchet MS', sans-serif; letter-spacing: .5px; color: var(--paper); }
 #front-svg { transform: scale(1.035); transition: transform 1.4s cubic-bezier(.2,.7,.2,1); }

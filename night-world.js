@@ -25,7 +25,7 @@
     front.classList.toggle('visible', vending);
     scene.inert = view !== 'street';
     arrival.inert = view !== 'street';
-    header.inert = vending;
+    header.inert = false;   // the navbar stays reachable inside the machine view
     byId('machine-cue').inert = view !== 'street';
     byId('street-footnote').setAttribute('aria-hidden', String(view !== 'street'));
     if (vending) byId('back-btn').focus({ preventScroll: true });
