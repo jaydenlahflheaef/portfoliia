@@ -7,6 +7,7 @@
   <meta name="description" content="An after-hours art world by Jayden Kim. Take the long way home.">
   <meta name="theme-color" content="#110b25">
   <link rel="stylesheet" href="night-world.css">
+  <link rel="stylesheet" href="machine/cabinet.css">
   <link rel="icon" href="data:,">
   <!-- Tailwind CDN removed — zero utility classes were used; it was a large
        render-blocking script that dominated page load time -->
@@ -124,239 +125,6 @@
     #back-btn:focus-visible { outline: 1px solid rgba(200,220,240,0.4); outline-offset: 3px; }
     #back-btn:active { color: #fff; }
 
-    /* ── VM MACHINE — styled like image.jpg ── */
-    .vm-wrap {
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      width: min(480px, 88vw);
-      max-height: 92vh;
-      overflow: hidden;
-      background: #8e9888;
-      border-radius: 4px 4px 2px 2px;
-      box-shadow:
-        0 0 0 2px #5c6658,
-        0 0 0 4px #3c4438,
-        0 0 150px rgba(130,195,255,0.35),
-        0 28px 130px rgba(0,0,0,0.99);
-      z-index: 1;
-    }
-
-    /* top brand strip — matches gray-green body */
-    .vm-header {
-      background: #7c8877;
-      border-bottom: 3px solid #4c5448;
-      padding: 0.5rem 1rem 0.45rem;
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.6rem;
-    }
-    .vm-header-jp {
-      font-family: 'Noto Serif JP', serif;
-      font-size: 1.1rem;
-      color: rgba(222, 242, 255, 0.93);
-      letter-spacing: 0.4em;
-      text-shadow: 0 0 22px rgba(150,210,255,0.8);
-    }
-    .vm-header-en {
-      font-family: 'COTN', sans-serif;
-      font-size: 0.72rem;
-      color: rgba(175,200,215,0.60);
-      letter-spacing: 0.18em;
-    }
-
-    /* dark metal display bezel */
-    .vm-display-outer {
-      background: #3c4440;
-      padding: 9px 11px;
-      flex-shrink: 0;
-      border-top: 2px solid #282e2c;
-      border-bottom: 2px solid #282e2c;
-    }
-
-    /* backlit display — bright white-cyan like image.jpg */
-    .vm-display-inner {
-      background: linear-gradient(180deg, #cceaf8 0%, #a8d4ec 55%, #92c4e0 100%);
-      border-radius: 2px;
-      overflow: visible;
-      box-shadow:
-        inset 0 0 55px rgba(190,235,255,0.6),
-        inset 0 0 18px rgba(255,255,255,0.5),
-        0 0 40px rgba(110,185,255,0.45);
-    }
-
-    /* product rows */
-    .vm-row {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 4px;
-      padding: 5px 5px 0;
-    }
-    .vm-row:last-child { padding-bottom: 5px; }
-
-    /* metallic shelf divider */
-    .vm-row-divider {
-      height: 9px;
-      background: linear-gradient(180deg, #38403c 0%, #2c3430 55%, #202826 100%);
-      margin: 2px 0;
-      box-shadow: 0 1px 0 rgba(255,255,255,0.06), inset 0 1px 0 rgba(0,0,0,0.5);
-    }
-
-    /* individual drink slot */
-    .vm-slot {
-      border-radius: 3px;
-      overflow: hidden;
-      cursor: pointer;
-      position: relative;
-      transition: transform 0.14s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.14s ease;
-      border: 1px solid rgba(0,0,0,0.28);
-    }
-    .vm-slot:hover {
-      transform: scale(1.07) translateY(-4px);
-      box-shadow: 0 8px 24px rgba(0,0,0,0.65), 0 0 14px rgba(180,225,255,0.25);
-      z-index: 2;
-    }
-    .vm-slot:focus-visible { outline: 2px solid rgba(180,220,255,0.75); outline-offset: 2px; }
-    .vm-slot:active { transform: scale(0.97); }
-
-    /* glass-case light reflection */
-    .vm-slot::after {
-      content: '';
-      position: absolute;
-      top: 0; bottom: 0; left: 0; width: 32%;
-      background: linear-gradient(90deg, rgba(255,255,255,0.26) 0%, transparent 100%);
-      pointer-events: none;
-      border-radius: 3px 0 0 3px;
-    }
-
-    .vm-row-1 .vm-slot { height: 118px; }
-    .vm-row-2 .vm-slot { height: 88px; }
-    .vm-row-3 .vm-slot { height: 88px; }
-
-    /* artwork name label at slot bottom */
-    .slot-label {
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      padding: 0.16rem 0.25rem;
-      font-size: 0.46rem;
-      letter-spacing: 0.09em;
-      color: rgba(235, 248, 255, 0.92);
-      background: rgba(0,0,0,0.74);
-      text-align: center;
-      border-top: 1px solid rgba(255,255,255,0.05);
-    }
-
-    /* below display: cork board + control panel */
-    .vm-below {
-      display: grid;
-      grid-template-columns: 56% 44%;
-      background: #8e9888;
-      border-top: 2px solid #4c5448;
-      flex-shrink: 0;
-    }
-
-    /* cork notice board — tan/amber like image.jpg */
-    .vm-notice {
-      background: #8e9888;
-      padding: 8px 10px;
-      border-right: 2px solid #5c6658;
-    }
-    .vm-notice-paper {
-      background: #c4a03c;
-      border-radius: 3px;
-      padding: 7px 9px;
-      border: 1px solid #9a7e28;
-      box-shadow: inset 0 0 12px rgba(0,0,0,0.30), 0 1px 0 rgba(255,255,255,0.04);
-    }
-    .vm-notice-line {
-      height: 2px;
-      background: #5c4016;
-      border-radius: 1px;
-      margin-bottom: 5px;
-      opacity: 0.55;
-    }
-    .vm-notice-line:last-child { margin-bottom: 0; width: 58%; }
-    .vm-notice-title {
-      font-size: 0.6rem;
-      color: #3a2406;
-      letter-spacing: 0.12em;
-      font-family: 'Noto Serif JP', serif;
-      margin-bottom: 5px;
-    }
-
-    /* right control panel — dark metal */
-    .vm-ctrl-panel {
-      background: #28302c;
-      padding: 8px 10px;
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-      align-items: flex-start;
-    }
-    .vm-ctrl-black {
-      width: 100%;
-      height: 30px;
-      background: #0a0e0c;
-      border-radius: 2px;
-      border: 1px solid #181e1a;
-      box-shadow: inset 0 0 10px rgba(0,0,0,0.9);
-    }
-    .vm-ctrl-slot {
-      width: 62%;
-      height: 4px;
-      background: #060a08;
-      border-radius: 2px;
-    }
-
-    /* bottom section */
-    .vm-bottom {
-      background: #28302c;
-      border-top: 3px solid #181e1a;
-      padding: 7px 10px;
-      flex-shrink: 0;
-    }
-    .vm-btn-row {
-      display: flex;
-      gap: 5px;
-      margin-bottom: 6px;
-    }
-    .vm-btn {
-      flex: 1;
-      height: 13px;
-      background: #181e1a;
-      border-radius: 2px;
-      border: 1px solid #222a24;
-    }
-    .vm-coin-row {
-      display: flex;
-      gap: 6px;
-      align-items: center;
-      margin-bottom: 5px;
-    }
-    .vm-coin-slot {
-      flex: 1;
-      height: 4px;
-      background: #060a08;
-      border-radius: 2px;
-    }
-    .vm-indicator-lights { display: flex; gap: 4px; }
-    .vm-dot { width: 5px; height: 5px; border-radius: 50%; }
-    .vm-dot-g { background: #3af014; box-shadow: 0 0 7px rgba(58,240,20,1); }
-    .vm-dot-r { background: #ff2055; box-shadow: 0 0 7px rgba(255,32,85,1); }
-    .vm-dispense-housing {
-      background: #0a0e0c;
-      border-radius: 3px;
-      padding: 4px 6px;
-      border: 1px solid #181e1a;
-    }
-    .vm-dispense-slot {
-      width: 100%;
-      height: 14px;
-      background: #040608;
-      border-radius: 2px;
-    }
   </style>
 </head>
 <body data-view="street">
@@ -758,7 +526,7 @@
 <!-- BILLBOARD — mid-distance, frontal, single centre mast -->
 <!-- styled after the classic floodlit highway billboard   -->
 <!-- ══════════════════════════════════════════════════════ -->
-<g id="billboard">
+<g id="billboard" role="img" aria-label="After Hours — the art of Jayden Kim">
   <!-- centre mast + foot -->
   <rect x="250" y="408" width="13" height="94" fill="#131028"/>
   <rect x="242" y="497" width="30" height="5" rx="2" fill="#0d0a1e"/>
@@ -814,49 +582,10 @@
 <!-- VM shadow — moon is upper-left, shadow falls lower-right -->
 <polygon points="490,522 626,492 768,648 628,675" fill="#03010a" opacity="0.60" filter="url(#blur8)"/>
 
-<g id="vm-group" style="pointer-events:none">
-
-  <!-- case-light pool spilling onto the road — the machine faces the road -->
-  <ellipse cx="648" cy="516" rx="75" ry="14" fill="#bfe4ea" opacity="0.12" filter="url(#blur20)" class="floor-pulse"/>
-  <ellipse cx="675" cy="520" rx="120" ry="24" fill="#8fb8d0" opacity="0.06" filter="url(#blur40)" class="floor-pulse"/>
-
-  <!-- ═══ TOP FACE ═══ A(501,331) B(576,331) E(616,329) G(541,330) -->
-  <polygon points="501,331 576,331 616,329 541,330" fill="#20241f"/>
-  <line x1="501" y1="331" x2="576" y2="331" stroke="#32362f" stroke-width="1.2"/>
-  <line x1="501" y1="331" x2="576" y2="331" stroke="#ff6ad6" stroke-width="1" opacity="0.4"/>
-
-  <!-- ═══ SIDE FLANK (wide, camera-facing) — shaded body with sky tint ═══ -->
-  <polygon points="501,331 576,331 576,525 501,525" fill="url(#vmSideG)"/>
-  <polygon points="501,331 576,331 576,525 501,525" fill="url(#vmSkyTintG)"/>
-  <line x1="501" y1="331" x2="501" y2="525" stroke="#d8a8f0" stroke-width="0.8" opacity="0.3"/>
-  <line x1="504" y1="430" x2="573" y2="430" stroke="#2e342c" stroke-width="0.8" opacity="0.9"/>
-  <line x1="504" y1="500" x2="573" y2="500" stroke="#2e342c" stroke-width="0.8" opacity="0.9"/>
-  <g fill="#242a22">
-    <rect x="508" y="506" width="22" height="1.6" rx="0.8"/>
-    <rect x="508" y="510" width="22" height="1.6" rx="0.8"/>
-    <rect x="508" y="514" width="22" height="1.6" rx="0.8"/>
-  </g>
-  <rect x="501" y="512" width="75" height="13" fill="#171b16"/>
-  <polygon points="501,331 576,331 576,525 501,525" fill="none" stroke="#2c322a" stroke-width="1"/>
-
-  <!-- ═══ FRONT FACE (faces the road) — pale body; display drawn by JS in
-       true face perspective (see VM FRONT script) ═══ -->
-  <polygon points="576,331 616,329 616,497 576,525" fill="url(#vmBodyG)"/>
-  <polygon points="576,331 616,329 616,497 576,525" fill="#9a7ae0" opacity="0.09"/>
-  <g id="vm-front"/>
-  <polygon points="576,331 616,329 616,497 576,525" fill="none" stroke="#20241f" stroke-width="0.8"/>
-
-  <!-- Moonlight shadow — cast from upper-left moon, falls right across ground/road -->
-  <polygon points="501,525 616,500 960,550 749,580"
-           fill="url(#vmShadowG)" opacity="0.7" filter="url(#blur8)" pointer-events="none"/>
-
-  <!-- Hit area -->
-  <polygon id="vm-hit" points="501,329 616,329 616,500 576,525 501,525"
-           fill="rgba(0,0,0,0.002)"
-           pointer-events="all"
-           role="button" tabindex="0" aria-label="Approach the vending machine" style="cursor:pointer"/>
+<g id="vm-group">
+  <image href="machine/street-machine.svg" x="480" y="305" width="175" height="245" aria-hidden="true"/>
+  <polygon id="vm-hit" points="496,328 579,320 623,325 623,518 541,539 496,529" fill="transparent" pointer-events="all" role="button" tabindex="0" aria-label="Approach the art vending machine" style="cursor:pointer"/>
 </g>
-
 
 <!-- ── ATMOSPHERE ── -->
 <rect width="1200" height="675" fill="url(#fogG)" pointer-events="none"/>
@@ -870,7 +599,7 @@
 </div><!-- end #scene-view -->
 
 <header id="night-header" class="world-ui">
-  <a class="world-signature" href="./" aria-label="Jayden Kim, back to the street"><span class="signature-star" aria-hidden="true">✳</span><span>JAYDEN KIM<small>ART, AFTER DARK</small></span></a>
+  <a class="world-signature" href="./" aria-label="Jayden Kim, back to the street"><span class="signature-star" aria-hidden="true">✳</span><span>OPEN ALL NIGHT<small>COME A LITTLE CLOSER</small></span></a>
   <nav class="night-nav" aria-label="Scene">
     <button id="nav-street" class="nav-link" type="button" aria-current="page">street</button>
     <button id="nav-machine" class="nav-link" type="button">the machine</button>
@@ -883,7 +612,7 @@
 
 <main id="arrival" class="world-ui">
   <p class="eyebrow"><span class="night-dot" aria-hidden="true"></span> SOMEWHERE AFTER MIDNIGHT</p>
-  <h1>No rush.<br><em>You're here now.</em></h1>
+  <h1 class="sr-only">After Hours — the art of Jayden Kim</h1><p class="arrival-note">A little art for the way home.</p>
   <div class="arrival-actions">
     <button id="explore-btn" class="world-link" type="button">Follow the light <span aria-hidden="true">↗</span></button>
   </div>
@@ -894,585 +623,67 @@
 <!-- ════════════════════════════════════════ -->
 <!-- FRONT VIEW: first-person scene         -->
 <!-- ════════════════════════════════════════ -->
-<div id="front-view" role="dialog" aria-modal="true" aria-label="The after-hours vending machine" aria-hidden="true" inert>
-
-  <button id="back-btn">
-    <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true">
-      <path d="M8.5 2L4 6.5L8.5 11" stroke="currentColor" stroke-width="1.4"
-            stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-    return to night
-  </button>
-
-  <!-- ── IMMERSIVE FIRST-PERSON SCENE ── -->
-  <!-- viewBox: machine (x=460-740) centered, visible y≈-160 to 440 -->
-  <svg id="front-svg" aria-hidden="true" viewBox="174 -65 853 760" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <!-- Sky — same reference palette as the main scene, seen closer -->
-    <linearGradient id="fSkyBaseG" x1="0" y1="-140" x2="0" y2="345" gradientUnits="userSpaceOnUse">
-      <stop offset="0%"   stop-color="#0e1c6a"/>
-      <stop offset="45%"  stop-color="#4030b0"/>
-      <stop offset="80%"  stop-color="#7a5fd4"/>
-      <stop offset="100%" stop-color="#b28ef0"/>
-    </linearGradient>
-    <radialGradient id="fsg4" cx="430" cy="100" r="380" gradientUnits="userSpaceOnUse">
-      <stop offset="0%"   stop-color="#4a3ac0" stop-opacity="0.5"/>
-      <stop offset="100%" stop-color="#0a0418" stop-opacity="0"/>
-    </radialGradient>
-    <!-- VM display gradient -->
-    <linearGradient id="fDispG" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%"   stop-color="#cce8f8"/>
-      <stop offset="55%"  stop-color="#a8d4ec"/>
-      <stop offset="100%" stop-color="#90c2e0"/>
-    </linearGradient>
-    <!-- pink/purple sky tint falling on the machine body -->
-    <linearGradient id="fVmTintG" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%"   stop-color="#e070d8" stop-opacity="0.10"/>
-      <stop offset="45%"  stop-color="#b06ae0" stop-opacity="0.05"/>
-      <stop offset="100%" stop-color="#b06ae0" stop-opacity="0.02"/>
-    </linearGradient>
-    <!-- Vignette centred on visible viewport — deep indigo like the main scene -->
-    <radialGradient id="fVigG" cx="600" cy="100" r="440" gradientUnits="userSpaceOnUse">
-      <stop offset="0%"   stop-color="#0d0530" stop-opacity="0"/>
-      <stop offset="60%"  stop-color="#0d0530" stop-opacity="0.10"/>
-      <stop offset="100%" stop-color="#0d0530" stop-opacity="0.5"/>
-    </radialGradient>
-    <filter id="fglow5" x="-60%" y="-60%" width="220%" height="220%">
-      <feGaussianBlur stdDeviation="5" result="b"/>
-      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-    </filter>
-    <filter id="fb8"  x="-60%"  y="-60%"  width="220%" height="220%"><feGaussianBlur stdDeviation="8"/></filter>
-    <filter id="fb20" x="-120%" y="-120%" width="340%" height="340%"><feGaussianBlur stdDeviation="20"/></filter>
-    <filter id="fb40" x="-200%" y="-200%" width="500%" height="500%"><feGaussianBlur stdDeviation="40"/></filter>
-    <filter id="fdGlow" x="-150%" y="-150%" width="400%" height="400%">
-      <feGaussianBlur in="SourceGraphic" stdDeviation="9" result="b9"/>
-      <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="b3"/>
-      <feMerge><feMergeNode in="b9"/><feMergeNode in="b9"/><feMergeNode in="b3"/><feMergeNode in="SourceGraphic"/></feMerge>
-    </filter>
-    <filter id="fcoreGlow" x="-100%" y="-100%" width="300%" height="300%">
-      <feGaussianBlur in="SourceGraphic" stdDeviation="5" result="b5"/>
-      <feGaussianBlur in="SourceGraphic" stdDeviation="1.5" result="b1"/>
-      <feMerge><feMergeNode in="b5"/><feMergeNode in="b1"/><feMergeNode in="SourceGraphic"/></feMerge>
-    </filter>
-  </defs>
-
-  <!-- ══ SKY — reference palette; galaxy band closer and at a steeper angle ══ -->
-  <!-- (photo background retired; sky/sky-front.png kept on disk) -->
-  <rect x="-2000" y="-500" width="5200" height="2500" fill="#0c1758"/>
-  <rect x="-2000" y="-140" width="5200" height="485" fill="url(#fSkyBaseG)"/>
-  <!-- ambient nebula washes — vivid like the main scene -->
-  <ellipse cx="300" cy="60"  rx="380" ry="220" fill="#3a55e0" opacity="0.20" filter="url(#fb40)"/>
-  <ellipse cx="980" cy="180" rx="360" ry="200" fill="#6a48d8" opacity="0.16" filter="url(#fb40)"/>
-  <ellipse cx="620" cy="330" rx="640" ry="90"  fill="#a48ae8" opacity="0.22" filter="url(#fb40)"/>
-  <ellipse cx="820" cy="20"  rx="480" ry="260" fill="#d035c0" opacity="0.38" filter="url(#fb40)"/>
-  <ellipse cx="850" cy="40"  rx="560" ry="320" fill="#e035c0" opacity="0.20" filter="url(#fb40)"/>
-  <ellipse cx="560" cy="140" rx="420" ry="220" fill="#b040d0" opacity="0.26" filter="url(#fb40)"/>
-  <ellipse cx="240" cy="240" rx="300" ry="150" fill="#e050c8" opacity="0.18" filter="url(#fb40)"/>
-  <!-- GALAXY BAND — core upper-right, sweeping steeply overhead -->
-  <g transform="rotate(-24 760 -30)">
-    <ellipse cx="760" cy="-30" rx="520" ry="150" fill="#c860ea" opacity="0.42" filter="url(#fb40)"/>
-    <ellipse cx="760" cy="-30" rx="390" ry="100" fill="#ee3fcc" opacity="0.50" filter="url(#fb40)"/>
-    <ellipse cx="760" cy="-30" rx="320" ry="80"  fill="#ff4fd2" opacity="0.42" filter="url(#fb20)"/>
-    <ellipse cx="760" cy="-30" rx="265" ry="62"  fill="#ff7ad8" opacity="0.55" filter="url(#fb20)"/>
-    <ellipse cx="760" cy="-30" rx="155" ry="40"  fill="#ffd8f4" opacity="0.60" filter="url(#fb20)"/>
-    <ellipse cx="760" cy="-30" rx="82"  ry="26"  fill="#ffffff" opacity="0.90" filter="url(#fb20)"/>
-    <ellipse cx="760" cy="-30" rx="42"  ry="14"  fill="#ffffff" opacity="0.95" filter="url(#fb8)"/>
-  </g>
-  <!-- deep indigo corners and edges, like the main scene -->
-  <ellipse cx="174"  cy="-120" rx="480" ry="380" fill="#0d0636" opacity="0.5" filter="url(#fb40)"/>
-  <ellipse cx="1027" cy="-120" rx="460" ry="360" fill="#0d0636" opacity="0.4" filter="url(#fb40)"/>
-  <rect x="174" y="-120" width="110" height="600" fill="#0d0636" opacity="0.3" filter="url(#fb40)"/>
-  <rect x="917" y="-120" width="110" height="600" fill="#0d0636" opacity="0.3" filter="url(#fb40)"/>
-  <!-- MOON — bigger this close -->
-  <circle cx="330" cy="-58" r="42" fill="#eeeeff" opacity="0.10" filter="url(#fb20)"/>
-  <circle cx="330" cy="-58" r="26" fill="#f4f2ff" opacity="0.25" filter="url(#fb8)"/>
-  <circle cx="330" cy="-58" r="20" fill="#f6f4ff"/>
-  <circle cx="324" cy="-64" r="6.5" fill="#c9c9e2" opacity="0.4"/>
-  <circle cx="337" cy="-52" r="4.8" fill="#c9c9e2" opacity="0.35"/>
-  <circle cx="325" cy="-49" r="3.4" fill="#c9c9e2" opacity="0.3"/>
-  <!-- ══ BLINKING STARS (JS-generated, see script below) ══ -->
-
-  <!-- ══ STARS / DUST (JS injection disabled) ══ -->
-  <defs>
-    <clipPath id="fSkyClip"><rect x="0" y="-500" width="1200" height="790"/></clipPath>
-  </defs>
-  <g id="front-dust"/>
-  <g id="front-dust-core"/>
-  <g id="front-stars"/>
-
-  <!-- ══ CITY SKYLINE — layered/tiered like the main scene (JS injected) ══ -->
-  <g id="front-city"/>
-  <!-- Horizon glow behind skyline — pale lavender like the main scene -->
-  <ellipse cx="320"  cy="345" rx="200" ry="55" fill="#8a7ae8" opacity="0.16" filter="url(#fb20)"/>
-  <ellipse cx="880"  cy="345" rx="200" ry="55" fill="#8a7ae8" opacity="0.16" filter="url(#fb20)"/>
-  <ellipse cx="600"  cy="345" rx="620" ry="80" fill="#9a8ae8" opacity="0.12" filter="url(#fb40)"/>
-  <!-- Building windows (JS injected) -->
-  <g id="front-wins"/>
-  <!-- Ground plane -->
-  <rect x="-2000" y="340" width="5200" height="1600" fill="#0c0a12"/>
-  <rect x="-2000" y="340" width="5200" height="1600" fill="url(#fsg4)" opacity="0.3"/>
-  <!-- Lavender ground reflection near horizon -->
-  <rect x="-2000" y="340" width="5200" height="60" fill="#9a8ae8" opacity="0.08"/>
-  <!-- VM floor glow on ground -->
-  <ellipse cx="600" cy="350" rx="220" ry="30" fill="#bfe4ea" opacity="0.10" filter="url(#fb20)"/>
-
-  <!-- ══ VM DISPLAY ILLUMINATION — warm-white case light, contained ══ -->
-  <ellipse cx="600" cy="220" rx="310" ry="260" fill="#bfe4ea" opacity="0.12" filter="url(#fb40)"/>
-  <ellipse cx="600" cy="165" rx="165" ry="135" fill="#cfeaf2" opacity="0.09" filter="url(#fb20)"/>
-
-  <!-- ══ VENDING MACHINE (x=460-740, y=50-630, 280×580px) ══ -->
-  <!-- Body -->
-  <rect x="460" y="50"  width="280" height="580" rx="3"  fill="#8e9888"/>
-  <rect x="460" y="50"  width="7"   height="580" rx="3"  fill="#7a8475"/>
-  <rect x="733" y="50"  width="7"   height="580" rx="3"  fill="#7a8475"/>
-  <rect x="460" y="50"  width="280" height="4"   rx="2"  fill="#6e7870"/>
-
-  <!-- Header -->
-  <rect x="460" y="54"  width="280" height="46"          fill="#7c8877"/>
-  <rect x="460" y="99"  width="280" height="3"           fill="#4c5448"/>
-  <text x="600" y="81"  text-anchor="middle" font-family="'Noto Serif JP',serif" font-size="19" fill="rgba(222,242,255,0.93)" letter-spacing="8">作品集</text>
-  <text x="600" y="95"  text-anchor="middle" font-family="monospace,sans-serif"   font-size="7.5" fill="rgba(175,200,215,0.50)" letter-spacing="2">AFTER HOURS · JAYDEN KIM</text>
-
-  <!-- Display bezel -->
-  <rect x="460" y="102" width="280" height="286"          fill="#3c4440"/>
-  <rect x="466" y="108" width="268" height="274" rx="1"   fill="#2e3432"/>
-  <!-- Display window -->
-  <rect x="468" y="110" width="264" height="272"          fill="url(#fDispG)"/>
-  <rect x="468" y="110" width="264" height="272"          fill="rgba(200,240,255,0.08)" filter="url(#fb8)"/>
-  <rect x="468" y="110" width="264" height="8"            fill="#eef8fa" opacity="0.85"/>
-
-  <!-- drink rows (JS injected — same palettes as the street machine) -->
-  <g id="front-drinks"/>
-  <!-- Shelf 1 + price strip -->
-  <rect x="472" y="192" width="256" height="8" fill="#2a3230"/><rect x="472" y="192" width="256" height="1" fill="rgba(255,255,255,0.07)"/>
-  <rect x="474" y="193.5" width="252" height="5" fill="#e2dccc" opacity="0.92"/>
-  <g fill="#c04038">
-    <rect x="481" y="194.7" width="11" height="2.6" rx="0.6"/><rect x="513" y="194.7" width="11" height="2.6" rx="0.6"/>
-    <rect x="545" y="194.7" width="11" height="2.6" rx="0.6"/><rect x="577" y="194.7" width="11" height="2.6" rx="0.6"/>
-    <rect x="609" y="194.7" width="11" height="2.6" rx="0.6"/><rect x="641" y="194.7" width="11" height="2.6" rx="0.6"/>
-    <rect x="673" y="194.7" width="11" height="2.6" rx="0.6"/><rect x="705" y="194.7" width="11" height="2.6" rx="0.6"/>
-  </g>
-
-  <!-- Shelf 2 + price strip -->
-  <rect x="472" y="257" width="256" height="8" fill="#2a3230"/><rect x="472" y="257" width="256" height="1" fill="rgba(255,255,255,0.07)"/>
-  <rect x="474" y="258.5" width="252" height="5" fill="#e2dccc" opacity="0.92"/>
-  <g fill="#c04038">
-    <rect x="481" y="259.7" width="11" height="2.6" rx="0.6"/><rect x="513" y="259.7" width="11" height="2.6" rx="0.6"/>
-    <rect x="545" y="259.7" width="11" height="2.6" rx="0.6"/><rect x="577" y="259.7" width="11" height="2.6" rx="0.6"/>
-    <rect x="609" y="259.7" width="11" height="2.6" rx="0.6"/><rect x="641" y="259.7" width="11" height="2.6" rx="0.6"/>
-    <rect x="673" y="259.7" width="11" height="2.6" rx="0.6"/><rect x="705" y="259.7" width="11" height="2.6" rx="0.6"/>
-  </g>
-
-
-  <!-- Display bottom panel (+ price strip under row 3) -->
-  <rect x="468" y="322" width="264" height="60" fill="#182028"/>
-  <rect x="474" y="322.5" width="252" height="5" fill="#e2dccc" opacity="0.92"/>
-  <g fill="#c04038">
-    <rect x="481" y="323.7" width="11" height="2.6" rx="0.6"/><rect x="513" y="323.7" width="11" height="2.6" rx="0.6"/>
-    <rect x="545" y="323.7" width="11" height="2.6" rx="0.6"/><rect x="577" y="323.7" width="11" height="2.6" rx="0.6"/>
-    <rect x="609" y="323.7" width="11" height="2.6" rx="0.6"/><rect x="641" y="323.7" width="11" height="2.6" rx="0.6"/>
-    <rect x="673" y="323.7" width="11" height="2.6" rx="0.6"/><rect x="705" y="323.7" width="11" height="2.6" rx="0.6"/>
-  </g>
-  <rect x="472" y="328" width="61"  height="20" rx="2" fill="#1e2c34"/>
-  <rect x="537" y="328" width="61"  height="20" rx="2" fill="#1e2c34"/>
-  <rect x="602" y="328" width="61"  height="20" rx="2" fill="#1e2c34"/>
-  <rect x="667" y="328" width="61"  height="20" rx="2" fill="#1e2c34"/>
-  <rect x="480" y="332" width="8"   height="8"  rx="1" fill="#0e1618"/>
-  <rect x="492" y="332" width="8"   height="8"  rx="1" fill="#0e1618"/>
-  <circle cx="548" cy="336" r="2.5" fill="#39ff14" opacity="0.9"/>
-  <rect x="609" y="332" width="8"   height="8"  rx="1" fill="#0e1618"/>
-  <rect x="674" y="332" width="8"   height="8"  rx="1" fill="#0e1618"/>
-  <rect x="472" y="354" width="256" height="12" rx="1" fill="#141e22"/>
-  <rect x="472" y="370" width="256" height="10" rx="1" fill="#0e1618"/>
-
-  <!-- BELOW DISPLAY: cork board (left) + control panel (right) -->
-  <rect x="460" y="388" width="168" height="86" fill="#8e9888"/>
-  <rect x="467" y="395" width="154" height="74" rx="3" fill="#c4a03c"/>
-  <rect x="467" y="395" width="154" height="74" rx="3" fill="#b89030" opacity="0.26"/>
-  <rect x="472" y="400" width="102" height="64" rx="2" fill="#f0ead0"/>
-  <rect x="478" y="397" width="22"  height="7"  rx="1" fill="rgba(218,212,198,0.78)" transform="rotate(-4 489 400)"/>
-  <rect x="540" y="397" width="22"  height="7"  rx="1" fill="rgba(218,212,198,0.78)" transform="rotate(5  551 400)"/>
-  <text x="523" y="417" text-anchor="middle" font-family="'Noto Serif JP',serif" font-size="9" fill="#3a2408" opacity="0.82">作品集</text>
-  <rect x="477" y="423" width="92"  height="2"  rx="1" fill="#9a8860" opacity="0.55"/>
-  <rect x="477" y="429" width="78"  height="2"  rx="1" fill="#9a8860" opacity="0.45"/>
-  <rect x="477" y="435" width="86"  height="2"  rx="1" fill="#9a8860" opacity="0.38"/>
-  <rect x="477" y="441" width="62"  height="2"  rx="1" fill="#9a8860" opacity="0.32"/>
-  <rect x="477" y="447" width="74"  height="2"  rx="1" fill="#9a8860" opacity="0.26"/>
-  <rect x="628" y="388" width="112" height="86" fill="#28302c"/>
-  <rect x="635" y="395" width="98"  height="40" rx="2" fill="#0a0e0c"/>
-  <rect x="643" y="427" width="58"  height="4"  rx="2" fill="#060a08"/>
-  <circle cx="690" cy="408" r="3.5" fill="#3af014" opacity="0.90"/>
-  <circle cx="700" cy="408" r="3.5" fill="#ff2055" opacity="0.85"/>
-  <rect x="718" y="399" width="8"   height="30" rx="3" fill="#141a18"/>
-  <rect x="718" y="408" width="8"   height="8"  rx="2" fill="#2a3430"/>
-
-  <!-- BUTTON ROW -->
-  <rect x="460" y="474" width="280" height="31" fill="#28302c"/>
-  <rect x="460" y="474" width="280" height="2"  fill="#141a18"/>
-  <rect x="467" y="481" width="38"  height="18" rx="2" fill="#181e1a"/>
-  <rect x="509" y="481" width="38"  height="18" rx="2" fill="#181e1a"/>
-  <rect x="551" y="481" width="38"  height="18" rx="2" fill="#181e1a"/>
-  <rect x="593" y="481" width="38"  height="18" rx="2" fill="#181e1a"/>
-  <rect x="635" y="481" width="38"  height="18" rx="2" fill="#181e1a"/>
-  <rect x="677" y="481" width="38"  height="18" rx="2" fill="#181e1a"/>
-  <circle cx="486" cy="490" r="2.5" fill="#2a3430"/>
-  <circle cx="528" cy="490" r="2.5" fill="#2a3430"/>
-  <circle cx="570" cy="490" r="2.5" fill="#2a3430"/>
-  <circle cx="612" cy="490" r="2.5" fill="#2a3430"/>
-  <circle cx="654" cy="490" r="2.5" fill="#2a3430"/>
-  <circle cx="696" cy="490" r="2.5" fill="#2a3430"/>
-
-  <!-- COIN SLOTS -->
-  <rect x="460" y="505" width="280" height="25" fill="#28302c"/>
-  <rect x="467" y="511" width="108" height="10" rx="4" fill="#060a08"/>
-  <rect x="581" y="511" width="108" height="10" rx="4" fill="#060a08"/>
-  <circle cx="708" cy="516" r="3.5" fill="#3af014" opacity="0.90"/>
-
-  <!-- DISPENSE TRAY -->
-  <rect x="460" y="530" width="280" height="42" rx="2" fill="#0a0e0c"/>
-  <rect x="460" y="530" width="280" height="3"  fill="#141a18"/>
-  <rect x="467" y="537" width="266" height="28" rx="1" fill="#040608"/>
-  <rect x="467" y="558" width="266" height="2"  fill="#141a18"/>
-
-  <!-- BASE TRIM -->
-  <rect x="460" y="572" width="280" height="58" fill="#7c8877"/>
-  <rect x="460" y="572" width="280" height="3"  fill="#4c5448"/>
-  <rect x="460" y="625" width="280" height="5"  fill="#5c6655"/>
-  <rect x="468" y="580" width="264" height="3"  rx="1" fill="#6c7668" opacity="0.55"/>
-  <rect x="468" y="587" width="264" height="3"  rx="1" fill="#6c7668" opacity="0.55"/>
-  <rect x="468" y="594" width="264" height="3"  rx="1" fill="#6c7668" opacity="0.55"/>
-  <rect x="468" y="601" width="264" height="3"  rx="1" fill="#6c7668" opacity="0.55"/>
-  <rect x="468" y="608" width="264" height="3"  rx="1" fill="#6c7668" opacity="0.55"/>
-  <rect x="468" y="615" width="264" height="3"  rx="1" fill="#6c7668" opacity="0.55"/>
-  <rect x="470" y="624" width="52"  height="6"  rx="2" fill="#5c6655"/>
-  <rect x="678" y="624" width="52"  height="6"  rx="2" fill="#5c6655"/>
-  <!-- Outline -->
-  <rect x="460" y="50"  width="280" height="580" rx="3" fill="none" stroke="#5c6655" stroke-width="1.5"/>
-  <!-- pink/purple sky tint falling on the body -->
-  <rect x="460" y="50"  width="280" height="580" rx="3" fill="url(#fVmTintG)"/>
-
-  <!-- ══ DISPLAY ILLUMINATION — warm-white case light, contained ══ -->
-  <rect x="468" y="110" width="264" height="272" fill="#cfeaf2" opacity="0.12" filter="url(#fb8)" class="glow-pulse"/>
-  <rect x="462" y="104" width="276" height="284" rx="2" fill="none" stroke="#a8d8e4" stroke-width="6" opacity="0.20" filter="url(#fb8)" class="glow-pulse"/>
-  <rect x="460" y="108" width="12" height="276" fill="#cfeaf2" opacity="0.16" filter="url(#fb8)" class="glow-pulse"/>
-  <rect x="728" y="108" width="12" height="276" fill="#cfeaf2" opacity="0.16" filter="url(#fb8)" class="glow-pulse"/>
-  <ellipse cx="600" cy="110" rx="130" ry="40" fill="#dff0f4" opacity="0.16" filter="url(#fb20)" class="glow-pulse"/>
-  <ellipse cx="600" cy="452" rx="310" ry="40" fill="#bfe4ea" opacity="0.08" filter="url(#fb20)" class="floor-pulse"/>
-  <ellipse cx="600" cy="446" rx="180" ry="20" fill="#dff0f4" opacity="0.07" filter="url(#fb8)" class="floor-pulse"/>
-  <!-- Green LED glow (control panel) -->
-  <ellipse cx="690" cy="408" rx="22" ry="14" fill="#3af014" opacity="0.30" filter="url(#fb8)"/>
-  <!-- Red LED glow (control panel) -->
-  <ellipse cx="700" cy="408" rx="22" ry="14" fill="#ff2055" opacity="0.26" filter="url(#fb8)"/>
-  <!-- Green LED glow (coin slot) -->
-  <ellipse cx="708" cy="516" rx="18" ry="11" fill="#3af014" opacity="0.28" filter="url(#fb8)"/>
-
-  <!-- ══ ATMOSPHERE / VIGNETTE ══ -->
-  <rect x="-2000" y="-500" width="5200" height="2500" fill="url(#fVigG)"/>
-  </svg>
-
-  <div class="vending-caption"><p class="eyebrow">A LIGHT LEFT ON, JUST FOR YOU</p><p>Little things. <em>Other worlds.</em></p></div>
+<div id="front-view" role="dialog" aria-modal="true" aria-label="The art vending machine" aria-hidden="true" inert>
+  <div class="machine-toolbar">
+    <button id="back-btn" type="button"><span aria-hidden="true">←</span> Back to the street</button>
+    <p>ONE SMALL WINDOW. SIX OTHER WORLDS.</p>
+    <span class="demo-label">DEMO COLLECTION</span>
+  </div>
+  <section class="art-cabinet" aria-label="Japanese art vending machine">
+    <span class="cabinet-screw screw-tl" aria-hidden="true"></span><span class="cabinet-screw screw-tr" aria-hidden="true"></span>
+    <header class="cabinet-brand"><div><h2 lang="ja">作品自販機</h2><p>ART DISPENSARY</p></div><span class="cabinet-brand-note">AFTER HOURS<br><b>24H</b></span></header>
+    <div class="cabinet-content">
+      <div class="display-case"><div class="display-tube" aria-hidden="true"></div><div class="painting-grid"><button class="painting-selection" type="button" data-art-id="A1" data-title="Blue Hour" data-image="artwork/blue-hour.svg" aria-haspopup="dialog" aria-label="View Blue Hour, demo painting A1">
+  <span class="painting-frame"><img data-src="artwork/blue-hour.svg" width="600" height="760" decoding="async" alt="Blue Hour, demo painting"></span>
+  <span class="selection-label"><b>A1</b><span>Blue Hour</span></span>
+  <span class="selection-switch"><i aria-hidden="true"></i><span lang="ja">選択</span><span class="selection-arrow" aria-hidden="true">↗</span></span>
+</button>
+<button class="painting-selection" type="button" data-art-id="A2" data-title="Persimmons" data-image="artwork/persimmons.svg" aria-haspopup="dialog" aria-label="View Persimmons, demo painting A2">
+  <span class="painting-frame"><img data-src="artwork/persimmons.svg" width="600" height="760" decoding="async" alt="Persimmons, demo painting"></span>
+  <span class="selection-label"><b>A2</b><span>Persimmons</span></span>
+  <span class="selection-switch"><i aria-hidden="true"></i><span lang="ja">選択</span><span class="selection-arrow" aria-hidden="true">↗</span></span>
+</button>
+<button class="painting-selection" type="button" data-art-id="A3" data-title="Last Train" data-image="artwork/last-train.svg" aria-haspopup="dialog" aria-label="View Last Train, demo painting A3">
+  <span class="painting-frame"><img data-src="artwork/last-train.svg" width="600" height="760" decoding="async" alt="Last Train, demo painting"></span>
+  <span class="selection-label"><b>A3</b><span>Last Train</span></span>
+  <span class="selection-switch"><i aria-hidden="true"></i><span lang="ja">選択</span><span class="selection-arrow" aria-hidden="true">↗</span></span>
+</button>
+<button class="painting-selection" type="button" data-art-id="B1" data-title="Tide Pool" data-image="artwork/tide-pool.svg" aria-haspopup="dialog" aria-label="View Tide Pool, demo painting B1">
+  <span class="painting-frame"><img data-src="artwork/tide-pool.svg" width="600" height="760" decoding="async" alt="Tide Pool, demo painting"></span>
+  <span class="selection-label"><b>B1</b><span>Tide Pool</span></span>
+  <span class="selection-switch"><i aria-hidden="true"></i><span lang="ja">選択</span><span class="selection-arrow" aria-hidden="true">↗</span></span>
+</button>
+<button class="painting-selection" type="button" data-art-id="B2" data-title="Paper Moon" data-image="artwork/paper-moon.svg" aria-haspopup="dialog" aria-label="View Paper Moon, demo painting B2">
+  <span class="painting-frame"><img data-src="artwork/paper-moon.svg" width="600" height="760" decoding="async" alt="Paper Moon, demo painting"></span>
+  <span class="selection-label"><b>B2</b><span>Paper Moon</span></span>
+  <span class="selection-switch"><i aria-hidden="true"></i><span lang="ja">選択</span><span class="selection-arrow" aria-hidden="true">↗</span></span>
+</button>
+<button class="painting-selection" type="button" data-art-id="B3" data-title="Summer Room" data-image="artwork/summer-room.svg" aria-haspopup="dialog" aria-label="View Summer Room, demo painting B3">
+  <span class="painting-frame"><img data-src="artwork/summer-room.svg" width="600" height="760" decoding="async" alt="Summer Room, demo painting"></span>
+  <span class="selection-label"><b>B3</b><span>Summer Room</span></span>
+  <span class="selection-switch"><i aria-hidden="true"></i><span lang="ja">選択</span><span class="selection-arrow" aria-hidden="true">↗</span></span>
+</button></div><p class="display-caption"><span lang="ja">お好きな作品をお選びください</span><span>SELECT A PAINTING TO LOOK CLOSER</span></p></div>
+      <aside class="cabinet-controls" aria-label="Machine display">
+        <div class="selection-lcd"><span id="lcd-code">00</span><small lang="ja">お選びください</small></div>
+        <div class="payment-details" aria-hidden="true"><p lang="ja">硬貨投入口</p><div class="coin-plate"><span class="coin-slot"></span></div><div class="coin-values">¥10 · ¥50<br>¥100 · ¥500</div><div class="coin-return"><span>↶</span><small lang="ja">返却</small></div><div class="bill-slot"></div><small class="bill-note">1000円</small></div>
+        <div class="free-viewing"><b lang="ja">鑑賞無料</b><span>FREE TO<br>GET LOST</span></div>
+        <span class="cabinet-keyhole" aria-hidden="true"></span>
+        <span class="service-label">JK—06<br>AFTER HOURS<br>ART DISPENSARY</span>
+      </aside>
+    </div>
+    <footer class="cabinet-bottom"><div class="cabinet-note"><span lang="ja">夜は、まだ長い。</span><small>The night is still young.</small></div><div class="retrieval-tray" aria-hidden="true"><span lang="ja">取出口</span><i></i></div><div class="cabinet-vent" aria-hidden="true"></div></footer>
+    <span class="cabinet-screw screw-bl" aria-hidden="true"></span><span class="cabinet-screw screw-br" aria-hidden="true"></span>
+  </section>
+  <p class="machine-ground-note">A little art for the way home.</p>
 </div><!-- front-view -->
 
+<dialog id="artwork-viewer" aria-labelledby="artwork-title">
+  <div class="viewer-toolbar"><span id="artwork-number">A1 / 06</span><span>DEMO PAINTING</span><button id="close-artwork" type="button" autofocus>Close <span aria-hidden="true">×</span></button></div>
+  <div class="viewer-canvas"><img id="artwork-image" alt="" width="600" height="760"></div>
+  <div class="viewer-footer"><button id="previous-artwork" type="button" aria-label="Previous painting">← <span>Previous</span></button><div aria-live="polite"><h2 id="artwork-title">Blue Hour</h2><p>Demo collection · After Hours</p></div><button id="next-artwork" type="button" aria-label="Next painting"><span>Next</span> →</button></div>
+</dialog>
+
 <script>
-// ── STAR GENERATION + MILKY WAY (disabled) ──
-/* (function () {
-  const g  = document.getElementById('stars');
-  const ns = 'http://www.w3.org/2000/svg';
-  function mkStar(x, y, r, fill, lo, hi) {
-    const dur = (Math.random() * 4 + 2).toFixed(1) + 's';
-    const dly = (Math.random() * 7).toFixed(1) + 's';
-    const c = document.createElementNS(ns, 'circle');
-    c.setAttribute('cx', x); c.setAttribute('cy', y); c.setAttribute('r', r);
-    c.setAttribute('fill', fill); c.setAttribute('class', 'star');
-    c.style.setProperty('--dur', dur); c.style.setProperty('--dly', dly);
-    c.style.setProperty('--lo', lo);   c.style.setProperty('--hi', hi);
-    g.appendChild(c);
-  }
-  // background stars
-  const pal = ['#ffffff','#ffeeff','#ffddff','#ffccff','#eeddff','#ffffff','#ffffff','#fffaff'];
-  for (let i = 0; i < 520; i++) {
-    const x = Math.random() * 1200;
-    const y = Math.random() * 310;
-    const big = Math.random() < 0.14;
-    const r = big ? Math.random() * 1.6 + 1.0 : Math.random() * 0.8 + 0.2;
-    const fill = pal[Math.floor(Math.random() * pal.length)];
-    mkStar(x, y, r, fill, (Math.random()*0.18+0.08).toFixed(2), (Math.random()*0.65+0.45).toFixed(2));
-  }
-  // milky way cluster — denser bright pink-white stars along the band
-  // band centerline: (0,295)→(1200,75), parametric: cx=t*1200, cy=295-t*220
-  const mwPal = ['#ffffff','#ffeeFF','#ffddff','#ffe8ff','#ffffff'];
-  for (let i = 0; i < 380; i++) {
-    const t  = Math.random();
-    const bx = t * 1200;
-    const by = 295 - t * 220;
-    const spread = 52;
-    const x = bx + (Math.random() - 0.5) * spread * 2;
-    const y = by + (Math.random() - 0.5) * spread;
-    if (y < 0 || y > 310) continue;
-    const r    = Math.random() < 0.12 ? Math.random() * 1.4 + 0.8 : Math.random() * 0.7 + 0.15;
-    const fill = mwPal[Math.floor(Math.random() * mwPal.length)];
-    mkStar(x, y, r, fill, (Math.random()*0.22+0.12).toFixed(2), (Math.random()*0.70+0.50).toFixed(2));
-  }
-})(); */
-
-// ── FRONT VIEW STARS (disabled) ──
-/* (function () {
-  const g  = document.getElementById('front-stars');
-  const ns = 'http://www.w3.org/2000/svg';
-  const pal   = ['#ffffff','#ffeeff','#ffddff','#ffccff','#eeddff','#ffffff','#fffaff'];
-  const mwPal = ['#ffffff','#ffeeFF','#ffddff','#ffe8ff','#ffffff'];
-  function mk(x, y, r, fill, lo, hi) {
-    const dur = (Math.random() * 4 + 2).toFixed(1) + 's';
-    const dly = (Math.random() * 7).toFixed(1) + 's';
-    const c = document.createElementNS(ns, 'circle');
-    c.setAttribute('cx', x); c.setAttribute('cy', y); c.setAttribute('r', r);
-    c.setAttribute('fill', fill); c.setAttribute('class', 'star');
-    c.style.setProperty('--dur', dur); c.style.setProperty('--dly', dly);
-    c.style.setProperty('--lo', lo);   c.style.setProperty('--hi', hi);
-    g.appendChild(c);
-  }
-  // background stars — same coordinate space as main scene (y < 310)
-  for (let i = 0; i < 520; i++) {
-    const x = Math.random() * 1200;
-    const y = Math.random() * 310;
-    const big = Math.random() < 0.14;
-    const r = big ? Math.random() * 1.6 + 1.0 : Math.random() * 0.8 + 0.2;
-    const fill = pal[Math.floor(Math.random() * pal.length)];
-    mk(x, y, r, fill, (Math.random()*0.18+0.08).toFixed(2), (Math.random()*0.65+0.45).toFixed(2));
-  }
-  // milky way cluster — same band as main scene: (0,295)→(1200,75)
-  for (let i = 0; i < 380; i++) {
-    const t  = Math.random();
-    const bx = t * 1200;
-    const by = 295 - t * 220;
-    const spread = 52;
-    const x = bx + (Math.random() - 0.5) * spread * 2;
-    const y = by + (Math.random() - 0.5) * spread;
-    if (y < 0 || y > 310) continue;
-    const r    = Math.random() < 0.12 ? Math.random() * 1.4 + 0.8 : Math.random() * 0.7 + 0.15;
-    const fill = mwPal[Math.floor(Math.random() * mwPal.length)];
-    mk(x, y, r, fill, (Math.random()*0.22+0.12).toFixed(2), (Math.random()*0.70+0.50).toFixed(2));
-  }
-})(); */
-
-// ── COSMIC DUST (disabled) ──
-/* (function () {
-  const ns = 'http://www.w3.org/2000/svg';
-
-  function mkP(g, x, y, r, fill, lo, hi) {
-    const dur = (Math.random() * 3 + 1).toFixed(1) + 's';
-    const dly = (Math.random() * 6).toFixed(1) + 's';
-    const c = document.createElementNS(ns, 'circle');
-    c.setAttribute('cx', x); c.setAttribute('cy', y); c.setAttribute('r', r);
-    c.setAttribute('fill', fill); c.setAttribute('class', 'star');
-    c.style.setProperty('--dur', dur); c.style.setProperty('--dly', dly);
-    c.style.setProperty('--lo', lo.toFixed(2));
-    c.style.setProperty('--hi', hi.toFixed(2));
-    g.appendChild(c);
-  }
-
-  function bandPoint(spread) {
-    const t = Math.random();
-    return [
-      t * 1200 + (Math.random() - 0.5) * spread * 2,
-      (295 - t * 220) + (Math.random() - 0.5) * spread
-    ];
-  }
-
-  const outerPal = [
-    '#ff00cc','#ff22dd','#ee00bb','#dd00aa','#cc00ff',
-    '#aa00ee','#ff44cc','#ff88dd','#ffffff','#ffaaee',
-    '#ff00bb','#ff33cc','#ee22cc','#bb00cc','#ffffff'
-  ];
-  const corePal = [
-    '#ffffff','#ffffff','#ffffff','#ffe8ff',
-    '#ff88ff','#ff44ee','#ffccff','#ffffff'
-  ];
-
-  function populateBand(outer, core) {
-    for (let i = 0; i < 3000; i++) {
-      let x, y;
-      if (Math.random() < 0.80) {
-        const spread = Math.random() < 0.55 ? 40 : 95;
-        [x, y] = bandPoint(spread);
-      } else {
-        x = Math.random() * 1200;
-        y = Math.random() * 310;
-      }
-      if (y < 0 || y > 310) continue;
-      const big = Math.random() < 0.12;
-      const r   = big ? Math.random() * 2.0 + 1.0 : Math.random() * 1.0 + 0.25;
-      const fill = outerPal[Math.floor(Math.random() * outerPal.length)];
-      mkP(outer, x, y, r, fill, Math.random() * 0.2 + 0.35, Math.random() * 0.2 + 0.78);
-    }
-    for (let i = 0; i < 1200; i++) {
-      const spread = Math.random() < 0.65 ? 14 : 32;
-      const [x, y] = bandPoint(spread);
-      if (y < 0 || y > 310) continue;
-      const big = Math.random() < 0.18;
-      const r   = big ? Math.random() * 2.2 + 1.2 : Math.random() * 1.1 + 0.5;
-      const fill = corePal[Math.floor(Math.random() * corePal.length)];
-      mkP(core, x, y, r, fill, Math.random() * 0.1 + 0.60, Math.random() * 0.05 + 0.94);
-    }
-  }
-
-  const outer = document.getElementById('dust');
-  const core  = document.getElementById('dust-core');
-  if (outer && core) populateBand(outer, core);
-
-  const fouter = document.getElementById('front-dust');
-  const fcore  = document.getElementById('front-dust-core');
-  if (fouter && fcore) populateBand(fouter, fcore);
-})(); */
-
-// ── FRONT VIEW CITY — layered skyline matching the main scene's generator ──
-(function () {
-  const ns = 'http://www.w3.org/2000/svg';
-  const g = document.getElementById('front-city');
-  if (!g) return;
-  const R = Math.random;
-  const BASE = 340;
-  const mk = (t) => document.createElementNS(ns, t);
-  function rect(x, y, w, h, fill, op) {
-    const e = mk('rect');
-    e.setAttribute('x', x.toFixed(1)); e.setAttribute('y', y.toFixed(1));
-    e.setAttribute('width', Math.max(0.5, w).toFixed(1));
-    e.setAttribute('height', Math.max(0.5, h).toFixed(1));
-    e.setAttribute('fill', fill);
-    if (op !== undefined) e.setAttribute('opacity', op);
-    g.appendChild(e);
-    return e;
-  }
-  const warm = ['#f5d065', '#ffe488', '#f2b855', '#fffaaa', '#ffc85a', '#fde8a0'];
-  const cool = ['#cfe0ff', '#e8e6ff', '#b8ccf8', '#d8b0ff', '#f0d8ff'];
-  // far hazy layer
-  for (let fx = 150; fx < 1050;) {
-    const fw = 26 + R() * 50;
-    const fh = 30 + R() * 55;
-    rect(fx, BASE - fh, fw, fh, '#1c1746', 0.85);
-    const n = (fw * fh / 320) | 0;
-    for (let i = 0; i < n; i++) {
-      rect(fx + 2 + R() * (fw - 4), BASE - fh + 3 + R() * (fh - 8), 1.2, 1.7,
-           R() < 0.6 ? '#a8b4e8' : '#e8c8a8', (0.14 + R() * 0.2).toFixed(2));
-    }
-    fx += fw + 3 + R() * 15;
-  }
-  // near layer — tiered tops, rim light, antennas, structured windows
-  for (let bx = 150; bx < 1050;) {
-    const bw = 34 + R() * 58;
-    const bh = 70 + R() * 115;
-    const by = BASE - bh;
-    const character = R() < 0.4 ? 0 : R() < 0.75 ? 1 : 2;
-    rect(bx, by, bw, bh, '#0b0d15');
-    rect(bx, by, 1, bh, '#262048', '0.4');
-    rect(bx - 0.7, by - 1.6, bw + 1.4, 1.8, '#0d0f18');
-    rect(bx - 0.7, by - 2.2, bw + 1.4, 0.9, '#ff5fd6', (0.14 + R() * 0.26).toFixed(2));
-    if (bw > 40 && R() < 0.45) {                       // set-back tier
-      const tw = bw * (0.5 + R() * 0.3);
-      const th = 10 + R() * 18;
-      const tx = bx + (R() < 0.5 ? 2 : bw - tw - 2);
-      rect(tx, by - th, tw, th, '#0b0d15');
-      rect(tx - 0.7, by - th - 1.4, tw + 1.4, 1.6, '#0d0f18');
-      rect(tx - 0.7, by - th - 2, tw + 1.4, 0.8, '#ff5fd6', '0.2');
-    }
-    if (bw > 30 && R() < 0.45) {                       // antenna + beacon
-      const ax = bx + bw * (0.3 + R() * 0.4);
-      const ah = 8 + R() * 13;
-      const ant = mk('line');
-      ant.setAttribute('x1', ax.toFixed(1)); ant.setAttribute('y1', by.toFixed(1));
-      ant.setAttribute('x2', ax.toFixed(1)); ant.setAttribute('y2', (by - ah).toFixed(1));
-      ant.setAttribute('stroke', '#0a0c10');
-      ant.setAttribute('stroke-width', '1');
-      g.appendChild(ant);
-      if (R() < 0.5) {
-        const tip = mk('circle');
-        tip.setAttribute('cx', ax.toFixed(1));
-        tip.setAttribute('cy', (by - ah).toFixed(1));
-        tip.setAttribute('r', '1.1');
-        tip.setAttribute('fill', '#ff3344');
-        tip.setAttribute('class', 'roof-blink');
-        g.appendChild(tip);
-      }
-    }
-    const cols = Math.max(2, Math.round(bw / 7));
-    const rows = Math.max(2, Math.round(bh / 10));
-    const cw = (bw - 4) / cols, ch = (bh - 5) / rows;
-    const ww = Math.min(2.8, cw * 0.55), wh = Math.min(3.6, ch * 0.55);
-    for (let r2 = 0; r2 < rows; r2++) {
-      const rate = character === 0 && R() < 0.15 ? 0.85
-                 : character === 2 ? 0.08 : 0.3;
-      for (let c = 0; c < cols; c++) {
-        if (R() > rate) continue;
-        const pal = character === 0 ? (R() < 0.55 ? cool : warm)
-                                    : (R() < 0.8 ? warm : cool);
-        const wy = by + 2.5 + r2 * ch + (ch - wh) / 2;
-        if (wy + wh > BASE - 1) continue;
-        const e = rect(bx + 2 + c * cw + (cw - ww) / 2, wy, ww, wh,
-                       pal[(R() * pal.length) | 0], (0.4 + R() * 0.55).toFixed(2));
-        if (R() < 0.12) {
-          e.setAttribute('class', 'city-win');
-          e.style.setProperty('--dur', (2 + R() * 5).toFixed(1) + 's');
-          e.style.setProperty('--dly', (R() * 9).toFixed(1) + 's');
-          e.style.setProperty('--lo', '0.15');
-          e.style.setProperty('--hi', '0.85');
-        }
-      }
-    }
-    if (bh > 85 && bw >= 36 && R() < 0.18) {           // neon sign
-      const neonCols = ['#ff2cc8', '#22d4ff', '#b44dff', '#ff5fa0'];
-      const vert = R() < 0.6;
-      const sign = rect(bx + 4 + R() * (bw - (vert ? 10 : 24)),
-                        by + 6 + R() * bh * 0.3,
-                        vert ? 2.5 : 9 + R() * 8,
-                        vert ? 9 + R() * 12 : 2.5,
-                        neonCols[(R() * 4) | 0]);
-      sign.setAttribute('filter', 'url(#fglow5)');
-      sign.setAttribute('class', 'lamp-flicker');
-    }
-    bx += bw + 4 + R() * 24;
-  }
-})();
-
-// ── FRONT VIEW DRINKS — vivid rows matching the street machine ──
-(function () {
-  const ns = 'http://www.w3.org/2000/svg';
-  const g = document.getElementById('front-drinks');
-  if (!g) return;
-  function rect(x, y, w, h, fill, rx, op) {
-    const e = document.createElementNS(ns, 'rect');
-    e.setAttribute('x', x.toFixed(1)); e.setAttribute('y', y.toFixed(1));
-    e.setAttribute('width', w.toFixed(1)); e.setAttribute('height', h.toFixed(1));
-    e.setAttribute('fill', fill);
-    if (rx) e.setAttribute('rx', rx);
-    if (op !== undefined) e.setAttribute('opacity', op);
-    g.appendChild(e);
-  }
-  const rows = [
-    { base: 192, h: 72, cap: true,     // bottles
-      pal: ['#4cae4e','#e8a020','#f07828','#d84040','#f0c22e','#3a80d0','#dceef2','#37a24a'] },
-    { base: 257, h: 52, cap: false,    // cans
-      pal: ['#2c2c36','#d04888','#f0d040','#68c040','#ececec','#40b0a0','#d0a030','#4868c8'] },
-    { base: 322, h: 52, cap: false,    // boxes & bottles
-      pal: ['#c8b890','#e05050','#f2f2e8','#e8c040','#4a4a5c','#b04898','#64aad8','#d8d0b8'] },
-  ];
-  const x0 = 474, step = 31.75, w = 27;
-  rows.forEach((row) => {
-    row.pal.forEach((col, i) => {
-      const x = x0 + i * step;
-      const top = row.base - row.h;
-      rect(x, top, w, row.h, col, 2);
-      if (row.cap) {                                  // bottle neck + cap
-        rect(x + w * 0.28, top - 6, w * 0.44, 6.5, col, 1.5);
-        rect(x + w * 0.3, top - 9, w * 0.4, 3.6, '#e8e8e0', 1);
-      } else {                                        // can rim
-        rect(x, top, w, 2.2, '#ffffff', 1, 0.4);
-      }
-      rect(x + w * 0.12, top + row.h * 0.3, w * 0.76, row.h * 0.32, '#f6f2ea', 1, 0.9);  // label
-      rect(x + 2, top + 2, 4, row.h - 5, '#ffffff', 1.6, 0.28);                          // sheen
-    });
-  });
-})();
-
 // ── SPIRAL GALAXY ENGINE — canvas particle simulation ──
 // Kinematic density-wave galaxy: ~10k particles on progressively-twisted
 // elliptical orbits. The arms are a persistent crowding pattern — stars
@@ -2473,139 +1684,6 @@ setTimeout(bootGalaxy, 300);
     }
   }
   fill('stars',        40, 0,   1200, 0,   310);   // canvas galaxy already carries the starfield
-  fill('front-stars', 240, 174,  853, -100, 430);
-})();
-
-// ── FRONT-VIEW GALAXY BAND — glitter along the band (closer view) ──
-(function () {
-  const ns = 'http://www.w3.org/2000/svg';
-  const outer = document.getElementById('front-dust');
-  const core = document.getElementById('front-dust-core');
-  if (!outer || !core) return;
-  const R = Math.random;
-  const gauss = () => (R() + R() + R() + R() - 2) / 2;
-  const CX = 760, CY = -30, TH = -24 * Math.PI / 180;
-  const dx = Math.cos(TH), dy = Math.sin(TH);
-  const pal = ['#ffffff', '#ffe6ff', '#ffd0f4', '#ffc0ee', '#e6d8ff', '#c0b8ff', '#ff9ae0'];
-  function speck(parent, x, y, r, fill, lo, hi) {
-    const c = document.createElementNS(ns, 'circle');
-    c.setAttribute('cx', x.toFixed(1)); c.setAttribute('cy', y.toFixed(1));
-    c.setAttribute('r', r.toFixed(2));
-    c.setAttribute('fill', fill);
-    if (R() < 0.4) {
-      c.setAttribute('class', 'star');
-      c.style.setProperty('--dur', (R() * 4 + 2).toFixed(1) + 's');
-      c.style.setProperty('--dly', (R() * 7).toFixed(1) + 's');
-      c.style.setProperty('--lo', lo.toFixed(2));
-      c.style.setProperty('--hi', hi.toFixed(2));
-    } else {
-      c.setAttribute('opacity', hi.toFixed(2));
-    }
-    parent.appendChild(c);
-  }
-  for (let i = 0; i < 520; i++) {           // band glitter
-    const t = R() * 2 - 1;
-    const along = t * 470;
-    const spread = gauss() * (70 * (1 - Math.abs(t) * 0.45) + 14);
-    const x = CX + dx * along - dy * spread;
-    const y = CY + dy * along + dx * spread;
-    if (y > 330) continue;
-    const big = R() < 0.1;
-    speck(outer, x, y, big ? 1.4 + R() * 1.2 : 0.4 + R() * 0.9,
-          pal[(R() * pal.length) | 0], R() * 0.2 + 0.15, R() * 0.35 + 0.55);
-  }
-  for (let i = 0; i < 160; i++) {           // dense white heart
-    const t = gauss() * 0.35;
-    const along = t * 470;
-    const spread = gauss() * 26;
-    const x = CX + dx * along - dy * spread;
-    const y = CY + dy * along + dx * spread;
-    if (y > 330) continue;
-    speck(core, x, y, 0.5 + R() * 1.1, R() < 0.6 ? '#ffffff' : '#ffeaff',
-          R() * 0.15 + 0.5, R() * 0.1 + 0.88);
-  }
-})();
-
-// ── VM FRONT — road-facing display drawn in true face perspective ──
-// Content is authored in face coordinates (u across, v down) and mapped onto
-// the machine's front plane, so shelves/controls foreshorten correctly.
-(function () {
-  const ns = 'http://www.w3.org/2000/svg';
-  const g = document.getElementById('vm-front');
-  if (!g) return;
-  const U0 = 576, UW = 40;
-  const topY = (u) => 331 - 2 * u;
-  const botY = (u) => 525 - 28 * u;
-  const px = (u) => U0 + UW * u;
-  const py = (u, v) => topY(u) + (botY(u) - topY(u)) * v;
-  function quad(u1, v1, u2, v2, fill, op, cls, filt) {
-    const e = document.createElementNS(ns, 'polygon');
-    e.setAttribute('points',
-      px(u1).toFixed(2) + ',' + py(u1, v1).toFixed(2) + ' ' +
-      px(u2).toFixed(2) + ',' + py(u2, v1).toFixed(2) + ' ' +
-      px(u2).toFixed(2) + ',' + py(u2, v2).toFixed(2) + ' ' +
-      px(u1).toFixed(2) + ',' + py(u1, v2).toFixed(2));
-    e.setAttribute('fill', fill);
-    if (op !== undefined) e.setAttribute('opacity', op);
-    if (cls) e.setAttribute('class', cls);
-    if (filt) e.setAttribute('filter', filt);
-    g.appendChild(e);
-    return e;
-  }
-
-  // backlit display window
-  quad(0.06, 0.028, 0.94, 0.50, '#23282a');
-  quad(0.085, 0.042, 0.915, 0.487, 'url(#vmCaseG)');
-  quad(0.085, 0.042, 0.915, 0.062, '#eef8fa', 0.85);
-
-  // shelves: drinks + price strips
-  const rows = [
-    { v0: 0.075, v1: 0.135, pal: ['#4cae4e','#e8a020','#f07828','#d84040','#f0c22e','#3a80d0','#dceef2'] },
-    { v0: 0.21,  v1: 0.265, pal: ['#2c2c36','#d04888','#f0d040','#68c040','#ececec','#40b0a0','#d0a030'] },
-    { v0: 0.345, v1: 0.40,  pal: ['#c8b890','#e05050','#f2f2e8','#e8c040','#4a4a5c','#64aad8','#d8d0b8'] },
-  ];
-  rows.forEach((row) => {
-    row.pal.forEach((col, i) => {
-      const u = 0.11 + i * 0.112;
-      quad(u, row.v0, u + 0.088, row.v1, col);
-      quad(u + 0.012, row.v0 + 0.008, u + 0.03, row.v1 - 0.012, '#ffffff', 0.28);
-    });
-    quad(0.085, row.v1 + 0.012, 0.915, row.v1 + 0.036, '#e2dccc', 0.92);
-    for (let i = 0; i < 7; i++) {
-      const u = 0.115 + i * 0.112;
-      quad(u, row.v1 + 0.017, u + 0.045, row.v1 + 0.031, '#c04038', 0.85);
-    }
-  });
-  // glass reflection + contained breathing glow
-  quad(0.12, 0.05, 0.30, 0.48, '#ffffff', 0.06);
-  quad(0.05, 0.02, 0.95, 0.51, '#cfeaf2', undefined, 'glow-pulse', 'url(#blur8)');
-
-  // mid panel: cardboard note + controls
-  quad(0.08, 0.545, 0.42, 0.665, '#8a6a3c');
-  quad(0.10, 0.553, 0.40, 0.657, '#a07c46');
-  quad(0.14, 0.615, 0.36, 0.628, '#4a3618', 0.7);
-  quad(0.52, 0.54, 0.92, 0.675, '#565e52');
-  quad(0.55, 0.555, 0.73, 0.585, '#14181a');
-  quad(0.58, 0.565, 0.70, 0.573, '#040606');
-  quad(0.78, 0.55, 0.89, 0.60, '#1a2022');
-  quad(0.825, 0.558, 0.845, 0.592, '#060a0a');
-  quad(0.55, 0.615, 0.90, 0.655, '#3c443c');
-  quad(0.575, 0.624, 0.635, 0.645, '#141a16');
-  quad(0.665, 0.624, 0.725, 0.645, '#141a16');
-  quad(0.755, 0.624, 0.815, 0.645, '#141a16');
-  quad(0.86, 0.627, 0.885, 0.642, '#3af014').setAttribute('filter', 'url(#glow5)');
-
-  // wide dispense flap
-  quad(0.07, 0.715, 0.93, 0.83, '#3a423a');
-  quad(0.10, 0.73, 0.90, 0.815, '#12161a');
-  quad(0.10, 0.73, 0.90, 0.745, '#20262c');
-  quad(0.28, 0.762, 0.72, 0.783, '#0a0d10');
-
-  // seams + base plinth
-  quad(0.04, 0.53, 0.96, 0.536, '#4a5146', 0.8);
-  quad(0.04, 0.70, 0.96, 0.706, '#4a5146', 0.8);
-  quad(0, 0.90, 1, 1, '#171b16');
-  quad(0, 0.90, 1, 0.912, '#242822');
 })();
 
 // ── GROUND DETAIL — stains, cracks, mica glints (perspective-scaled) ──
@@ -3005,110 +2083,6 @@ setTimeout(bootGalaxy, 300);
       winG.appendChild(dot);
     }
   });
-})();
-
-// ── SHOOTING STARS ──
-(function () {
-  const ns = 'http://www.w3.org/2000/svg';
-  let gradId = 0;
-
-  // cfg: { svgId, groupId, glowFilter, x0, xw, y0, yh }
-  function spawnShootingStar(cfg) {
-    const svg = document.getElementById(cfg.svgId);
-    if (!svg) return;
-
-    const angleDeg = 28 + Math.random() * 22;
-    const tailLen  = 90  + Math.random() * 110;
-    const dist     = 220 + Math.random() * 280;
-    const duration = 700 + Math.random() * 500;
-
-    const sx = cfg.x0 + Math.random() * cfg.xw;
-    const sy = cfg.y0 + Math.random() * cfg.yh;
-    const dx = Math.cos(angleDeg * Math.PI / 180);
-    const dy = Math.sin(angleDeg * Math.PI / 180);
-
-    // Gradient fixed in local space — tail at (-tailLen,0), head at (0,0)
-    // userSpaceOnUse coords are in the element's local coordinate system,
-    // so they stay aligned with the line as the group moves.
-    const gid  = 'ssg' + (gradId++);
-    const defs = svg.querySelector('defs');
-    const grad = document.createElementNS(ns, 'linearGradient');
-    grad.setAttribute('id', gid);
-    grad.setAttribute('gradientUnits', 'userSpaceOnUse');
-    grad.setAttribute('x1', -tailLen); grad.setAttribute('y1', 0);
-    grad.setAttribute('x2', 0);        grad.setAttribute('y2', 0);
-    const s0 = document.createElementNS(ns, 'stop');
-    s0.setAttribute('offset', '0%'); s0.setAttribute('stop-color', '#ffffff'); s0.setAttribute('stop-opacity', '0');
-    const s1 = document.createElementNS(ns, 'stop');
-    s1.setAttribute('offset', '100%'); s1.setAttribute('stop-color', '#ffffff'); s1.setAttribute('stop-opacity', '1');
-    grad.appendChild(s0); grad.appendChild(s1);
-    defs.appendChild(grad);
-
-    // Group holds line + head in local space; only its transform changes each frame
-    const container = document.getElementById(cfg.groupId) || svg;
-    const g = document.createElementNS(ns, 'g');
-
-    const line = document.createElementNS(ns, 'line');
-    line.setAttribute('x1', -tailLen); line.setAttribute('y1', 0);
-    line.setAttribute('x2', 0);        line.setAttribute('y2', 0);
-    line.setAttribute('stroke', 'url(#' + gid + ')');
-    line.setAttribute('stroke-width', '1.5');
-    line.setAttribute('stroke-linecap', 'round');
-    g.appendChild(line);
-
-    const head = document.createElementNS(ns, 'circle');
-    head.setAttribute('cx', 0); head.setAttribute('cy', 0); head.setAttribute('r', '2');
-    head.setAttribute('fill', '#ffffff');
-    head.setAttribute('filter', 'url(#' + cfg.glowFilter + ')');
-    g.appendChild(head);
-
-    container.appendChild(g);
-
-    // CSS animation handles opacity — zero JS overhead for fade
-    const fadeKf = [
-      { opacity: 0 },
-      { opacity: 1, offset: 0.08 },
-      { opacity: 1, offset: 0.75 },
-      { opacity: 0 }
-    ];
-    g.animate(fadeKf, { duration, fill: 'forwards', easing: 'linear' });
-
-    // Only 1 attribute change per frame: the group transform
-    const t0 = performance.now();
-    function tick(now) {
-      if (document.hidden || document.body.dataset.still === 'true' || !document.getElementById('front-view').classList.contains('visible')) {
-        g.remove(); grad.remove(); return;
-      }
-      const p  = Math.min((now - t0) / duration, 1);
-      const hx = (sx + dx * dist * p).toFixed(1);
-      const hy = (sy + dy * dist * p).toFixed(1);
-      g.setAttribute('transform', `translate(${hx},${hy}) rotate(${angleDeg})`);
-      if (p < 1) { requestAnimationFrame(tick); }
-      else { g.remove(); grad.remove(); }
-    }
-    requestAnimationFrame(tick);
-  }
-
-  function makeScheduler(cfg) {
-    function run() {
-      const delay = 2000 + Math.random() * 4000;
-      setTimeout(() => {
-        if (!document.hidden && document.body.dataset.still !== 'true' &&
-            !matchMedia('(prefers-reduced-motion: reduce)').matches &&
-            document.getElementById('front-view').classList.contains('visible')) spawnShootingStar(cfg);
-        run();
-      }, delay);
-    }
-    setTimeout(run, 1000 + Math.random() * 2000);
-  }
-
-  // Main scene sky: retired along with the photo background (galaxy replaced it)
-  // makeScheduler({ svgId: 'scene-svg', groupId: 'stars', glowFilter: 'glow5',
-  //                 x0: 30, xw: 900, y0: 15, yh: 160 });
-
-  // Front view sky: x 200–980, y -100 to 180 (above horizon ~310)
-  makeScheduler({ svgId: 'front-svg', groupId: 'front-stars', glowFilter: 'fglow5',
-                  x0: 200, xw: 780, y0: -100, yh: 280 });
 })();
 
 </script>

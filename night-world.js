@@ -6,6 +6,10 @@
   const scene = byId('scene-view');
   const arrival = byId('arrival');
   const header = byId('night-header');
+  const artworkViewer = byId('artwork-viewer');
+  const paintings = [...front.querySelectorAll('.painting-selection')];
+  let currentPainting = 0;
+  let artworksLoaded = false;
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   let returnFocus = byId('explore-btn');
   let chosenStill = null;
@@ -14,6 +18,8 @@
     if (trigger) returnFocus = trigger;
     body.dataset.view = view;
     const vending = view === 'vending';
+    if (vending) loadPaintings();
+    else if (artworkViewer.open) artworkViewer.close();
     front.inert = !vending;
     front.setAttribute('aria-hidden', String(!vending));
     front.classList.toggle('visible', vending);
@@ -38,9 +44,18 @@
   byId('nav-street').addEventListener('click', e => setView('street', e.currentTarget));
   byId('nav-machine').addEventListener('click', e => setView('vending', e.currentTarget));
   document.addEventListener('keydown', e => {
-    if (e.key === 'Escape' && body.dataset.view !== 'street') setView('street');
-    // The scene dialog has one control; keep keyboard focus inside it.
-    if (e.key === 'Tab' && body.dataset.view === 'vending') { e.preventDefault(); byId('back-btn').focus(); }
+    if (artworkViewer.open) {
+      if (e.key === 'ArrowRight') { e.preventDefault(); showPainting(currentPainting + 1); }
+      if (e.key === 'ArrowLeft') { e.preventDefault(); showPainting(currentPainting - 1); }
+      return; // The native painting dialog owns Escape and focus while open.
+    }
+    if (e.key === 'Escape' && body.dataset.view === 'vending') setView('street');
+    if (e.key === 'Tab' && body.dataset.view === 'vending') {
+      const controls = [byId('back-btn'), ...paintings];
+      const first = controls[0], last = controls[controls.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    }
   });
   byId('night-header').querySelector('a').addEventListener('click', e => {
     e.preventDefault(); returnFocus = byId('explore-btn'); setView('street');
@@ -52,15 +67,44 @@
     const y = (innerHeight - 675 * scale) / 2 + 326 * scale;
     body.style.setProperty('--machine-x', x + 'px');
     body.style.setProperty('--machine-y', y + 'px');
-    // Match the viewport ratio so both the machine header and tray stay visible.
-    const aspect = innerWidth / innerHeight;
-    const worldHeight = Math.max(810, 350 / aspect);
-    const worldWidth = worldHeight * aspect;
-    byId('front-svg').setAttribute('viewBox', `${600 - worldWidth / 2} -65 ${worldWidth} ${worldHeight}`);
-    byId('front-svg').setAttribute('preserveAspectRatio', 'xMidYMid meet');
+    // Keep the title on the physical billboard even when the street is cropped.
+    const billboard = byId('billboard');
+    if (innerWidth <= 640) {
+      const size = Math.min(.72, (innerWidth - 48) / scale / 430);
+      const left = (1200 - innerWidth / scale) / 2 + 24 / scale;
+      billboard.setAttribute('transform', `translate(${left - 42 * size} ${318 - 502 * size}) scale(${size})`);
+    } else billboard.removeAttribute('transform');
   }
   positionScene();
   addEventListener('resize', positionScene, { passive: true });
+
+  function loadPaintings() {
+    if (artworksLoaded) return;
+    artworksLoaded = true;
+    front.querySelectorAll('img[data-src]').forEach(img => { img.src = img.dataset.src; });
+  }
+  function showPainting(index) {
+    currentPainting = (index + paintings.length) % paintings.length;
+    const painting = paintings[currentPainting];
+    byId('artwork-title').textContent = painting.dataset.title;
+    byId('artwork-number').textContent = `${painting.dataset.artId} / ${String(paintings.length).padStart(2, '0')}`;
+    const fullImage = byId('artwork-image');
+    fullImage.src = painting.dataset.image;
+    fullImage.alt = `${painting.dataset.title}, demo painting`;
+    byId('lcd-code').textContent = painting.dataset.artId;
+  }
+  paintings.forEach((painting, index) => painting.addEventListener('click', () => {
+    showPainting(index);
+    artworkViewer.showModal();
+  }));
+  byId('close-artwork').addEventListener('click', () => artworkViewer.close());
+  byId('previous-artwork').addEventListener('click', () => showPainting(currentPainting - 1));
+  byId('next-artwork').addEventListener('click', () => showPainting(currentPainting + 1));
+  artworkViewer.addEventListener('close', () => paintings[currentPainting].focus({ preventScroll: true }));
+  [byId('vm-hit'), byId('explore-btn'), byId('nav-machine')].forEach(control => {
+    control.addEventListener('pointerenter', loadPaintings, { once: true });
+    control.addEventListener('focus', loadPaintings, { once: true });
+  });
 
   function syncMotion() {
     const still = reduced.matches || chosenStill === true;
