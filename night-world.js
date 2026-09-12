@@ -233,33 +233,6 @@
     if (el) el.lastChild.textContent = ' ' + line;
   })();
 
-  // chalk tally on the pavement — one stroke a visit, five to a gate
-  (function tally() {
-    const svg = document.getElementById('scene-svg');
-    if (!svg || visits < 2) return;
-    const ns = 'http://www.w3.org/2000/svg';
-    const g = document.createElementNS(ns, 'g');
-    g.setAttribute('stroke', '#d9c9b4');
-    g.setAttribute('stroke-width', '1.6');
-    g.setAttribute('stroke-linecap', 'round');
-    g.setAttribute('opacity', '0.3');
-    const marks = Math.min(visits, 15);
-    for (let i = 0; i < marks; i++) {
-      const gate = (i / 5) | 0, within = i % 5;
-      const x = 940 + gate * 26 + within * 5, y = 566;   // right pavement, clear of both text blocks and the road
-      const l = document.createElementNS(ns, 'line');
-      if (within === 4) {                       // the strike across the gate
-        l.setAttribute('x1', x - 17); l.setAttribute('y1', y + 11);
-        l.setAttribute('x2', x + 2);  l.setAttribute('y2', y - 1);
-      } else {
-        l.setAttribute('x1', x); l.setAttribute('y1', y);
-        l.setAttribute('x2', x - 2.5); l.setAttribute('y2', y + 11);
-      }
-      g.appendChild(l);
-    }
-    svg.appendChild(g);
-  })();
-
   // the machine remembers what you looked at last
   if (mem.lastCode) { const lcd = byId('lcd-code'); if (lcd) lcd.textContent = mem.lastCode; }
   seen.forEach(id => {
