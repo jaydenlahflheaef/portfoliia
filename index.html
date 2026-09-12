@@ -1487,7 +1487,7 @@
 function* startGalaxyEngine() {
   const canvas = document.getElementById('galaxy-canvas');
   if (!canvas || !canvas.getContext) return;
-  const BUILD = 45;                 // bump when sky changes — logged to console
+  const BUILD = 46;                 // bump when sky changes — logged to console
   // main display canvas stays GPU-accelerated; all HELPER canvases below are
   // created software-backed (willReadFrequently) — immune to the silent GPU
   // backing-store loss that was blanking the sky on retina/busy systems
@@ -1504,7 +1504,10 @@ function* startGalaxyEngine() {
     const fit = Math.sqrt(PIXEL_BUDGET / Math.max(1, innerWidth * innerHeight));
     return Math.max(0.75, Math.min(cap, fit));
   }
-  const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const motionQuery = matchMedia('(prefers-reduced-motion: reduce)');
+  const isStill = () => motionQuery.matches || document.body.dataset.still === 'true';
+  const PROFILE = new URLSearchParams(location.search).has('profile');
+  const startedAt = performance.now();
 
   // scene constants (SVG viewBox coordinates)
   const VW = 1200, VH = 675, SKY = 318;
@@ -1540,8 +1543,9 @@ function* startGalaxyEngine() {
   // sky looks identical in every browser
   const FILTER_OK = (() => {
     const x = document.createElement('canvas').getContext('2d', { willReadFrequently: true });
+    if (!('filter' in x)) return false;
     x.filter = 'brightness(1.5)';
-    return x.filter !== 'none';
+    return x.filter === 'brightness(1.5)';
   })();
   function pixelFX(cv, fn) {
     const x = cv.getContext('2d', { willReadFrequently: true });
@@ -1565,6 +1569,9 @@ function* startGalaxyEngine() {
     if (FILTER_OK) {
       x.filter = GRADE;
       x.drawImage(c, 0, 0);
+      // This canvas is reused for the starfield. Never leave its grade active:
+      // filtering each of its hundreds of subsequent draws stalls the page.
+      x.filter = 'none';
       return g;
     }
     x.drawImage(c, 0, 0);
@@ -1754,6 +1761,7 @@ function* startGalaxyEngine() {
     return [ex * p.cb - ey * p.sb, ex * p.sb + ey * p.cb];
   }
   let gasTex, dustTex, coreSpr, starTex;
+  let needsDraw = true;
   let skyCache = null;   // declared here so layout() can release it before its own `let` would run
   function buildDiscTextures() {
     // the faint disc/bulge stars, frozen into the rotating pattern layer.
@@ -2092,6 +2100,7 @@ function* startGalaxyEngine() {
   // static deep-sky layer: nebulae, companions, non-twinkling field stars
   function bakeDeepSky(cv) {
     const b = cv.getContext('2d', { willReadFrequently: true });
+    if (FILTER_OK) b.filter = 'none';
     b.setTransform(s, 0, 0, s, offx, offy);
     // crisp moon, upper-left like the reference (sits low enough to clear
     // the top crop on wide windows)
@@ -2137,17 +2146,25 @@ function* startGalaxyEngine() {
   // measured 9.8s of dead air at boot. Skipping it lets raster finish off-thread;
   // the check then runs once on a later frame, and drawSkyBase's periodic
   // watchdog still covers a backing store that dies later.
+  let layoutWidth = 0, layoutHeight = 0;
   function layout(heal) {
     DPR = pickDPR();
+    const nextWidth = Math.round(innerWidth * DPR), nextHeight = Math.round(innerHeight * DPR);
+    if (heal instanceof Event && layoutWidth === nextWidth && layoutHeight === nextHeight) return;
+    layoutWidth = nextWidth; layoutHeight = nextHeight;
+    needsDraw = true;
     // drop the previous backing stores explicitly; leaving them to the GC keeps
     // several MB of GPU memory alive across every resize
     release(bg); release(skyCache); skyCache = null;
-    canvas.width  = innerWidth * DPR;
-    canvas.height = innerHeight * DPR;
-    s = Math.max(canvas.width / VW, canvas.height / VH);
-    offx = (canvas.width  - VW * s) / 2;
-    offy = (canvas.height - VH * s) / 2;
-    skyH = Math.max(1, Math.min(canvas.height, Math.ceil(SKY * s + offy)));
+    // Keep the full scene's projection, but allocate only its visible sky.
+    // The old full-height canvas uploaded a transparent lower half every frame.
+    s = Math.max(nextWidth / VW, nextHeight / VH);
+    offx = (nextWidth - VW * s) / 2;
+    offy = (nextHeight - VH * s) / 2;
+    skyH = Math.max(1, Math.min(nextHeight, Math.ceil(SKY * s + offy)));
+    canvas.width = nextWidth;
+    canvas.height = skyH;
+    canvas.style.height = (skyH / DPR) + 'px';
     bg = paintSkyBase(WASHES);
     bakeDeepSky(bg);
     // ── self-heal: Chrome sometimes silently drops canvas backing stores on
@@ -2172,7 +2189,11 @@ function* startGalaxyEngine() {
   }
   yield;   // hand the frame back
   layout(false);
-  addEventListener('resize', layout);
+  let resizeTimer;
+  addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => { layout(new Event('resize')); requestDraw(); }, 140);
+  }, { passive: true });
   // the health probe that used to block boot, now on its own frame
   setTimeout(() => {
     const hx = (canvas.width / 2) | 0, hy = ((SKY - 60) * s + offy) | 0;
@@ -2181,17 +2202,6 @@ function* startGalaxyEngine() {
                      canvas.width + 'x' + canvas.height,
                      '| window', innerWidth + 'x' + innerHeight + '@' + (window.devicePixelRatio || 1),
                      '| \u2705 sky healthy');
-    // rolling frame time, logged once so a real machine can be compared against
-    // headless numbers — open the console and send this line
-    let n = 0, prev = performance.now(); const d = [];
-    (function sample(t) {
-      d.push(t - prev); prev = t;
-      if (++n < 180) requestAnimationFrame(sample);
-      else { d.sort((a, b) => a - b);
-        console.log('[galaxy] fps median', (1000 / d[d.length >> 1]).toFixed(0),
-                    '| frame median', d[d.length >> 1].toFixed(1) + 'ms',
-                    'p95', d[Math.floor(d.length * .95)].toFixed(1) + 'ms'); }
-    })(performance.now());
   }, 1200);
 
   // ── state ──
@@ -2200,6 +2210,18 @@ function* startGalaxyEngine() {
   let novaAt = 2 + rnd() * 4;
   let t = rnd() * 500, last = performance.now();
   let limit = live.length, ftAcc = 0, ftN = 0;
+  let frameRequest = 0, frameCount = 0;
+  let drawSamples = [], gapSamples = [];
+  const isCovered = () => document.hidden || (fv && fv.classList.contains('visible'));
+  function requestDraw() {
+    if (!frameRequest && !isCovered()) frameRequest = requestAnimationFrame(loop);
+  }
+  function syncAnimation() {
+    if (frameRequest) cancelAnimationFrame(frameRequest);
+    frameRequest = 0;
+    last = performance.now();
+    if (!isCovered() && (!isStill() || needsDraw || !canvas.dataset.ready)) requestDraw();
+  }
 
   // sky base cache — bg + wisps composited only when the slow sway has moved,
   // turning 3 full-screen blits per frame into 1
@@ -2259,18 +2281,21 @@ function* startGalaxyEngine() {
   }
 
   function loop(now) {
-    requestAnimationFrame(loop);
-    const dt = Math.min((now - last) / 1000, 0.05);
+    frameRequest = 0;
+    if (isCovered()) return;
+    const drawStarted = performance.now();
+    const gap = now - last;
+    const still = isStill();
+    const dt = still ? 0 : Math.min(gap / 1000, 0.05);
     last = now;
-    if (fv && fv.classList.contains('visible')) return;   // paused behind front view
-    if (!REDUCED) t += dt;
+    t += dt;
 
     const paNow  = PA   + 0.052 * Math.sin(t * 0.134);              // precession
     const incNow = INCL + 0.061 * Math.sin(t * 0.103 + 1.7);
     const cosI = Math.cos(incNow), sinI = Math.sin(incNow);
     const cosP = Math.cos(paNow),  sinP = Math.sin(paNow);
 
-    if (!REDUCED) {                                       // advance every orbit
+    if (!still) {                                       // advance every orbit
       for (const p of stars) p.tau += p.om * dt;
       patAngle += PAT_OM * dt;                            // baked gas/dust layer spins as a pattern
     }
@@ -2334,7 +2359,7 @@ function* startGalaxyEngine() {
 
     // supernovae — a real disc star detonates, rides its orbit while fading
     novaAt -= dt;
-    if (!REDUCED && novaAt <= 0 && novae.length < 3) {
+    if (!still && novaAt <= 0 && novae.length < 3) {
       novae.push({ p: discRefs[(rnd() * DISC_N) | 0], k: 0 });
       novaAt = 3 + rnd() * 5;
     }
@@ -2368,17 +2393,40 @@ function* startGalaxyEngine() {
     // adaptive quality — permanently trim the star budget if frames run long.
     // Stable subset (shuffled array prefix): no temporal dithering, no flicker,
     // and it only ever steps down, so it can't oscillate.
-    ftAcc += performance.now() - now; ftN++;
-    if (ftN === 120) {
+    const drawMs = performance.now() - drawStarted;
+    ftAcc += drawMs; ftN++;
+    if (ftN === 30) {
       if (ftAcc / ftN > 20 && limit > live.length * 0.4) limit = (limit * 0.7) | 0;
       ftAcc = 0; ftN = 0;
     }
 
     // night-world.css holds the canvas at opacity 0 until [data-ready] — flip it
     // once a real frame has painted, so the galaxy fades in over the backdrop
-    if (!canvas.dataset.ready) canvas.dataset.ready = 'true';
+    if (!canvas.dataset.ready) {
+      canvas.dataset.ready = 'true';
+      canvas.dataset.initMs = Math.round(performance.now() - startedAt);
+      // Retire the temporary animated sky after the crossfade releases its layers.
+      setTimeout(() => document.getElementById('sky-warmup')?.remove(), isStill() ? 0 : 1900);
+    }
+    if (PROFILE) {
+      canvas.dataset.frameCount = ++frameCount;
+      drawSamples.push(drawMs); gapSamples.push(gap);
+      if (drawSamples.length === 60) {
+        const percentile = (values, p) => values.sort((a,b) => a-b)[Math.floor(values.length*p)].toFixed(1);
+        canvas.dataset.renderMs = percentile(drawSamples, .5);
+        canvas.dataset.renderP95 = percentile(drawSamples, .95);
+        canvas.dataset.frameMs = percentile(gapSamples, .5);
+        canvas.dataset.liveStars = limit;
+        drawSamples = []; gapSamples = [];
+      }
+    }
+    needsDraw = false;
+    if (!still) requestDraw();
   }
-  requestAnimationFrame(loop);
+  document.addEventListener('visibilitychange', syncAnimation);
+  document.addEventListener('night-motion-change', syncAnimation);
+  motionQuery.addEventListener('change', syncAnimation);
+  requestDraw();
 }
 // Start after the page has painted, but never depend on rAF alone to bootstrap:
 // a rAF registered during parsing may get no rendering opportunity at all (it

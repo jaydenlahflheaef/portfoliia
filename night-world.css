@@ -191,7 +191,11 @@ body #back-btn { top: 30px; left: 32px; padding: 12px 6px; font: 11px/1.5 'Trebu
 .vending-caption > p:last-child { margin-top: 12px; font: 30px/1.25 Georgia, serif; }
 .vending-caption em { display: block; color: #d4bedd; }
 @media (max-width: 640px) {
-  #night-header { padding: 22px 20px; }
+  #night-header { grid-template-columns: 1fr auto; gap: 12px 16px; padding: 22px 20px 36px; }
+  .world-signature { grid-column: 1; grid-row: 1; white-space: nowrap; }
+  .night-settings { grid-column: 2; grid-row: 1; white-space: nowrap; }
+  .night-nav { grid-column: 1 / -1; grid-row: 2; gap: 32px; }
+  .nav-link { font-size: 11px; white-space: nowrap; }
   .world-signature { gap: 8px; font-size: 9px; letter-spacing: 1.6px; }
   .world-signature small { font-size: 7px; letter-spacing: 1.2px; }
   .signature-star { font-size: 28px; }
