@@ -110,9 +110,12 @@ button:focus-visible, a:focus-visible { outline: 1px solid #f4d6a7; outline-offs
 }
 /* hand off: the pre-sky dissolves as the real galaxy comes up */
 #galaxy-canvas[data-ready="true"] + #sky-warmup { opacity: 0; }
-#vm-hit:focus-visible { outline: none; stroke: #ffe4b8; stroke-width: 2; }
-#vm-hit:hover { fill: rgba(225,239,255,.07); }
-#vm-hit:active { fill: rgba(225,239,255,.14); }
+#vm-group { -webkit-user-select: none; user-select: none; }
+#vm-group image { pointer-events: none; }
+#vm-hit { outline: none; -webkit-tap-highlight-color: transparent; }
+#vm-hit:focus-visible { stroke: #ffe4b8; stroke-width: 1.5; stroke-dasharray: 3 3; }
+#vm-hit:hover, #vm-hit:active { fill: transparent; }
+#vm-hit:focus:not(:focus-visible) { stroke: none; }
 .world-ui { position: fixed; z-index: 10; transition: opacity .5s ease, transform .6s ease; }
 /* ── transparent navbar ──
    No solid bar: a gradient that fades to nothing, a faint backdrop blur, and a

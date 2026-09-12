@@ -1,14 +1,14 @@
 /* One street, one sky. The close-up only adds the cabinet in front of it. */
 body[data-view="vending"] #scene-view { transform: none; }
 body[data-view="vending"] #billboard, body[data-view="vending"] #vm-group { opacity: 0; }
-#billboard, #vm-group { transition: opacity .28s ease; }
-body #front-view { background: transparent; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; transition: opacity .32s ease; }
-#front-view:not(.visible) { content-visibility: hidden; }
+#billboard, #vm-group { transition: none; }
+body #front-view { background: transparent; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; outline: none; visibility: hidden; contain: layout style; transition: opacity .14s ease, visibility 0s .14s; }
+body #front-view.visible { visibility: visible; transition-delay: 0s; }
 #front-view::before { content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none; background: linear-gradient(#090e190d 0%, #090e1938 36%, #060a11c9 100%); }
 .sr-only { position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
 .arrival-note { margin: 12px 0 20px; color: #dfd2e7; font: italic 25px/1.4 Georgia, serif; }
 .art-cabinet {
-  position: relative; width: min(780px, calc(100% - 64px)); margin: 12px auto 0; padding: 20px 22px 24px;
+  position: relative; width: min(1100px, calc(100% - 96px)); margin: 12px auto 0; padding: 18px 22px 20px;
   border-radius: 11px 10px 4px 4px; border: 1px solid #c5cdc3;
   background: linear-gradient(90deg, #6d8082 0, #acb7ae 1.2%, #d3d6c5 3.2%, #bac3b6 5%, #c8cbb9 55%, #acb4a6 95.5%, #728685 98%, #526a70 100%);
   box-shadow: inset 0 2px 1px #fffdeaaa, inset 0 -5px 1px #4a6062, 7px 3px 0 #354c56, 12px 5px 0 #223642, 0 25px 55px #010709c9;
@@ -22,23 +22,37 @@ body #front-view { background: transparent; overflow-x: hidden; overflow-y: auto
 .cabinet-brand-note { font: 8px/1.5 'Trebuchet MS', sans-serif; letter-spacing: 1.4px; text-align: right; color: #bac4b3; }
 .cabinet-brand-note b { font: 21px/1.3 Georgia, serif; letter-spacing: 1px; color: #eae6c7; }
 .cabinet-content { position: relative; display: grid; grid-template-columns: minmax(0,1fr) 82px; gap: 15px; }
-.display-case { position: relative; padding: 25px 18px 10px; border: 5px solid #405456; border-bottom-width: 8px; border-radius: 4px 4px 2px 2px; background: linear-gradient(#d9e7d7, #c8ddd1 18%, #b3c9bd 85%, #a7beb4); box-shadow: inset 0 5px 10px #172e384d, 0 1px 0 1px #eeebd499, 0 0 21px #e1f4d62e; }
+.display-case { position: relative; padding: 28px 24px 14px; border: 5px solid #405456; border-bottom-width: 8px; border-radius: 4px 4px 2px 2px; background: #e3e9df; box-shadow: inset 0 2px 4px #172e3826, 0 1px 0 1px #eeebd499; }
 .display-case::after { content: ''; position: absolute; inset: 0; pointer-events: none; border: 1px solid #f6ffed66; border-right: 3px solid #f6ffed66; background: linear-gradient(112deg, #f3ffef0d 4%, #f3ffef2b 5%, #f3ffef05 8%, transparent 8% 75%, #f3ffef10 75% 77%, transparent 77%); }
 .display-tube { position: absolute; left: 8px; right: 8px; top: 4px; height: 5px; border-radius: 3px; background: #f6ffe6; box-shadow: 0 3px 13px 5px #f3ffda7a; }
-.painting-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 24px 14px; }
-.painting-selection { display: flex; flex-direction: column; min-width: 0; padding: 0; border: 0; background: transparent; color: #34464a; cursor: pointer; text-align: left; }
-.painting-frame { position: relative; display: block; width: 100%; aspect-ratio: 600/760; border: 5px solid #e8e2c7; border-left-color: #d6cfb2; border-bottom-color: #bdb99f; background: #abb3a1; box-shadow: 0 2px 4px #122b314d, inset 0 0 0 1px #7f8776; transition: transform .2s ease, box-shadow .2s ease; }
+.painting-grid { columns: 3; column-gap: 18px; }
+.painting-selection { display: inline-flex; flex-direction: column; width: 100%; min-width: 0; padding: 0; margin: 0 0 17px; border: 0; background: transparent; color: #34464a; cursor: pointer; text-align: left; break-inside: avoid; vertical-align: top; }
+.painting-frame { position: relative; display: block; width: 100%; aspect-ratio: var(--art-ratio, 600/760); border-radius: 2px; overflow: hidden; background: #c9d1c5; transition: transform .18s ease; }
 .painting-frame img { display: block; width: 100%; height: 100%; object-fit: cover; }
-.painting-selection:hover .painting-frame { transform: translateY(-3px); box-shadow: 0 6px 9px #12373c4d; }
+.painting-selection:hover .painting-frame { transform: translateY(-2px); }
 .painting-selection:focus-visible { outline: 2px solid #873b32; outline-offset: 5px; }
 .painting-selection:active .painting-frame { transform: translateY(0) scale(.98); }
-.selection-label { display: flex; align-items: center; gap: 6px; width: 100%; margin-top: 9px; padding: 4px 3px 5px; border-bottom: 2px solid #5e7070; box-shadow: 0 2px 0 #eaf0d3; font: 9px/1.35 'Trebuchet MS', sans-serif; }
+.selection-label { display: flex; align-items: baseline; gap: 6px; width: 100%; padding: 8px 1px 0; font: 10px/1.4 'Trebuchet MS', sans-serif; color: #53605a; }
 .selection-label b { color: #995644; font-size: 8px; }
 .selection-label > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.selection-switch { position: relative; display: flex; align-items: center; justify-content: center; gap: 6px; margin: 8px auto 0; padding: 3px 12px; min-width: 68%; color: #cee4bf; background: linear-gradient(#526666, #304c52 48%, #15373e); border: 1px solid #283f40; border-bottom: 2px solid #193438; border-radius: 12px; box-shadow: inset 0 1px #adbab055, 0 1px #f6ffdb77; font: 8px/1.3 sans-serif; }
-.selection-switch i { width: 4px; height: 4px; border-radius: 50%; background: #b2d790; box-shadow: 0 0 5px #cfeea777; }
-.painting-selection:hover .selection-switch { color: #fff0c3; border-color: #719a75; }
-.selection-arrow { font-size: 10px; }
+.selection-label small { margin-left: auto; font-size: 6px; letter-spacing: 1px; color: #788278; }
+.painting-open { position: absolute; right: 9px; bottom: 9px; display: grid; place-items: center; width: 27px; height: 27px; border-radius: 50%; background: #f1eee3ed; color: #25453f; opacity: 0; transition: opacity .15s ease; }
+.painting-selection:hover .painting-open, .painting-selection:focus-visible .painting-open { opacity: 1; }
+.gallery-heading { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-bottom: 18px; }
+.gallery-kicker { font: 7px/1.5 'Trebuchet MS', sans-serif; letter-spacing: 1.8px; color: #738072; margin-bottom: 5px; }
+.gallery-heading h3 { font: 34px/1.2 Georgia, serif; letter-spacing: -.7px; color: #344c45; }
+.gallery-edition { font: 7px/1.8 'Trebuchet MS', sans-serif; letter-spacing: 1.1px; color: #748071; text-align: right; }
+.gallery-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 22px; }
+.gallery-filters { display: flex; gap: 2px; padding: 3px; border: 1px solid #becabe; border-radius: 24px; }
+.gallery-filters button { border: 0; border-radius: 20px; background: transparent; color: #67766b; padding: 8px 14px; font: 10px/1.2 'Trebuchet MS', sans-serif; cursor: pointer; }
+.gallery-filters button span { padding-left: 5px; font: 7px/1 monospace; opacity: .65; }
+.gallery-filters button[aria-pressed="true"] { background: #31544b; color: #f0efe2; }
+.gallery-filters button:hover { color: #122e26; background: #d1dacc; }
+.gallery-filters button[aria-pressed="true"]:hover { color: #fff; background: #23463d; }
+#rearrange-artwork { border: 0; background: transparent; color: #657366; padding: 8px 0 8px 12px; font: 9px/1.3 'Trebuchet MS', sans-serif; cursor: pointer; }
+#rearrange-artwork > span:last-child { font-size: 17px; margin-left: 5px; vertical-align: middle; }
+.gallery-toolbar button:focus-visible { outline: 2px solid #886044; outline-offset: 3px; }
+#rearrange-artwork:hover { color: #244438; }
 .display-caption { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding-top: 16px; font: 7px/1.4 'Trebuchet MS', sans-serif; color: #496467; }
 .display-caption > span:last-child { font-size: 6px; letter-spacing: .8px; }
 .cabinet-controls { display: flex; flex-direction: column; align-items: center; padding-top: 7px; }
@@ -97,9 +111,20 @@ body #front-view { background: transparent; overflow-x: hidden; overflow-y: auto
   .cabinet-brand h2 { font-size: 22px; }
   .cabinet-content { grid-template-columns: minmax(0,1fr); gap: 14px; }
   .display-case { padding: 24px 12px 12px; border-width: 4px; }
-  .painting-grid { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 24px 16px; }
+  .painting-grid { columns: 2; column-gap: 12px; }
+  .painting-selection { margin-bottom: 14px; }
+  .gallery-heading { gap: 8px; margin-bottom: 14px; }
+  .gallery-heading h3 { font-size: 25px; }
+  .gallery-kicker { font-size: 5px; letter-spacing: .8px; }
+  .gallery-edition { font-size: 5px; letter-spacing: .5px; }
+  .gallery-toolbar { gap: 5px; margin-bottom: 16px; }
+  .gallery-filters button { font-size: 9px; padding: 9px 9px; min-height: 34px; }
+  .gallery-filters button span { font-size: 6px; padding-left: 3px; }
+  #rearrange-artwork { padding: 8px 3px 8px 6px; }
+  #rearrange-artwork > span:first-child { display: none; }
+  .painting-open { display: none; }
+  .selection-label small { display: none; }
   .selection-label { font-size: 9px; }
-  .selection-switch { min-height: 24px; padding: 3px 12px; margin-top: 7px; }
   .display-caption { justify-content: center; padding-top: 18px; }
   .display-caption > span:last-child { display: none; }
   .cabinet-controls { display: grid; grid-template-columns: 70px 1fr 73px; align-items: center; gap: 12px; padding: 6px 4px 0; }
@@ -121,6 +146,7 @@ body #front-view { background: transparent; overflow-x: hidden; overflow-y: auto
   .viewer-footer h2 { font-size: 21px; }
   .viewer-footer button span { display: none; }
   .viewer-footer button { font-size: 22px; min-width: 35px; }
+  body[data-view="vending"] #front-view { padding-top: 116px; }
 }
 @media (prefers-reduced-motion: reduce) { .painting-frame, #billboard, #vm-group { transition: none; } }
 body[data-still="true"] .painting-frame { transition: none; }

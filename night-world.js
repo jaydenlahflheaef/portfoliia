@@ -8,33 +8,48 @@
   const header = byId('night-header');
   const artworkViewer = byId('artwork-viewer');
   const paintings = [...front.querySelectorAll('.painting-selection')];
+  let galleryOrder = [...paintings];
+  let viewerPaintings = [...paintings];
   let currentPainting = 0;
   let artworksLoaded = false;
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   let returnFocus = byId('explore-btn');
   let chosenStill = null;
+  let viewTimer;
 
   function setView(view, trigger) {
+    if (body.dataset.view === view) return;
     if (trigger) returnFocus = trigger;
+    clearTimeout(viewTimer);
+    // Give the cabinet's first paint priority, then let the visible sky resume.
+    body.dataset.transitioning = 'true';
     body.dataset.view = view;
+    document.dispatchEvent(new Event('night-motion-change'));
     const vending = view === 'vending';
     if (vending) loadPaintings();
     else if (artworkViewer.open) artworkViewer.close();
     front.inert = !vending;
     front.setAttribute('aria-hidden', String(!vending));
     front.classList.toggle('visible', vending);
-    scene.inert = view !== 'street';
+    // The hit target is the street's only control. Making thousands of SVG
+    // descendants inert forced a full scene style update inside the click.
+    byId('vm-hit').setAttribute('tabindex', vending ? '-1' : '0');
+    scene.setAttribute('aria-hidden', String(vending));
     arrival.inert = view !== 'street';
     header.inert = false;   // the navbar stays reachable inside the machine view
     byId('machine-cue').inert = view !== 'street';
     byId('street-footnote').setAttribute('aria-hidden', String(view !== 'street'));
-    // focus the view itself, not the first painting: focusing a button paints a
-    // focus ring on entry for mouse users, and the container carries the label
-    if (vending) front.focus({ preventScroll: true });
-    else returnFocus.focus({ preventScroll: true });
+    // Focus after the first paint; synchronous focus forced the hidden cabinet
+    // to finish layout before the input event could return.
+    requestAnimationFrame(() => setTimeout(() => {
+      if (body.dataset.view === view) (vending ? front : returnFocus).focus({ preventScroll: true });
+    }, 0));
     byId('nav-street').setAttribute('aria-current', vending ? 'false' : 'page');
     byId('nav-machine').setAttribute('aria-current', vending ? 'page' : 'false');
-    document.dispatchEvent(new Event('night-motion-change'));
+    viewTimer = setTimeout(() => {
+      delete body.dataset.transitioning;
+      document.dispatchEvent(new Event('night-motion-change'));
+    }, body.dataset.still === 'true' ? 32 : 180);
   }
   [byId('vm-hit'), byId('explore-btn'), byId('machine-cue')].forEach(el => {
     el.addEventListener('click', () => setView('vending', el.id === 'machine-cue' ? byId('explore-btn') : el));
@@ -80,31 +95,57 @@
   function loadPaintings() {
     if (artworksLoaded) return;
     artworksLoaded = true;
-    front.querySelectorAll('img[data-src]').forEach(img => { img.src = img.dataset.src; });
+    front.querySelectorAll('img[data-src]').forEach(img => {
+      img.src = img.dataset.src;
+      img.decode().catch(() => {});
+    });
   }
   function showPainting(index) {
-    currentPainting = (index + paintings.length) % paintings.length;
-    const painting = paintings[currentPainting];
+    currentPainting = (index + viewerPaintings.length) % viewerPaintings.length;
+    const painting = viewerPaintings[currentPainting];
     byId('artwork-title').textContent = painting.dataset.title;
-    byId('artwork-number').textContent = `${painting.dataset.artId} / ${String(paintings.length).padStart(2, '0')}`;
+    byId('artwork-number').textContent = `${painting.dataset.artId} / ${String(viewerPaintings.length).padStart(2, '0')}`;
     const fullImage = byId('artwork-image');
     fullImage.src = painting.dataset.image;
     fullImage.alt = `${painting.dataset.title}, demo painting`;
     byId('lcd-code').textContent = painting.dataset.artId;
-  }
-  paintings.forEach((painting, index) => painting.addEventListener('click', () => {
-    showPainting(index);
     remember(painting);
+  }
+  paintings.forEach(painting => painting.addEventListener('click', () => {
+    viewerPaintings = galleryOrder.filter(p => !p.hidden);
+    showPainting(viewerPaintings.indexOf(painting));
     artworkViewer.showModal();
   }));
   byId('close-artwork').addEventListener('click', () => artworkViewer.close());
   byId('previous-artwork').addEventListener('click', () => showPainting(currentPainting - 1));
   byId('next-artwork').addEventListener('click', () => showPainting(currentPainting + 1));
-  artworkViewer.addEventListener('close', () => paintings[currentPainting].focus({ preventScroll: true }));
-  [byId('vm-hit'), byId('explore-btn'), byId('nav-machine')].forEach(control => {
+  artworkViewer.addEventListener('close', () => {
+    if (body.dataset.view === 'vending') viewerPaintings[currentPainting].focus({ preventScroll: true });
+  });
+  const filters = [...front.querySelectorAll('[data-filter]')];
+  filters.forEach(button => button.addEventListener('click', () => {
+    const filter = button.dataset.filter;
+    filters.forEach(b => b.setAttribute('aria-pressed', String(b === button)));
+    paintings.forEach(p => { p.hidden = filter !== 'all' && p.dataset.category !== filter; });
+    const count = paintings.filter(p => !p.hidden).length;
+    byId('gallery-status').textContent = `Showing ${count} demo paintings${filter === 'all' ? '.' : `: ${filter}.`}`;
+  }));
+  byId('rearrange-artwork').addEventListener('click', () => {
+    const previous = [...galleryOrder];
+    for (let i = galleryOrder.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [galleryOrder[i], galleryOrder[j]] = [galleryOrder[j], galleryOrder[i]];
+    }
+    if (galleryOrder.every((p,i) => p === previous[i])) [galleryOrder[0],galleryOrder[1]] = [galleryOrder[1],galleryOrder[0]];
+    front.querySelector('.painting-grid').append(...galleryOrder);
+    byId('gallery-status').textContent = 'Paintings rearranged. Find a new favorite.';
+  });
+  [byId('vm-hit'), byId('explore-btn'), byId('machine-cue'), byId('nav-machine')].forEach(control => {
     control.addEventListener('pointerenter', loadPaintings, { once: true });
     control.addEventListener('focus', loadPaintings, { once: true });
   });
+  if ('requestIdleCallback' in window) requestIdleCallback(loadPaintings, { timeout: 1500 });
+  else setTimeout(loadPaintings, 700);
 
   function syncMotion() {
     const still = reduced.matches || chosenStill === true;

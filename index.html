@@ -593,36 +593,46 @@
     <span class="cabinet-screw screw-tl" aria-hidden="true"></span><span class="cabinet-screw screw-tr" aria-hidden="true"></span>
     <header class="cabinet-brand"><div><h2 lang="ja">作品自販機</h2><p>ART DISPENSARY</p></div><span class="cabinet-brand-note">AFTER HOURS<br><b>24H</b></span></header>
     <div class="cabinet-content">
-      <div class="display-case"><div class="display-tube" aria-hidden="true"></div><div class="painting-grid"><button class="painting-selection" type="button" data-art-id="A1" data-title="Blue Hour" data-image="artwork/blue-hour.svg" aria-haspopup="dialog" aria-label="View Blue Hour, demo painting A1">
-  <span class="painting-frame"><img data-src="artwork/blue-hour.svg" width="600" height="760" decoding="async" alt="Blue Hour, demo painting"></span>
-  <span class="selection-label"><b>A1</b><span>Blue Hour</span></span>
-  <span class="selection-switch"><i aria-hidden="true"></i><span lang="ja">選択</span><span class="selection-arrow" aria-hidden="true">↗</span></span>
-</button>
-<button class="painting-selection" type="button" data-art-id="A2" data-title="Persimmons" data-image="artwork/persimmons.svg" aria-haspopup="dialog" aria-label="View Persimmons, demo painting A2">
-  <span class="painting-frame"><img data-src="artwork/persimmons.svg" width="600" height="760" decoding="async" alt="Persimmons, demo painting"></span>
-  <span class="selection-label"><b>A2</b><span>Persimmons</span></span>
-  <span class="selection-switch"><i aria-hidden="true"></i><span lang="ja">選択</span><span class="selection-arrow" aria-hidden="true">↗</span></span>
-</button>
-<button class="painting-selection" type="button" data-art-id="A3" data-title="Last Train" data-image="artwork/last-train.svg" aria-haspopup="dialog" aria-label="View Last Train, demo painting A3">
-  <span class="painting-frame"><img data-src="artwork/last-train.svg" width="600" height="760" decoding="async" alt="Last Train, demo painting"></span>
-  <span class="selection-label"><b>A3</b><span>Last Train</span></span>
-  <span class="selection-switch"><i aria-hidden="true"></i><span lang="ja">選択</span><span class="selection-arrow" aria-hidden="true">↗</span></span>
-</button>
-<button class="painting-selection" type="button" data-art-id="B1" data-title="Tide Pool" data-image="artwork/tide-pool.svg" aria-haspopup="dialog" aria-label="View Tide Pool, demo painting B1">
-  <span class="painting-frame"><img data-src="artwork/tide-pool.svg" width="600" height="760" decoding="async" alt="Tide Pool, demo painting"></span>
-  <span class="selection-label"><b>B1</b><span>Tide Pool</span></span>
-  <span class="selection-switch"><i aria-hidden="true"></i><span lang="ja">選択</span><span class="selection-arrow" aria-hidden="true">↗</span></span>
-</button>
-<button class="painting-selection" type="button" data-art-id="B2" data-title="Paper Moon" data-image="artwork/paper-moon.svg" aria-haspopup="dialog" aria-label="View Paper Moon, demo painting B2">
-  <span class="painting-frame"><img data-src="artwork/paper-moon.svg" width="600" height="760" decoding="async" alt="Paper Moon, demo painting"></span>
-  <span class="selection-label"><b>B2</b><span>Paper Moon</span></span>
-  <span class="selection-switch"><i aria-hidden="true"></i><span lang="ja">選択</span><span class="selection-arrow" aria-hidden="true">↗</span></span>
-</button>
-<button class="painting-selection" type="button" data-art-id="B3" data-title="Summer Room" data-image="artwork/summer-room.svg" aria-haspopup="dialog" aria-label="View Summer Room, demo painting B3">
-  <span class="painting-frame"><img data-src="artwork/summer-room.svg" width="600" height="760" decoding="async" alt="Summer Room, demo painting"></span>
-  <span class="selection-label"><b>B3</b><span>Summer Room</span></span>
-  <span class="selection-switch"><i aria-hidden="true"></i><span lang="ja">選択</span><span class="selection-arrow" aria-hidden="true">↗</span></span>
-</button></div><p class="display-caption"><span lang="ja">お好きな作品をお選びください</span><span>SELECT A PAINTING TO LOOK CLOSER</span></p></div>
+      <div class="display-case">
+        <div class="display-tube" aria-hidden="true"></div>
+        <div class="gallery-heading"><div><p class="gallery-kicker">A COLLECTION OF LITTLE WORLDS</p><h3>Small escapes.</h3></div><span class="gallery-edition">DEMO COLLECTION<br>VOL. 01 — 06 WORKS</span></div>
+        <div class="gallery-toolbar">
+          <div class="gallery-filters" role="group" aria-label="Filter paintings">
+            <button type="button" data-filter="all" aria-pressed="true">All <span>06</span></button>
+            <button type="button" data-filter="scenes" aria-pressed="false">Scenes <span>03</span></button>
+            <button type="button" data-filter="studies" aria-pressed="false">Studies <span>03</span></button>
+          </div>
+          <button id="rearrange-artwork" type="button" aria-label="Rearrange paintings"><span>Rearrange</span> <span aria-hidden="true">⟳</span></button>
+        </div>
+        <p id="gallery-status" class="sr-only" role="status">Showing all 6 demo paintings.</p>
+        <div class="painting-grid" aria-label="Demo paintings">
+          <button class="painting-selection" type="button" data-art-id="A1" data-title="Blue Hour" data-category="scenes" data-image="artwork/blue-hour.svg" style="--art-ratio: 4 / 5" aria-haspopup="dialog" aria-label="View Blue Hour, demo painting A1">
+            <span class="painting-frame"><img data-src="artwork/blue-hour.svg" width="600" height="760" decoding="async" fetchpriority="low" draggable="false" alt="Blue Hour, demo painting"><span class="painting-open" aria-hidden="true">↗</span></span>
+            <span class="selection-label"><b>A1</b><span>Blue Hour</span><small>DEMO</small></span>
+          </button>
+          <button class="painting-selection" type="button" data-art-id="B1" data-title="Tide Pool" data-category="studies" data-image="artwork/tide-pool.svg" style="--art-ratio: 4 / 3" aria-haspopup="dialog" aria-label="View Tide Pool, demo painting B1">
+            <span class="painting-frame"><img data-src="artwork/tide-pool.svg" width="600" height="760" decoding="async" fetchpriority="low" draggable="false" alt="Tide Pool, demo painting"><span class="painting-open" aria-hidden="true">↗</span></span>
+            <span class="selection-label"><b>B1</b><span>Tide Pool</span><small>DEMO</small></span>
+          </button>
+          <button class="painting-selection" type="button" data-art-id="A2" data-title="Persimmons" data-category="studies" data-image="artwork/persimmons.svg" style="--art-ratio: 5 / 4" aria-haspopup="dialog" aria-label="View Persimmons, demo painting A2">
+            <span class="painting-frame"><img data-src="artwork/persimmons.svg" width="600" height="760" decoding="async" fetchpriority="low" draggable="false" alt="Persimmons, demo painting"><span class="painting-open" aria-hidden="true">↗</span></span>
+            <span class="selection-label"><b>A2</b><span>Persimmons</span><small>DEMO</small></span>
+          </button>
+          <button class="painting-selection" type="button" data-art-id="B2" data-title="Paper Moon" data-category="studies" data-image="artwork/paper-moon.svg" style="--art-ratio: 4 / 5" aria-haspopup="dialog" aria-label="View Paper Moon, demo painting B2">
+            <span class="painting-frame"><img data-src="artwork/paper-moon.svg" width="600" height="760" decoding="async" fetchpriority="low" draggable="false" alt="Paper Moon, demo painting"><span class="painting-open" aria-hidden="true">↗</span></span>
+            <span class="selection-label"><b>B2</b><span>Paper Moon</span><small>DEMO</small></span>
+          </button>
+          <button class="painting-selection" type="button" data-art-id="A3" data-title="Last Train" data-category="scenes" data-image="artwork/last-train.svg" style="--art-ratio: 3 / 2" aria-haspopup="dialog" aria-label="View Last Train, demo painting A3">
+            <span class="painting-frame"><img data-src="artwork/last-train.svg" width="600" height="760" decoding="async" fetchpriority="low" draggable="false" alt="Last Train, demo painting"><span class="painting-open" aria-hidden="true">↗</span></span>
+            <span class="selection-label"><b>A3</b><span>Last Train</span><small>DEMO</small></span>
+          </button>
+          <button class="painting-selection" type="button" data-art-id="B3" data-title="Summer Room" data-category="scenes" data-image="artwork/summer-room.svg" style="--art-ratio: 3 / 4" aria-haspopup="dialog" aria-label="View Summer Room, demo painting B3">
+            <span class="painting-frame"><img data-src="artwork/summer-room.svg" width="600" height="760" decoding="async" fetchpriority="low" draggable="false" alt="Summer Room, demo painting"><span class="painting-open" aria-hidden="true">↗</span></span>
+            <span class="selection-label"><b>B3</b><span>Summer Room</span><small>DEMO</small></span>
+          </button>
+        </div>
+        <p class="display-caption"><span lang="ja">お好きな作品をお選びください</span><span>TAKE YOUR TIME. PICK A WORLD.</span></p>
+      </div>
       <aside class="cabinet-controls" aria-label="Machine display">
         <div class="selection-lcd"><span id="lcd-code">00</span><small lang="ja">お選びください</small></div>
         <div class="payment-details" aria-hidden="true"><p lang="ja">硬貨投入口</p><div class="coin-plate"><span class="coin-slot"></span></div><div class="coin-values">¥10 · ¥50<br>¥100 · ¥500</div><div class="coin-return"><span>↶</span><small lang="ja">返却</small></div><div class="bill-slot"></div><small class="bill-note">1000円</small></div>
@@ -658,7 +668,7 @@
 function* startGalaxyEngine() {
   const canvas = document.getElementById('galaxy-canvas');
   if (!canvas || !canvas.getContext) return;
-  const BUILD = 49;                 // bump when sky changes — logged to console
+  const BUILD = 50;                 // bump when sky changes — logged to console
   // main display canvas stays GPU-accelerated; all HELPER canvases below are
   // created software-backed (willReadFrequently) — immune to the silent GPU
   // backing-store loss that was blanking the sky on retina/busy systems
@@ -677,10 +687,9 @@ function* startGalaxyEngine() {
   }
   const motionQuery = matchMedia('(prefers-reduced-motion: reduce)');
   const isStill = () => motionQuery.matches || document.body.dataset.still === 'true';
-  // The machine view is transparent — the sky shows through behind the cabinet —
-  // so only a hidden tab should stop the galaxy. Pausing on 'vending' froze a
-  // sky the viewer can still see.
-  const isCovered = () => document.hidden;
+  // The sky stays alive around the cabinet. Yield only during the short view
+  // transition so texture uploads cannot compete with its first paint.
+  const isCovered = () => document.hidden || document.body.dataset.transitioning === 'true';
   const PROFILE = new URLSearchParams(location.search).has('profile');
   const startedAt = performance.now();
 
@@ -958,7 +967,7 @@ function* startGalaxyEngine() {
     }
     starTex = starBake;
     yield;
-    gasTex = (function () {
+    gasTex = yield* (function* () {
       const c = document.createElement('canvas');
       c.width = c.height = TEX_S;
       const x = c.getContext('2d', { willReadFrequently: true });
@@ -971,11 +980,12 @@ function* startGalaxyEngine() {
       x.fillStyle = hg;
       x.beginPath(); x.arc(0, 0, 440, 0, 7); x.fill();
       x.globalCompositeOperation = 'lighter';
-      for (const p of clouds) {
+      for (const [i, p] of clouds.entries()) {
         const [gx, gy] = discPos(p);
         x.globalAlpha = p.al;
         const w = p.sz * 2.6;
         x.drawImage(p.spr, gx - w / 2, gy - w / 2, w, w);
+        if (i % 24 === 23) yield;
       }
       // Two coloured ridges are baked once. Their tighter curve gives the
       // spiral a readable shape without adding work to animation frames.
@@ -990,22 +1000,24 @@ function* startGalaxyEngine() {
           x.drawImage(gasSpr[u > 0.56 ? 'ice' : 'pink'], gx - width, gy - width, width * 2, width * 2);
           x.globalAlpha = 0.035 * edge;
           x.drawImage(gasSpr[u > 0.56 ? 'blue' : 'hot'], gx - width * 0.45, gy - width * 0.45, width * 0.9, width * 0.9);
+          if (i % 16 === 15) yield;
         }
       }
       return graded(c);
     })();
     yield;
-    dustTex = (function () {
+    dustTex = yield* (function* () {
       const c = document.createElement('canvas');
       c.width = c.height = TEX_S;
       const x = c.getContext('2d', { willReadFrequently: true });
       const k = TEX_S / (TEX_R * 2);
       x.setTransform(k, 0, 0, k, TEX_S / 2, TEX_S / 2);
-      for (const p of dust) {
+      for (const [i, p] of dust.entries()) {
         const [gx, gy] = discPos(p);
         x.globalAlpha = p.al;
         const w = p.sz * 2.4;
         x.drawImage(p.spr, gx - w / 2, gy - w / 2, w, w);
+        if (i % 24 === 23) yield;
       }
       // Offset dark lanes reveal the arm edges against the luminous gas.
       for (let arm = 0; arm < 2; arm++) {
@@ -1016,6 +1028,7 @@ function* startGalaxyEngine() {
           const w = 15 + u * 28;
           x.globalAlpha = 0.105 * Math.sin(Math.PI * u);
           x.drawImage(dustSpr, gx - w, gy - w, w * 2, w * 2);
+          if (i % 16 === 15) yield;
         }
       }
       return graded(c);
@@ -1496,6 +1509,13 @@ function* startGalaxyEngine() {
   function loop(now) {
     frameRequest = 0;
     if (isCovered()) return;
+    // Most of the sky is behind the cabinet. Its slow drift remains smooth at
+    // 30 fps there, with half the drawing work; the street runs at up to 60 fps.
+    const interval = document.body.dataset.view === 'vending' ? 1000 / 30 : 1000 / 60;
+    if (canvas.dataset.ready && !needsDraw && !isStill() && now - last < interval - 1) {
+      requestDraw();
+      return;
+    }
     const drawStarted = performance.now();
     const gap = now - last;
     const still = isStill();
@@ -1540,10 +1560,13 @@ function* startGalaxyEngine() {
     ctx.globalCompositeOperation = 'lighter';
     ctx.globalAlpha = 1;
     ctx.drawImage(gasTex, -TEX_R, -TEX_R, TEX_R * 2, TEX_R * 2);
-    ctx.globalCompositeOperation = 'source-over';
-    ctx.drawImage(dustTex, -TEX_R, -TEX_R, TEX_R * 2, TEX_R * 2);
-    ctx.globalCompositeOperation = 'lighter';       // baked faint stars, above the dust
+    ctx.globalAlpha = 0.82;
     ctx.drawImage(starTex, -TEX_R, -TEX_R, TEX_R * 2, TEX_R * 2);
+    // Dust silhouettes the distant stars as well as the gas, revealing the
+    // spiral lanes. Reuse the same baked layers, with no extra drawing passes.
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.globalAlpha = 1;
+    ctx.drawImage(dustTex, -TEX_R, -TEX_R, TEX_R * 2, TEX_R * 2);
     ctx.restore();
     // stars — additive, so the core and arm ridges bloom to white.
     // Drawn in device space from pre-scaled mips: unscaled blits are the
