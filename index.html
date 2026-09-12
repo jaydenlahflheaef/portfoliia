@@ -664,7 +664,7 @@
 function* startGalaxyEngine() {
   const canvas = document.getElementById('galaxy-canvas');
   if (!canvas || !canvas.getContext) return;
-  const BUILD = 46;                 // bump when sky changes — logged to console
+  const BUILD = 47;                 // bump when sky changes — logged to console
   // main display canvas stays GPU-accelerated; all HELPER canvases below are
   // created software-backed (willReadFrequently) — immune to the silent GPU
   // backing-store loss that was blanking the sky on retina/busy systems
@@ -683,6 +683,10 @@ function* startGalaxyEngine() {
   }
   const motionQuery = matchMedia('(prefers-reduced-motion: reduce)');
   const isStill = () => motionQuery.matches || document.body.dataset.still === 'true';
+  // The machine view is transparent — the sky shows through behind the cabinet —
+  // so only a hidden tab should stop the galaxy. Pausing on 'vending' froze a
+  // sky the viewer can still see.
+  const isCovered = () => document.hidden;
   const PROFILE = new URLSearchParams(location.search).has('profile');
   const startedAt = performance.now();
 
@@ -889,6 +893,7 @@ function* startGalaxyEngine() {
   const haloAll  = stars.slice(DISC_N + BULGE_N);  // sparse and off-plane — all stay live
   const live  = discAll.slice(0, LIVE_DISC).concat(bulgeAll.slice(0, LIVE_BULGE), haloAll);
   const baked = discAll.slice(LIVE_DISC).concat(bulgeAll.slice(LIVE_BULGE));
+  for (const p of live) p.live = true;
   for (let i = live.length - 1; i > 0; i--) {  // shuffle so quality cuts sample uniformly
     const j = (rnd() * (i + 1)) | 0;
     const tmp = live[i]; live[i] = live[j]; live[j] = tmp;
@@ -940,24 +945,25 @@ function* startGalaxyEngine() {
   let gasTex, dustTex, coreSpr, starTex;
   let needsDraw = true;
   let skyCache = null;   // declared here so layout() can release it before its own `let` would run
-  function buildDiscTextures() {
+  function* buildDiscTextures() {
     // the faint disc/bulge stars, frozen into the rotating pattern layer.
     // starSpr sprites are already colour-graded, so this one is NOT re-graded.
-    starTex = (function () {
-      const c = document.createElement('canvas');
-      c.width = c.height = TEX_S;
-      const x = c.getContext('2d', { willReadFrequently: true });
-      const k = TEX_S / (TEX_R * 2);
-      x.setTransform(k, 0, 0, k, TEX_S / 2, TEX_S / 2);
-      x.globalCompositeOperation = 'lighter';
-      for (const p of baked) {
-        const [gx, gy] = discPos(p);
-        x.globalAlpha = Math.min(p.al * 1.13, 1);   // matches the live loop's mid-orbit brightness
-        const w = p.sz * 3.6;
-        x.drawImage(p.spr, gx - w / 2, gy - w / 2, w, w);
-      }
-      return c;
-    })();
+    const starBake = document.createElement('canvas');
+    starBake.width = starBake.height = TEX_S;
+    const sx = starBake.getContext('2d', { willReadFrequently: true });
+    const sk = TEX_S / (TEX_R * 2);
+    sx.setTransform(sk, 0, 0, sk, TEX_S / 2, TEX_S / 2);
+    sx.globalCompositeOperation = 'lighter';
+    for (let i = 0; i < baked.length; i++) {
+      const p = baked[i];
+      const [gx, gy] = discPos(p);
+      sx.globalAlpha = Math.min(p.al * 1.13, 1);
+      const w = p.sz * 3.6;
+      sx.drawImage(p.spr, gx - w / 2, gy - w / 2, w, w);
+      if (i % 400 === 399) yield;
+    }
+    starTex = starBake;
+    yield;
     gasTex = (function () {
       const c = document.createElement('canvas');
       c.width = c.height = TEX_S;
@@ -965,8 +971,8 @@ function* startGalaxyEngine() {
       const k = TEX_S / (TEX_R * 2);
       x.setTransform(k, 0, 0, k, TEX_S / 2, TEX_S / 2);
       const hg = x.createRadialGradient(0, 0, 0, 0, 0, 440);   // outer halo
-      hg.addColorStop(0, 'rgba(240,72,216,0.22)');
-      hg.addColorStop(0.6, 'rgba(150,54,224,0.09)');
+      hg.addColorStop(0, 'rgba(240,72,216,0.15)');
+      hg.addColorStop(0.6, 'rgba(150,54,224,0.06)');
       hg.addColorStop(1, 'rgba(150,54,224,0)');
       x.fillStyle = hg;
       x.beginPath(); x.arc(0, 0, 440, 0, 7); x.fill();
@@ -977,8 +983,24 @@ function* startGalaxyEngine() {
         const w = p.sz * 2.6;
         x.drawImage(p.spr, gx - w / 2, gy - w / 2, w, w);
       }
+      // Two coloured ridges are baked once. Their tighter curve gives the
+      // spiral a readable shape without adding work to animation frames.
+      for (let arm = 0; arm < 2; arm++) {
+        for (let i = 0; i < 104; i++) {
+          const u = i / 103, r = 38 + u * 366;
+          const theta = r * TWIST + arm * Math.PI + 0.1;
+          const gx = Math.cos(theta) * r, gy = Math.sin(theta) * r;
+          const width = 17 + u * 38;
+          const edge = Math.sin(Math.PI * u) ** 0.65;
+          x.globalAlpha = 0.065 * edge;
+          x.drawImage(gasSpr[u > 0.56 ? 'ice' : 'pink'], gx - width, gy - width, width * 2, width * 2);
+          x.globalAlpha = 0.035 * edge;
+          x.drawImage(gasSpr[u > 0.56 ? 'blue' : 'hot'], gx - width * 0.45, gy - width * 0.45, width * 0.9, width * 0.9);
+        }
+      }
       return graded(c);
     })();
+    yield;
     dustTex = (function () {
       const c = document.createElement('canvas');
       c.width = c.height = TEX_S;
@@ -991,8 +1013,20 @@ function* startGalaxyEngine() {
         const w = p.sz * 2.4;
         x.drawImage(p.spr, gx - w / 2, gy - w / 2, w, w);
       }
+      // Offset dark lanes reveal the arm edges against the luminous gas.
+      for (let arm = 0; arm < 2; arm++) {
+        for (let i = 0; i < 88; i++) {
+          const u = i / 87, r = 60 + u * 330;
+          const theta = r * TWIST + arm * Math.PI + 0.22;
+          const gx = Math.cos(theta) * r, gy = Math.sin(theta) * r;
+          const w = 15 + u * 28;
+          x.globalAlpha = 0.105 * Math.sin(Math.PI * u);
+          x.drawImage(dustSpr, gx - w, gy - w, w * 2, w * 2);
+        }
+      }
       return graded(c);
     })();
+    yield;
     // breathing core: the three glow layers baked into one pre-graded sprite
     coreSpr = (function () {
       const c = document.createElement('canvas');
@@ -1000,9 +1034,9 @@ function* startGalaxyEngine() {
       const x = c.getContext('2d', { willReadFrequently: true });
       const k = 320 / 300;
       x.globalCompositeOperation = 'lighter';
-      [[300, [[0, 'rgba(255,120,226,0.48)'], [0.55, 'rgba(236,64,214,0.18)'], [1, 'rgba(236,64,214,0)']]],
-       [125, [[0, 'rgba(255,242,252,0.9)'], [0.4, 'rgba(255,160,232,0.5)'], [1, 'rgba(255,120,220,0)']]],
-       [60,  [[0, 'rgba(255,255,255,1)'], [0.5, 'rgba(255,232,250,0.85)'], [1, 'rgba(255,200,240,0)']]],
+      [[280, [[0, 'rgba(255,120,226,0.32)'], [0.55, 'rgba(236,64,214,0.10)'], [1, 'rgba(236,64,214,0)']]],
+       [96,  [[0, 'rgba(255,242,252,0.78)'], [0.4, 'rgba(255,176,232,0.36)'], [1, 'rgba(255,120,220,0)']]],
+       [36,  [[0, 'rgba(255,255,255,1)'], [0.4, 'rgba(255,232,250,0.7)'], [1, 'rgba(255,200,240,0)']]],
       ].forEach(([r, stops]) => {
         const g = x.createRadialGradient(320, 320, 0, 320, 320, r * k);
         stops.forEach(([o, col]) => g.addColorStop(o, col));
@@ -1013,7 +1047,7 @@ function* startGalaxyEngine() {
     })();
   }
   yield;   // hand the frame back
-  buildDiscTextures();
+  yield* buildDiscTextures();
   yield;   // hand the frame back
 
   const glares = [];                           // fixed foreground lens-flare stars
@@ -1191,7 +1225,7 @@ function* startGalaxyEngine() {
   // reference-sky palette: deep indigo-blue field, violet mid-sky, pink kept
   // to the galaxy band, pale lavender glow at the horizon
   const WASHES = [
-    [690, 150, 620, 230, 'mag',  0.26],   // magenta bloom hugging the galaxy band
+    [690, 150, 620, 230, 'mag',  0.20],   // magenta bloom hugging the galaxy band
     [520,  80, 440, 180, 'vio',  0.22],   // violet spill along the band's sweep
     [880, 230, 420, 160, 'vio',  0.16],
     [150,  80, 430, 210, 'blue', 0.28],   // deep blue around the moon / left sky
@@ -1199,7 +1233,7 @@ function* startGalaxyEngine() {
     [300, 210, 520, 150, 'vio',  0.14],
     [600, 300, 720, 62,  'ice',  0.30],   // pale glowing horizon haze
     [600, 309, 430, 34,  'ice',  0.22],
-    [700, 150, 480, 190, 'pale', 0.10],   // soft white lift around the galaxy
+    [700, 150, 480, 190, 'pale', 0.06],   // soft white lift around the galaxy
   ];
   // hand a canvas's backing store back immediately rather than waiting for GC
   function release(cv) { if (cv && cv.width) { cv.width = 0; cv.height = 0; } }
@@ -1356,7 +1390,7 @@ function* startGalaxyEngine() {
       }
       if (blankAt(gasTex, (TEX_S / 2) | 0, (TEX_S / 2) | 0) || blankAt(coreSpr, 320, 320)) {
         console.warn('[galaxy] disc textures blank — rebuilding');
-        buildDiscTextures();
+        for (const stage of buildDiscTextures()) { /* rare backing-store recovery */ }
       }
     }
     // health log (badge removed — sky confirmed working)
@@ -1366,30 +1400,40 @@ function* startGalaxyEngine() {
   }
   yield;   // hand the frame back
   layout(false);
-  let resizeTimer;
+  let resizeTimer, resizePending = false;
   addEventListener('resize', () => {
     clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(() => { layout(new Event('resize')); requestDraw(); }, 140);
+    resizePending = true;
+    resizeTimer = setTimeout(() => {
+      if (isCovered()) return;
+      resizePending = false;
+      layout(new Event('resize')); requestDraw();
+    }, 180);
   }, { passive: true });
-  // the health probe that used to block boot, now on its own frame
-  setTimeout(() => {
-    const hx = (canvas.width / 2) | 0, hy = ((SKY - 60) * s + offy) | 0;
-    if (readbackOK() && blankAt(bg, hx, hy)) { console.warn('[galaxy] sky blank at boot — rebuilding'); layout(); }
-    else console.log('[galaxy] build', BUILD, '| DPR', DPR.toFixed(2), '| canvas',
-                     canvas.width + 'x' + canvas.height,
-                     '| window', innerWidth + 'x' + innerHeight + '@' + (window.devicePixelRatio || 1),
-                     '| \u2705 sky healthy');
-  }, 1200);
+  // Readback may synchronously rasterize the sky. Keep the health probe away
+  // from the machine entrance and run it once when the street is idle.
+  let probePending = true, probeRequest = 0;
+  function scheduleProbe() {
+    if (!probePending || probeRequest || isCovered()) return;
+    probeRequest = setTimeout(() => {
+      probeRequest = 0;
+      if (isCovered()) return;
+      probePending = false;
+      const hx = (canvas.width / 2) | 0, hy = ((SKY - 60) * s + offy) | 0;
+      if (readbackOK() && blankAt(bg, hx, hy)) { console.warn('[galaxy] sky blank at boot — rebuilding'); layout(); }
+      else console.log('[galaxy] build', BUILD, '| DPR', DPR.toFixed(2), '| canvas',
+                       canvas.width + 'x' + canvas.height, '| sky healthy');
+    }, 3000);
+  }
+  scheduleProbe();
 
   // ── state ──
-  const fv = document.getElementById('front-view');
   const novae = [];
   let novaAt = 2 + rnd() * 4;
   let t = rnd() * 500, last = performance.now();
   let limit = live.length, ftAcc = 0, ftN = 0;
   let frameRequest = 0, frameCount = 0;
   let drawSamples = [], gapSamples = [];
-  const isCovered = () => document.hidden || (fv && fv.classList.contains('visible'));
   function requestDraw() {
     if (!frameRequest && !isCovered()) frameRequest = requestAnimationFrame(loop);
   }
@@ -1397,12 +1441,15 @@ function* startGalaxyEngine() {
     if (frameRequest) cancelAnimationFrame(frameRequest);
     frameRequest = 0;
     last = performance.now();
+    if (isCovered()) return;
+    if (resizePending) { resizePending = false; layout(new Event('resize')); }
+    scheduleProbe();
     if (!isCovered() && (!isStill() || needsDraw || !canvas.dataset.ready)) requestDraw();
   }
 
   // sky base cache — bg + wisps composited only when the slow sway has moved,
   // turning 3 full-screen blits per frame into 1
-  let skyCacheAt = -9, healAt = -9, healCount = 0;   // skyCache itself is declared above layout()
+  let skyCacheAt = -9;   // skyCache itself is declared above layout()
   function drawSkyBase() {
     if (!skyCache || skyCache.width !== canvas.width || skyCache.height !== skyH) {
       skyCache = document.createElement('canvas');
@@ -1411,16 +1458,6 @@ function* startGalaxyEngine() {
       skyCacheAt = -9;
     }
     if (Math.abs(t - skyCacheAt) > 1.2) {    // wisps drift ~1px/s — recomposite sparsely
-      const hx = (canvas.width / 2) | 0, hy = ((SKY - 60) * s + offy) | 0;
-      // periodic self-heal, throttled: dead backing stores usually recover
-      // once the load storm passes; cap attempts so we never rebuild-spin
-      if (t - healAt > 2.5 && healCount < 10 &&
-          readbackOK() && blankAt(bg, hx, hy)) {
-        healAt = t;
-        healCount++;
-        console.warn('[galaxy] healing sky, attempt', healCount);
-        layout();
-      }
       skyCacheAt = t;
       const sc = skyCache.getContext('2d', { willReadFrequently: true });
       sc.setTransform(1, 0, 0, 1, 0, 0);
@@ -1435,10 +1472,6 @@ function* startGalaxyEngine() {
       sc.globalAlpha = 0.36;
       sc.drawImage(wispBlue, Math.sin(t * 0.057 + 2.1) * 45 - 45, -6, VW + 90, SKY);
       sc.restore();
-      if (blankAt(skyCache, hx, hy)) {       // cache store died — recreate next frame
-        skyCache = null;
-        return;
-      }
     }
     if (skyCache) ctx.drawImage(skyCache, 0, 0);
   }
@@ -1473,7 +1506,10 @@ function* startGalaxyEngine() {
     const cosP = Math.cos(paNow),  sinP = Math.sin(paNow);
 
     if (!still) {                                       // advance every orbit
-      for (const p of stars) p.tau += p.om * dt;
+      for (const p of live) p.tau += p.om * dt;
+      // The faint population is already a texture; only active novae need
+      // their original orbit advanced as well.
+      for (const n of novae) if (!n.p.live) n.p.tau += n.p.om * dt;
       patAngle += PAT_OM * dt;                            // baked gas/dust layer spins as a pattern
     }
 
@@ -1573,7 +1609,7 @@ function* startGalaxyEngine() {
     const drawMs = performance.now() - drawStarted;
     ftAcc += drawMs; ftN++;
     if (ftN === 30) {
-      if (ftAcc / ftN > 20 && limit > live.length * 0.4) limit = (limit * 0.7) | 0;
+      if (ftAcc / ftN > 9 && limit > live.length * 0.4) limit = (limit * 0.7) | 0;
       ftAcc = 0; ftN = 0;
     }
 
@@ -1600,6 +1636,7 @@ function* startGalaxyEngine() {
     needsDraw = false;
     if (!still) requestDraw();
   }
+  canvas.addEventListener('contextrestored', () => { resizePending = true; syncAnimation(); });
   document.addEventListener('visibilitychange', syncAnimation);
   document.addEventListener('night-motion-change', syncAnimation);
   motionQuery.addEventListener('change', syncAnimation);
@@ -1614,16 +1651,34 @@ let galaxyStarted = false;
 function bootGalaxy() {
   if (galaxyStarted) return;
   galaxyStarted = true;
-  // Drive the generator in slices: run stages until this frame's budget is
-  // spent, then yield to the browser so it can paint, move the cursor and
-  // answer clicks. Init used to run as one block and froze the page solid.
+  // Work only in idle slices, and stop between stages as soon as the
+  // gallery opens. Its entrance must never compete with sky texture baking.
   const gen = startGalaxyEngine();
-  (function step() {
+  let scheduled = false, complete = false;
+  const covered = () => document.hidden || document.body.dataset.view === 'vending';
+  function schedule() {
+    if (complete || scheduled || covered()) return;
+    scheduled = true;
+    if ('requestIdleCallback' in window) requestIdleCallback(step, { timeout: 200 });
+    else setTimeout(step, 24);
+  }
+  function step(deadline) {
+    scheduled = false;
+    if (covered()) return;
     const t0 = performance.now();
-    let r;
-    do { r = gen.next(); } while (!r.done && performance.now() - t0 < 10);
-    if (!r.done) requestAnimationFrame(step);
-  })();
+    let result;
+    do {
+      result = gen.next();
+    } while (!result.done && performance.now() - t0 < 5 && (!deadline || deadline.timeRemaining() > 3));
+    complete = result.done;
+    if (complete) {
+      document.removeEventListener('night-motion-change', schedule);
+      document.removeEventListener('visibilitychange', schedule);
+    } else schedule();
+  }
+  document.addEventListener('night-motion-change', schedule);
+  document.addEventListener('visibilitychange', schedule);
+  schedule();
 }
 requestAnimationFrame(() => requestAnimationFrame(bootGalaxy));
 setTimeout(bootGalaxy, 300);

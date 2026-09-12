@@ -221,7 +221,9 @@ body[data-still="true"][data-view="street"] #machine-cue { opacity: .9; }
   body[data-view="street"] #machine-cue { opacity: .9; }
 }
 @media (max-width: 640px) { #billboard { display: none; } }
-#front-view:not(.visible) *, body[data-view="vending"] #scene-view *, body[data-page-hidden="true"] * { animation-play-state: paused !important; }
+/* the street keeps animating behind the open machine — its sky is still on
+   screen there; only a hidden tab or an unopened front view is paused */
+#front-view:not(.visible) *, body[data-page-hidden="true"] * { animation-play-state: paused !important; }
 
 
 /* ── everything shifted down to sit under the navbar ──
