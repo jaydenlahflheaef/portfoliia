@@ -28,7 +28,9 @@
     header.inert = false;   // the navbar stays reachable inside the machine view
     byId('machine-cue').inert = view !== 'street';
     byId('street-footnote').setAttribute('aria-hidden', String(view !== 'street'));
-    if (vending) byId('back-btn').focus({ preventScroll: true });
+    // focus the view itself, not the first painting: focusing a button paints a
+    // focus ring on entry for mouse users, and the container carries the label
+    if (vending) front.focus({ preventScroll: true });
     else returnFocus.focus({ preventScroll: true });
     byId('nav-street').setAttribute('aria-current', vending ? 'false' : 'page');
     byId('nav-machine').setAttribute('aria-current', vending ? 'page' : 'false');
@@ -40,7 +42,6 @@
   byId('vm-hit').addEventListener('keydown', e => {
     if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setView('vending', e.currentTarget); }
   });
-  byId('back-btn').addEventListener('click', () => setView('street'));
   byId('nav-street').addEventListener('click', e => setView('street', e.currentTarget));
   byId('nav-machine').addEventListener('click', e => setView('vending', e.currentTarget));
   document.addEventListener('keydown', e => {
@@ -50,12 +51,10 @@
       return; // The native painting dialog owns Escape and focus while open.
     }
     if (e.key === 'Escape' && body.dataset.view === 'vending') setView('street');
-    if (e.key === 'Tab' && body.dataset.view === 'vending') {
-      const controls = [byId('back-btn'), ...paintings];
-      const first = controls[0], last = controls[controls.length - 1];
-      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
-      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
-    }
+    // No Tab trap here any more: the navbar is outside this view and is now the
+    // only way back to the street, so cycling focus inside the cabinet would
+    // strand keyboard users. The street scene stays inert, so natural tab order
+    // is just the navbar plus the paintings.
   });
   byId('night-header').querySelector('a').addEventListener('click', e => {
     e.preventDefault(); returnFocus = byId('explore-btn'); setView('street');

@@ -191,9 +191,9 @@ body[data-view="vending"] .world-ui:not(#night-header) { opacity: 0; pointer-eve
 #night-header { z-index: 70; pointer-events: none; }
 #night-header a, #night-header button { pointer-events: auto; }
 /* drop the machine's own toolbar clear of the bar so the two stack */
-body[data-view="vending"] #front-view { padding-top: 66px; }
+/* cabinet raised now the toolbar is gone, but kept clear of the navbar text */
+body[data-view="vending"] #front-view { padding-top: 72px; }
 body #front-view { background: #0c1758; transition: opacity .9s ease; }
-body #back-btn { top: 30px; left: 32px; padding: 12px 6px; font: 11px/1.5 'Trebuchet MS', sans-serif; letter-spacing: .5px; color: var(--paper); }
 #front-svg { transform: scale(1.035); transition: transform 1.4s cubic-bezier(.2,.7,.2,1); }
 #front-view.visible #front-svg { transform: scale(1); }
 .vending-caption { position: absolute; left: 38px; bottom: 6vh; pointer-events: none; }
@@ -217,7 +217,6 @@ body #back-btn { top: 30px; left: 32px; padding: 12px 6px; font: 11px/1.5 'Trebu
   #street-footnote { display: none; }
   #machine-cue { font-size: 11px; }
   .arrival-actions { gap: 26px; }
-  body #back-btn { top: 22px; left: 20px; }
   .vending-caption { left: 0; right: 0; text-align: center; bottom: 28px; }
   .vending-caption > p:last-child { font-size: 22px; margin-top: 8px; }
   .vending-caption em { display: inline; }

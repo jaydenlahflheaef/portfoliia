@@ -108,22 +108,6 @@
     #front-view.visible { opacity: 1; pointer-events: all; }
     #front-svg { width: 100%; height: 100%; }
 
-    /* back button */
-    #back-btn {
-      position: absolute;
-      top: 1.6rem; left: 1.8rem;
-      display: flex; align-items: center; gap: 0.4rem;
-      color: rgba(200, 220, 235, 0.6);
-      font-family: 'COTN', sans-serif;
-      font-size: 1rem; letter-spacing: 0.12em;
-      background: none; border: none; cursor: pointer;
-      padding: 0.35rem 0.55rem; border-radius: 3px;
-      transition: color 0.2s, background 0.2s;
-      z-index: 2;
-    }
-    #back-btn:hover  { color: rgba(220, 238, 255, 1); background: rgba(150,200,235,0.1); }
-    #back-btn:focus-visible { outline: 1px solid rgba(200,220,240,0.4); outline-offset: 3px; }
-    #back-btn:active { color: #fff; }
 
   </style>
 </head>
@@ -595,12 +579,7 @@
 <!-- ════════════════════════════════════════ -->
 <!-- FRONT VIEW: first-person scene         -->
 <!-- ════════════════════════════════════════ -->
-<div id="front-view" role="dialog" aria-modal="true" aria-label="The art vending machine" aria-hidden="true" inert>
-  <div class="machine-toolbar">
-    <button id="back-btn" type="button"><span aria-hidden="true">←</span> Back to the street</button>
-    <p>ONE SMALL WINDOW. SIX OTHER WORLDS.</p>
-    <span class="demo-label">DEMO COLLECTION</span>
-  </div>
+<div id="front-view" role="dialog" tabindex="-1" aria-label="The art vending machine" aria-hidden="true" inert>
   <section class="art-cabinet" aria-label="Japanese art vending machine">
     <span class="cabinet-screw screw-tl" aria-hidden="true"></span><span class="cabinet-screw screw-tr" aria-hidden="true"></span>
     <header class="cabinet-brand"><div><h2 lang="ja">作品自販機</h2><p>ART DISPENSARY</p></div><span class="cabinet-brand-note">AFTER HOURS<br><b>24H</b></span></header>
