@@ -658,7 +658,7 @@
 function* startGalaxyEngine() {
   const canvas = document.getElementById('galaxy-canvas');
   if (!canvas || !canvas.getContext) return;
-  const BUILD = 47;                 // bump when sky changes — logged to console
+  const BUILD = 48;                 // bump when sky changes — logged to console
   // main display canvas stays GPU-accelerated; all HELPER canvases below are
   // created software-backed (willReadFrequently) — immune to the silent GPU
   // backing-store loss that was blanking the sky on retina/busy systems
@@ -1311,17 +1311,19 @@ function* startGalaxyEngine() {
     // the top crop on wide windows)
     const MX = 315, MY = 76;
     b.globalCompositeOperation = 'lighter';
-    [[82, 0.14], [46, 0.26], [26, 0.45]].forEach(([r, a]) => {
+    // one extra, wider halo and stronger inner rings — the moon now carries the
+    // upper-left of the sky rather than sitting flat against the galaxy
+    [[124, 0.09], [82, 0.22], [46, 0.38], [26, 0.62], [19, 0.5]].forEach(([r, a]) => {
       const g = b.createRadialGradient(MX, MY, 0, MX, MY, r);
-      g.addColorStop(0, 'rgba(235,238,255,' + a + ')');
-      g.addColorStop(1, 'rgba(235,238,255,0)');
+      g.addColorStop(0, 'rgba(238,241,255,' + a + ')');
+      g.addColorStop(1, 'rgba(238,241,255,0)');
       b.fillStyle = g;
       b.beginPath(); b.arc(MX, MY, r, 0, 7); b.fill();
     });
     b.globalCompositeOperation = 'source-over';
-    b.fillStyle = '#fdfdff';
+    b.fillStyle = '#ffffff';
     b.beginPath(); b.arc(MX, MY, 17, 0, 7); b.fill();
-    b.fillStyle = 'rgba(188,190,228,0.38)';   // faint maria
+    b.fillStyle = 'rgba(192,195,232,0.26)';   // faint maria, lightened to match
     b.beginPath(); b.arc(MX - 5, MY - 4, 5.5, 0, 7); b.fill();
     b.beginPath(); b.arc(MX + 5.5, MY + 5, 4, 0, 7); b.fill();
     b.beginPath(); b.arc(MX - 4, MY + 6.5, 2.9, 0, 7); b.fill();
@@ -1959,7 +1961,7 @@ setTimeout(bootGalaxy, 300);
 })();
 
 </script>
-<div id="cursor" aria-hidden="true"><span class="cursor-follow"><span class="cursor-ring"></span><span class="cursor-glint"></span></span><span class="cursor-dot"></span></div>
+<div id="cursor" aria-hidden="true"><span class="cursor-follow"><span class="cursor-ring"></span><span class="cursor-glint"></span><span class="cursor-rays"></span></span><span class="cursor-dot"></span></div>
 <script src="night-world.js"></script>
 </body>
 </html>
