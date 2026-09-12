@@ -201,8 +201,6 @@
       cur.classList.toggle('hot', !!(e.target.closest && e.target.closest(HOT)));
       wake();
     }, { passive: true });
-    addEventListener('pointerdown', () => cur.classList.add('press'), { passive: true });
-    addEventListener('pointerup',   () => cur.classList.remove('press'), { passive: true });
     addEventListener('pointerleave',() => cur.classList.remove('awake'), { passive: true });
     addEventListener('blur',        () => cur.classList.remove('awake'));
   }

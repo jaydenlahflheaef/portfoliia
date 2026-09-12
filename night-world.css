@@ -264,8 +264,7 @@ body[data-still="true"][data-view="street"] #machine-cue { opacity: .9; }
               0 0 7px 1px rgba(255,226,255,.9),      /* reads on the night sky */
               0 0 18px 5px rgba(206,130,255,.42);
   transition: width .3s cubic-bezier(.22,.7,.2,1), height .3s cubic-bezier(.22,.7,.2,1),
-              margin .3s cubic-bezier(.22,.7,.2,1),
-              background .3s ease, box-shadow .3s ease;
+              margin .3s cubic-bezier(.22,.7,.2,1);
 }
 /* the halo: a soft gradient band, no hard border to catch the eye */
 .cursor-ring {
@@ -297,45 +296,6 @@ body[data-still="true"][data-view="street"] #machine-cue { opacity: .9; }
     rgba(255,232,196,.42) 84%, rgba(255,232,196,0) 100%);
 }
 #cursor.hot .cursor-glint { opacity: 1; transform: rotate(0deg) scale(1); }
-
-/* the diagonal arms: absent until you hold, so the star only appears on charge */
-.cursor-rays {
-  position: absolute; left: 0; top: 0; width: 56px; height: 56px;
-  margin: -28px 0 0 -28px; opacity: 0;
-  background:
-    linear-gradient(90deg, transparent 48.4%, rgba(255,242,214,.7) 50%, transparent 51.6%),
-    linear-gradient(180deg, transparent 48.4%, rgba(255,242,214,.7) 50%, transparent 51.6%);
-  -webkit-mask-image: radial-gradient(closest-side, #000 4%, rgba(0,0,0,.45) 30%, transparent 70%);
-          mask-image: radial-gradient(closest-side, #000 4%, rgba(0,0,0,.45) 30%, transparent 70%);
-  transform: rotate(45deg) scale(.4);
-  transition: opacity .45s ease, transform .45s cubic-bezier(.22,.7,.2,1);
-}
-/* ── hold to charge ──
-   Holding gathers light: the halo swells, the core brightens, and the glint
-   opens into an eight-point star. The charge is just a long transition, so
-   letting go early eases back from wherever it got to — hold longer, get more.
-   These sit after the .hot rules deliberately: same specificity, so pressing
-   wins over hover. Release uses the shorter base durations, which makes the
-   charge slow and the snap-back quick. The build is eased slow-in over
-   ~2.7s so the star gathers rather than arriving at once. */
-#cursor.press .cursor-dot {
-  width: 11px; height: 11px; margin: -5.5px 0 0 -5.5px;
-  transition-duration: 2.7s; transition-timing-function: cubic-bezier(.55,.02,.72,.5);
-  background: radial-gradient(closest-side, #ffffff, #fff3d4);
-  box-shadow: 0 0 0 1px rgba(38,18,58,.30),
-              0 0 16px 3px rgba(255,240,255,1),
-              0 0 46px 14px rgba(226,160,255,.72);
-}
-#cursor.press .cursor-ring {
-  transition-duration: 2.7s; transition-timing-function: cubic-bezier(.55,.02,.72,.5); transform: scale(2.35);
-  /* peak moved to the centre: at rest the halo is a ring, but a ring this big
-     reads as a loading spinner, so charged it becomes a bloom instead */
-  background: radial-gradient(closest-side,
-    rgba(255,246,228,.46) 0%, rgba(255,240,214,.26) 38%,
-    rgba(255,238,210,.10) 68%, rgba(255,238,210,0) 100%);
-}
-#cursor.press .cursor-glint { opacity: 1; transform: rotate(0deg) scale(2.1); transition-duration: 2.7s; transition-timing-function: cubic-bezier(.55,.02,.72,.5); }
-#cursor.press .cursor-rays  { opacity: .95; transform: rotate(45deg) scale(1.75); transition-duration: 2.7s; transition-timing-function: cubic-bezier(.55,.02,.72,.5); }
 
 /* the machine's hit area still wants a pointer for anyone without our cursor */
 #vm-hit { cursor: pointer; }
