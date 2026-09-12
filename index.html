@@ -871,6 +871,10 @@
 
 <header id="night-header" class="world-ui">
   <a class="world-signature" href="./" aria-label="Jayden Kim, back to the street"><span class="signature-star" aria-hidden="true">✳</span><span>JAYDEN KIM<small>ART, AFTER DARK</small></span></a>
+  <nav class="night-nav" aria-label="Scene">
+    <button id="nav-street" class="nav-link" type="button" aria-current="page">street</button>
+    <button id="nav-machine" class="nav-link" type="button">the machine</button>
+  </nav>
   <div class="night-settings" aria-label="Atmosphere settings">
     <button id="sound-btn" type="button" aria-pressed="false"><span class="sound-bars" aria-hidden="true"><i></i><i></i><i></i></span><span id="sound-label">Sound off</span></button>
     <button id="motion-btn" type="button" aria-pressed="true">Motion on</button>
@@ -1480,10 +1484,10 @@
 // used to run synchronously during parse, so the browser could not paint for
 // ~20s. It now starts after the first frame: the static sky/arrival.svg
 // backdrop shows immediately and the galaxy fades in over it via [data-ready].
-function startGalaxyEngine() {
+function* startGalaxyEngine() {
   const canvas = document.getElementById('galaxy-canvas');
   if (!canvas || !canvas.getContext) return;
-  const BUILD = 42;                 // bump when sky changes — logged to console
+  const BUILD = 44;                 // bump when sky changes — logged to console
   // main display canvas stays GPU-accelerated; all HELPER canvases below are
   // created software-backed (willReadFrequently) — immune to the silent GPU
   // backing-store loss that was blanking the sky on retina/busy systems
@@ -1605,6 +1609,7 @@ function startGalaxyEngine() {
     if (wd <= 24)  return 8;
     return 9;
   }
+  yield;   // hand the frame back
   const dustSpr = softSprite(128, [[0, 'rgba(26,6,58,0.7)'], [0.6, 'rgba(20,5,48,0.26)'],
                                    [1, 'rgba(20,5,48,0)']]);   // rich dark purple dust
   // photographic cross-flare sprite for bright foreground stars
@@ -1632,6 +1637,7 @@ function startGalaxyEngine() {
     return graded(c);
   })();
 
+  yield;   // hand the frame back
   // ── particle population ──
   function kin(a, b, beta, z) {   // shared orbital kinematics
     return { a, b, cb: Math.cos(beta), sb: Math.sin(beta), z,
@@ -1672,6 +1678,7 @@ function startGalaxyEngine() {
     star(a, a, rnd() * 6.283, gauss() * a * 0.35,
          0.4 + rnd() * 0.6, 0.10 + rnd() * 0.2, rnd() < 0.5 ? 'vio' : 'blue');
   }
+  yield;   // hand the frame back
   const discRefs = stars.slice(0, DISC_N);    // pre-shuffle refs for supernova picks
 
   // ── live / baked split ──
@@ -1692,6 +1699,7 @@ function startGalaxyEngine() {
     const tmp = live[i]; live[i] = live[j]; live[j] = tmp;
   }
 
+  yield;   // hand the frame back
   const clouds = [], dust = [];
   for (let i = 0; i < 150; i++) {             // glowing gas along the arms
     const a = 26 + (R - 30) * Math.pow(rnd(), 0.7);
@@ -1807,7 +1815,9 @@ function startGalaxyEngine() {
       return graded(c);
     })();
   }
+  yield;   // hand the frame back
   buildDiscTextures();
+  yield;   // hand the frame back
 
   const glares = [];                           // fixed foreground lens-flare stars
   for (let i = 0; i < 22; i++) {
@@ -1815,6 +1825,7 @@ function startGalaxyEngine() {
                   al: 0.25 + rnd() * 0.5, f: 0.4 + rnd() * 1.4, p: rnd() * 6.283 });
   }
 
+  yield;   // hand the frame back
   // background starfield — fills the sky beyond the galaxy
   const field = [];
   for (let i = 0; i < 1150; i++) {
@@ -2107,7 +2118,12 @@ function startGalaxyEngine() {
       b.drawImage(p.spr, p.x - w / 2, p.y - w / 2, w, w);
     }
   }
-  function layout() {
+  // `heal` is skipped on the very first layout: blankAt's getImageData forces the
+  // main thread to WAIT for every deferred sky-paint command to rasterise, which
+  // measured 9.8s of dead air at boot. Skipping it lets raster finish off-thread;
+  // the check then runs once on a later frame, and drawSkyBase's periodic
+  // watchdog still covers a backing store that dies later.
+  function layout(heal) {
     canvas.width  = innerWidth * DPR;
     canvas.height = innerHeight * DPR;
     s = Math.max(canvas.width / VW, canvas.height / VH);
@@ -2119,6 +2135,7 @@ function startGalaxyEngine() {
     // ── self-heal: Chrome sometimes silently drops canvas backing stores on
     // busy/retina systems; verify the sky actually painted, rebuild if not ──
     const hx = (canvas.width / 2) | 0, hy = ((SKY - 60) * s + offy) | 0;
+    if (heal === false) return;                 // boot path — checked later instead
     if (readbackOK()) {
       for (let tries = 0; tries < 3 && blankAt(bg, hx, hy); tries++) {
         console.warn('[galaxy] sky bg blank — rebuilding, attempt', tries + 1);
@@ -2135,8 +2152,16 @@ function startGalaxyEngine() {
                 canvas.width + 'x' + canvas.height,
                 '|', blankAt(bg, hx, hy) ? '⚠️ bg blank' : '✅ sky healthy');
   }
-  layout();
+  yield;   // hand the frame back
+  layout(false);
   addEventListener('resize', layout);
+  // the health probe that used to block boot, now on its own frame
+  setTimeout(() => {
+    const hx = (canvas.width / 2) | 0, hy = ((SKY - 60) * s + offy) | 0;
+    if (readbackOK() && blankAt(bg, hx, hy)) { console.warn('[galaxy] sky blank at boot — rebuilding'); layout(); }
+    else console.log('[galaxy] build', BUILD, '| DPR', DPR, '| canvas',
+                     canvas.width + 'x' + canvas.height, '| \u2705 sky healthy');
+  }, 1200);
 
   // ── state ──
   const fv = document.getElementById('front-view');
@@ -2333,7 +2358,16 @@ let galaxyStarted = false;
 function bootGalaxy() {
   if (galaxyStarted) return;
   galaxyStarted = true;
-  startGalaxyEngine();
+  // Drive the generator in slices: run stages until this frame's budget is
+  // spent, then yield to the browser so it can paint, move the cursor and
+  // answer clicks. Init used to run as one block and froze the page solid.
+  const gen = startGalaxyEngine();
+  (function step() {
+    const t0 = performance.now();
+    let r;
+    do { r = gen.next(); } while (!r.done && performance.now() - t0 < 10);
+    if (!r.done) requestAnimationFrame(step);
+  })();
 }
 requestAnimationFrame(() => requestAnimationFrame(bootGalaxy));
 setTimeout(bootGalaxy, 300);
@@ -2999,6 +3033,7 @@ setTimeout(bootGalaxy, 300);
 })();
 
 </script>
+<div id="cursor" aria-hidden="true"><span class="cursor-ring"></span><span class="cursor-dot"></span></div>
 <script src="night-world.js"></script>
 </body>
 </html>

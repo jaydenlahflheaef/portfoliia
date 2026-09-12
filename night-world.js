@@ -24,6 +24,8 @@
     byId('street-footnote').setAttribute('aria-hidden', String(view !== 'street'));
     if (vending) byId('back-btn').focus({ preventScroll: true });
     else returnFocus.focus({ preventScroll: true });
+    byId('nav-street').setAttribute('aria-current', vending ? 'false' : 'page');
+    byId('nav-machine').setAttribute('aria-current', vending ? 'page' : 'false');
     document.dispatchEvent(new Event('night-motion-change'));
   }
   [byId('vm-hit'), byId('explore-btn'), byId('machine-cue')].forEach(el => {
@@ -33,6 +35,8 @@
     if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setView('vending', e.currentTarget); }
   });
   byId('back-btn').addEventListener('click', () => setView('street'));
+  byId('nav-street').addEventListener('click', e => setView('street', e.currentTarget));
+  byId('nav-machine').addEventListener('click', e => setView('vending', e.currentTarget));
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape' && body.dataset.view !== 'street') setView('street');
     // The scene dialog has one control; keep keyboard focus inside it.
@@ -122,6 +126,43 @@
       audio = null;
     } finally { soundBusy = false; }
   });
+  // ── custom cursor ──
+  // One rAF drives both layers and writes transform only: setting left/top per
+  // mousemove would relayout the page on every pointer event. The ring lerps
+  // toward the dot so it trails; the loop parks itself when nothing is moving.
+  if (matchMedia('(hover: hover) and (pointer: fine)').matches) {
+    const cur = byId('cursor');
+    const dot = cur.querySelector('.cursor-dot');
+    const ring = cur.querySelector('.cursor-ring');
+    const HOT = 'a, button, [role="button"], #vm-hit, input, select, textarea';
+    let mx = innerWidth / 2, my = innerHeight / 2, rx = mx, ry = my, running = false;
+    body.classList.add('has-cursor');
+
+    function tick() {
+      const k = body.dataset.still === 'true' ? 1 : 0.18;   // no trail when motion is off
+      rx += (mx - rx) * k;
+      ry += (my - ry) * k;
+      dot.style.transform = `translate3d(${mx}px, ${my}px, 0)`;
+      ring.style.transform = `translate3d(${rx}px, ${ry}px, 0)`;
+      // keep going only while the ring is still catching up
+      if (Math.abs(mx - rx) > 0.1 || Math.abs(my - ry) > 0.1) requestAnimationFrame(tick);
+      else running = false;
+    }
+    function wake() { if (!running) { running = true; requestAnimationFrame(tick); } }
+
+    addEventListener('pointermove', e => {
+      if (e.pointerType !== 'mouse') return;
+      mx = e.clientX; my = e.clientY;
+      cur.classList.add('awake');
+      cur.classList.toggle('hot', !!(e.target.closest && e.target.closest(HOT)));
+      wake();
+    }, { passive: true });
+    addEventListener('pointerdown', () => cur.classList.add('press'), { passive: true });
+    addEventListener('pointerup',   () => cur.classList.remove('press'), { passive: true });
+    addEventListener('pointerleave',() => cur.classList.remove('awake'), { passive: true });
+    addEventListener('blur',        () => cur.classList.remove('awake'));
+  }
+
   document.addEventListener('visibilitychange', () => {
     body.dataset.pageHidden = String(document.hidden);
     if (!audio || !soundOn) return;
