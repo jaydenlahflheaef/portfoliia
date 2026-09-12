@@ -218,24 +218,6 @@
     <stop offset="100%" stop-color="#88b8cc" stop-opacity="0"/>
   </radialGradient>
 
-  <!-- lamp halos -->
-  <radialGradient id="lh1" cx="50%" cy="50%" r="50%">
-    <stop offset="0%" stop-color="#ff9944" stop-opacity="0.28"/>
-    <stop offset="100%" stop-color="#ff9944" stop-opacity="0"/>
-  </radialGradient>
-  <radialGradient id="lh2" cx="50%" cy="50%" r="50%">
-    <stop offset="0%" stop-color="#ff9944" stop-opacity="0.2"/>
-    <stop offset="100%" stop-color="#ff9944" stop-opacity="0"/>
-  </radialGradient>
-  <radialGradient id="lh3" cx="50%" cy="50%" r="50%">
-    <stop offset="0%" stop-color="#ff9944" stop-opacity="0.14"/>
-    <stop offset="100%" stop-color="#ff9944" stop-opacity="0"/>
-  </radialGradient>
-  <radialGradient id="lh4" cx="50%" cy="50%" r="50%">
-    <stop offset="0%" stop-color="#ff9944" stop-opacity="0.09"/>
-    <stop offset="100%" stop-color="#ff9944" stop-opacity="0"/>
-  </radialGradient>
-
   <!-- Atmosphere fog -->
   <linearGradient id="fogG" x1="0" y1="1" x2="0" y2="0">
     <stop offset="0%" stop-color="#080418" stop-opacity="0.45"/>
@@ -459,11 +441,8 @@
 <polygon points="490,675 875,318 640,675" fill="#c080ff" opacity="0.16" filter="url(#blur8)"/>
 <!-- Galaxy-band glare streak down the road centre -->
 <polygon points="530,675 875,318 585,675" fill="#d86ae0" opacity="0.10" filter="url(#blur8)"/>
-<!-- (lamp reflections are generated per-lamp — see STREET LAMPS script) -->
 <!-- Moonlight reflection streak — runs center of road toward VP -->
 <polygon points="510,675 875,318 595,675" fill="#d8c0ff" opacity="0.07" filter="url(#blur8)"/>
-<!-- VM case-light reflection on road (soft, warm-white like the reference) -->
-<ellipse cx="640" cy="528" rx="60" ry="10" fill="#9adce8" opacity="0.10" filter="url(#blur8)"/>
 
 <!-- ── PUDDLE REFLECTIONS on sidewalks — mirror the indigo/lavender sky ── -->
 <!-- left sidewalk puddles -->
@@ -517,12 +496,6 @@
 
 
 <!-- ══════════════════════════════════════════════════════ -->
-<!-- STREET LAMPS — JS generated with true vanishing-point   -->
-<!-- perspective along the right road edge (695,675)→(875,318) -->
-<!-- ══════════════════════════════════════════════════════ -->
-<g id="street-lamps"/>
-
-<!-- ══════════════════════════════════════════════════════ -->
 <!-- BILLBOARD — mid-distance, frontal, single centre mast -->
 <!-- styled after the classic floodlit highway billboard   -->
 <!-- ══════════════════════════════════════════════════════ -->
@@ -572,19 +545,12 @@
 </g>
 
 <!-- ══════════════════════════════════════════════════════ -->
-<!-- VENDING MACHINE — t≈0.42 on left road edge           -->
-<!-- Road at t=0.42: x=576, y=525. Machine beside road.   -->
-<!-- VP=(875,318).                                         -->
-<!-- Side face:  A(501,331) B(576,331) C(576,525) D(501,525) -->
-<!-- Top face:   A(501,331) B(576,331) E(616,329) G(541,330) -->
-<!-- Front face: B(576,331) E(616,329) F(616,497) C(576,525) -->
+<!-- VENDING MACHINE — cabinet and contact shadows share -->
+<!-- one projection in the SVG asset, beside the road.   -->
 <!-- ══════════════════════════════════════════════════════ -->
-<!-- VM shadow — moon is upper-left, shadow falls lower-right -->
-<polygon points="490,522 626,492 768,648 628,675" fill="#03010a" opacity="0.60" filter="url(#blur8)"/>
-
 <g id="vm-group">
-  <image href="machine/street-machine.svg" x="480" y="305" width="175" height="245" aria-hidden="true"/>
-  <polygon id="vm-hit" points="496,328 579,320 623,325 623,518 541,539 496,529" fill="transparent" pointer-events="all" role="button" tabindex="0" aria-label="Approach the art vending machine" style="cursor:pointer"/>
+  <image href="machine/street-machine.svg" x="475" y="305" width="190" height="275" aria-hidden="true"/>
+  <polygon id="vm-hit" points="500,328 575,325 615,326 615,501 542,544 500,536" fill="transparent" pointer-events="all" role="button" tabindex="0" aria-label="Approach the art vending machine" style="cursor:pointer"/>
 </g>
 
 <!-- ── ATMOSPHERE ── -->
@@ -1743,148 +1709,6 @@ setTimeout(bootGalaxy, 300);
     c.setAttribute('fill', R() < 0.6 ? '#cabcf8' : '#f8e8ff');
     c.setAttribute('opacity', (0.12 + R() * 0.2).toFixed(2));
     g.appendChild(c);
-  }
-})();
-
-// ── STREET LAMPS — true perspective series toward the vanishing point ──
-// Lamps are world-evenly spaced along the road, which on screen means
-// geometric spacing and linear size falloff toward the VP.
-(function () {
-  const ns = 'http://www.w3.org/2000/svg';
-  const g = document.getElementById('street-lamps');
-  if (!g) return;
-  const mk = (t) => document.createElementNS(ns, t);
-  const defs = document.querySelector('#scene-svg defs');
-
-  const halo = mk('radialGradient');
-  halo.setAttribute('id', 'lampHaloG2');
-  [['0%', '#ffc47a', '0.68'], ['45%', '#ff9944', '0.26'], ['100%', '#ff9944', '0']]
-    .forEach(([o, c, a]) => {
-      const st = mk('stop');
-      st.setAttribute('offset', o);
-      st.setAttribute('stop-color', c);
-      st.setAttribute('stop-opacity', a);
-      halo.appendChild(st);
-    });
-  defs.appendChild(halo);
-  const coneG = mk('linearGradient');
-  coneG.setAttribute('id', 'lampConeG');
-  coneG.setAttribute('x1', '0'); coneG.setAttribute('y1', '0');
-  coneG.setAttribute('x2', '0'); coneG.setAttribute('y2', '1');
-  [['0%', '#ffbe6e', '0.5'], ['70%', '#ffa050', '0.10'], ['100%', '#ff9944', '0']]
-    .forEach(([o, c, a]) => {
-      const st = mk('stop');
-      st.setAttribute('offset', o);
-      st.setAttribute('stop-color', c);
-      st.setAttribute('stop-opacity', a);
-      coneG.appendChild(st);
-    });
-  defs.appendChild(coneG);
-
-  const VPx = 875, VPy = 318;
-  for (let i = 0; i < 12; i++) {
-    // huge foreground gaps that tighten rapidly down the road — few, far-apart lamps
-    const t = 1 - 0.94 * Math.pow(0.40, i);
-    const k = 1 - t;                          // perspective scale, →0 at the VP
-    if (k < 0.045) break;
-    const bx = 695 + (VPx - 695) * t;         // base on the right road edge
-    const by = 675 + (VPy - 675) * t;
-    const H = 302 * k;                        // taller poles (heads still slope toward the VP)
-    const arm = 46 * k;
-    const hx = bx - arm, hy = by - H;      // lamp head, hanging over the road
-
-    // light cone falling to the pavement (behind the pole)
-    const cnw = mk('g');
-    cnw.setAttribute('opacity', (0.24 * Math.pow(k, 0.6)).toFixed(3));
-    const cn = mk('polygon');
-    cn.setAttribute('points',
-      (hx - 5 * k).toFixed(1) + ',' + hy.toFixed(1) + ' ' +
-      (hx + 5 * k).toFixed(1) + ',' + hy.toFixed(1) + ' ' +
-      (hx + 30 * k).toFixed(1) + ',' + by.toFixed(1) + ' ' +
-      (hx - 34 * k).toFixed(1) + ',' + by.toFixed(1));
-    cn.setAttribute('fill', 'url(#lampConeG)');
-    cn.setAttribute('class', 'lamp-flicker');
-    cnw.appendChild(cn);
-    g.appendChild(cnw);
-
-    // pool of light on the ground + wet-road reflection streak
-    const poolW = mk('g');
-    poolW.setAttribute('opacity', (0.72 * k).toFixed(2));
-    const pool = mk('ellipse');
-    pool.setAttribute('cx', hx.toFixed(1)); pool.setAttribute('cy', by.toFixed(1));
-    pool.setAttribute('rx', (34 * k).toFixed(1)); pool.setAttribute('ry', (7.5 * k).toFixed(1));
-    pool.setAttribute('fill', 'url(#lampHaloG2)');
-    pool.setAttribute('class', 'lamp-flicker');
-    poolW.appendChild(pool);
-    g.appendChild(poolW);
-    const refl = mk('ellipse');
-    refl.setAttribute('cx', (hx - 6 * k).toFixed(1));
-    refl.setAttribute('cy', Math.min(672, by - 2).toFixed(1));
-    refl.setAttribute('rx', (17 * k).toFixed(1)); refl.setAttribute('ry', (4 * k).toFixed(1));
-    refl.setAttribute('fill', '#ff9944');
-    refl.setAttribute('opacity', (0.32 * k).toFixed(2));
-    refl.setAttribute('filter', 'url(#blur8)');
-    g.appendChild(refl);
-
-    // pole + base + curved arm
-    const pole = mk('line');
-    pole.setAttribute('x1', bx.toFixed(1)); pole.setAttribute('y1', by.toFixed(1));
-    pole.setAttribute('x2', bx.toFixed(1)); pole.setAttribute('y2', hy.toFixed(1));
-    pole.setAttribute('stroke', '#100d22');
-    pole.setAttribute('stroke-width', Math.max(0.6, 4.6 * k).toFixed(2));
-    pole.setAttribute('stroke-linecap', 'round');
-    g.appendChild(pole);
-    const base = mk('rect');
-    base.setAttribute('x', (bx - 3.4 * k).toFixed(1));
-    base.setAttribute('y', (by - 4.5 * k).toFixed(1));
-    base.setAttribute('width', (6.8 * k).toFixed(1));
-    base.setAttribute('height', (4.5 * k).toFixed(1));
-    base.setAttribute('rx', (1.2 * k).toFixed(2));
-    base.setAttribute('fill', '#100d22');
-    g.appendChild(base);
-    const armP = mk('path');
-    armP.setAttribute('d',
-      'M ' + bx.toFixed(1) + ' ' + hy.toFixed(1) +
-      ' Q ' + (bx - arm * 0.55).toFixed(1) + ' ' + (hy - 7 * k).toFixed(1) +
-      ' ' + hx.toFixed(1) + ' ' + (hy - 1 * k).toFixed(1));
-    armP.setAttribute('stroke', '#100d22');
-    armP.setAttribute('stroke-width', Math.max(0.5, 3.4 * k).toFixed(2));
-    armP.setAttribute('fill', 'none');
-    armP.setAttribute('stroke-linecap', 'round');
-    g.appendChild(armP);
-
-    // head housing + halo + glowing tube + hot core
-    const head = mk('rect');
-    head.setAttribute('x', (hx - 8.5 * k).toFixed(1));
-    head.setAttribute('y', (hy - 4.6 * k).toFixed(1));
-    head.setAttribute('width', (17 * k).toFixed(1));
-    head.setAttribute('height', (5.4 * k).toFixed(1));
-    head.setAttribute('rx', (2.4 * k).toFixed(2));
-    head.setAttribute('fill', '#151129');
-    g.appendChild(head);
-    const haloW = mk('g');
-    haloW.setAttribute('opacity', Math.min(1, 0.95 * Math.pow(k, 0.45)).toFixed(2));
-    const hl = mk('circle');
-    hl.setAttribute('cx', hx.toFixed(1)); hl.setAttribute('cy', hy.toFixed(1));
-    hl.setAttribute('r', (54 * k + 6).toFixed(1));
-    hl.setAttribute('fill', 'url(#lampHaloG2)');
-    hl.setAttribute('class', 'lamp-flicker');
-    haloW.appendChild(hl);
-    g.appendChild(haloW);
-    const glass = mk('ellipse');
-    glass.setAttribute('cx', hx.toFixed(1)); glass.setAttribute('cy', (hy + 0.6 * k).toFixed(1));
-    glass.setAttribute('rx', (6.8 * k).toFixed(1));
-    glass.setAttribute('ry', (2.4 * k).toFixed(1));
-    glass.setAttribute('fill', '#ffe4b4');
-    glass.setAttribute('filter', 'url(#glow5)');
-    glass.setAttribute('class', 'lamp-flicker');
-    g.appendChild(glass);
-    const core = mk('ellipse');
-    core.setAttribute('cx', hx.toFixed(1)); core.setAttribute('cy', (hy + 0.4 * k).toFixed(1));
-    core.setAttribute('rx', (3.4 * k).toFixed(1));
-    core.setAttribute('ry', (1.3 * k).toFixed(1));
-    core.setAttribute('fill', '#fff4dc');
-    g.appendChild(core);
   }
 })();
 
