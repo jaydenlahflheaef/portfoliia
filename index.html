@@ -369,7 +369,12 @@
 <!-- Pre-sky: drifting glow that covers the engine's build. Animated purely on
      transform/opacity so the compositor keeps it moving while init blocks the
      main thread; cross-dissolves out as the live galaxy fades in. -->
-<div id="sky-warmup" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+<div id="sky-warmup" aria-hidden="true">
+  <i></i><i></i><i></i>
+  <div class="warm-disc"><div class="warm-arms"></div></div>
+  <div class="warm-core"></div>
+  <span class="warm-shoot"></span><span class="warm-shoot"></span>
+</div>
 <svg id="scene-svg" aria-label="Moonlit city, roadside billboard and glowing vending machine" viewBox="0 0 1200 675" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
 <defs>
   <!-- Sky atmosphere — deep navy/indigo base + vivid magenta nebula -->

@@ -21,39 +21,92 @@ button:focus-visible, a:focus-visible { outline: 1px solid #f4d6a7; outline-offs
   position: absolute; inset: 0; pointer-events: none; overflow: hidden;
   opacity: 1; transition: opacity 1.8s cubic-bezier(.4,0,.3,1);
 }
-/* screen blending ADDS light the way the engine's own 'lighter' compositing
-   does — normal alpha here just veils arrival.svg's starfield into flat fog.
-   Positions and the -11deg tilt mirror the real disc (PA = -11deg, centre
-   around 57%/17% of the viewport) so the live galaxy resolves out of this
-   shape instead of replacing it. */
+/* Everything here animates ONLY transform/opacity so the compositor keeps it
+   alive while init blocks the main thread. Screen blending ADDS light the way
+   the engine's own 'lighter' compositing does — plain alpha just veils
+   arrival.svg's starfield into flat fog. */
+
+/* ── the spiral itself ──
+   Geometry mirrors the engine: centre 57.5%/21% of the viewport, disc diameter
+   ~72vw, position angle -11deg, inclination 62deg (scaleY = cos 62 = .47).
+   Tilt is static on .warm-disc; the spin happens INSIDE it on .warm-arms, so
+   the arms turn in the disc plane rather than wobbling on screen — the same
+   order the canvas uses (rotate PA, scale by cos incl, then rotate pattern). */
+.warm-disc {
+  position: absolute; left: 57.5%; top: 21%;
+  width: 72vw; height: 72vw; margin: -36vw 0 0 -36vw;
+  transform: rotate(-11deg) scaleY(.47);
+}
+.warm-arms {
+  position: absolute; inset: 0; border-radius: 50%;
+  mix-blend-mode: screen; will-change: transform;
+  background: conic-gradient(from 0deg,
+    rgba(236,86,232,0)     0deg,  rgba(232,80,236,.46)  30deg,
+    rgba(255,150,255,.82)  58deg, rgba(255,196,255,.95) 74deg,
+    rgba(198,104,250,.50) 102deg, rgba(236,86,232,0)   142deg,
+    rgba(120,60,228,0)    186deg, rgba(168,92,242,.44) 212deg,
+    rgba(255,150,255,.78) 242deg, rgba(255,196,255,.88) 256deg,
+    rgba(168,92,242,.38)  292deg, rgba(120,60,228,0)   326deg,
+    rgba(236,86,232,0)    360deg);
+  /* hollow the middle for the core and fade the rim so it has no hard edge */
+  -webkit-mask-image: radial-gradient(closest-side, transparent 4%, rgba(0,0,0,.7) 13%,
+                        #000 26%, #000 42%, rgba(0,0,0,.5) 60%, transparent 82%);
+          mask-image: radial-gradient(closest-side, transparent 4%, rgba(0,0,0,.7) 13%,
+                        #000 26%, #000 42%, rgba(0,0,0,.5) 60%, transparent 82%);
+  animation: warm-spin 54s linear infinite;
+}
+@keyframes warm-spin { to { transform: rotate(360deg); } }
+
+/* the core, igniting where the real one does */
+.warm-core {
+  position: absolute; left: 57.5%; top: 21%;
+  width: 15vw; height: 8vw; margin: -4vw 0 0 -7.5vw;
+  border-radius: 50%; mix-blend-mode: screen; will-change: transform, opacity;
+  background: radial-gradient(closest-side, rgba(255,255,255,.98),
+                rgba(255,230,255,.55) 30%, rgba(255,196,250,.20) 56%, rgba(255,196,250,0) 78%);
+  animation: warm-breath 4.6s ease-in-out infinite alternate;
+}
+
+/* ambient colour so the band is not one flat hue */
 #sky-warmup i {
   position: absolute; display: block; border-radius: 50%;
   mix-blend-mode: screen; will-change: transform, opacity;
   animation: warm-drift var(--dur, 19s) var(--delay, 0s) ease-in-out infinite alternate;
 }
-/* the band itself, tilted along the disc */
-#sky-warmup i:nth-child(1) { left: 27%; top: -10%; width: 62vw; height: 23vw; --rot: -11deg; --dur: 17s;
-  background: radial-gradient(closest-side, rgba(236,86,232,.60), rgba(236,86,232,0) 68%); }
-/* violet shoulder trailing to the left */
-#sky-warmup i:nth-child(2) { left: 13%; top: 0%; width: 30vw; height: 15vw; --rot: -11deg; --dur: 23s; --delay: -6s;
-  background: radial-gradient(closest-side, rgba(124,60,228,.50), rgba(124,60,228,0) 70%); }
-/* cool blue rim on the right so the band is not one flat colour */
-#sky-warmup i:nth-child(3) { left: 66%; top: -4%; width: 31vw; height: 16vw; --rot: -11deg; --dur: 21s; --delay: -11s;
-  background: radial-gradient(closest-side, rgba(60,66,205,.52), rgba(60,66,205,0) 70%); }
-/* faint pink haze hugging the skyline */
-#sky-warmup i:nth-child(4) { left: 33%; top: 17%; width: 40vw; height: 8vw; --dur: 26s; --delay: -3s;
-  background: radial-gradient(closest-side, rgba(226,128,240,.24), rgba(226,128,240,0) 76%); }
-/* the core, breathing where the real one ignites */
-#sky-warmup i:nth-child(5) { left: 51%; top: 9%; width: 15vw; height: 8.5vw; --rot: -11deg; --dur: 4.6s;
-  background: radial-gradient(closest-side, rgba(255,241,255,.62), rgba(255,214,252,.18) 45%, rgba(255,214,252,0) 74%);
-  animation-name: warm-breath; }
+#sky-warmup i:nth-child(1) { left: 14%; top: 1%; width: 30vw; height: 15vw; --rot: -11deg; --dur: 23s; --delay: -6s;
+  background: radial-gradient(closest-side, rgba(124,60,228,.42), rgba(124,60,228,0) 70%); }
+#sky-warmup i:nth-child(2) { left: 66%; top: -3%; width: 31vw; height: 16vw; --rot: -11deg; --dur: 21s; --delay: -11s;
+  background: radial-gradient(closest-side, rgba(60,66,205,.46), rgba(60,66,205,0) 70%); }
+#sky-warmup i:nth-child(3) { left: 33%; top: 17%; width: 40vw; height: 8vw; --dur: 26s; --delay: -3s;
+  background: radial-gradient(closest-side, rgba(226,128,240,.22), rgba(226,128,240,0) 76%); }
+
+/* two shooting stars, so the wait has a beat of its own */
+.warm-shoot {
+  position: absolute; top: 8%; left: 12%; width: 12vw; height: 1px;
+  background: linear-gradient(90deg, rgba(255,241,232,0), rgba(255,241,232,.95));
+  opacity: 0; will-change: transform, opacity;
+  animation: warm-shoot 11s ease-in infinite;
+}
+.warm-shoot::after {
+  content: ''; position: absolute; right: 0; top: -1px;
+  width: 3px; height: 3px; border-radius: 50%;
+  background: #fff; box-shadow: 0 0 10px 2px rgba(251,216,255,.9);
+}
+.warm-shoot:nth-of-type(2) { top: 3%; left: 54%; width: 9vw; animation-duration: 17s; animation-delay: -7s; }
+@keyframes warm-shoot {
+  0%   { opacity: 0; transform: translate3d(0,0,0) rotate(24deg) scaleX(.6); }
+  4%   { opacity: 1; }
+  13%  { opacity: 0; transform: translate3d(34vw,15vw,0) rotate(24deg) scaleX(.4); }
+  100% { opacity: 0; transform: translate3d(34vw,15vw,0) rotate(24deg) scaleX(.4); }
+}
+
 @keyframes warm-drift {
   from { transform: translate3d(-3%, 0, 0) rotate(var(--rot, 0deg)) scale(1);    opacity: .5; }
   to   { transform: translate3d(3%, 2%, 0) rotate(var(--rot, 0deg)) scale(1.16); opacity: 1; }
 }
 @keyframes warm-breath {
-  from { transform: translate3d(0,0,0) rotate(var(--rot, 0deg)) scale(.8);  opacity: .32; }
-  to   { transform: translate3d(0,0,0) rotate(var(--rot, 0deg)) scale(1.18); opacity: .9; }
+  from { transform: scale(.82); opacity: .38; }
+  to   { transform: scale(1.2); opacity: .92; }
 }
 /* hand off: the pre-sky dissolves as the real galaxy comes up */
 #galaxy-canvas[data-ready="true"] + #sky-warmup { opacity: 0; }
