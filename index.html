@@ -1645,7 +1645,7 @@ function* startGalaxyEngine() {
       canvas.dataset.ready = 'true';
       canvas.dataset.initMs = Math.round(performance.now() - startedAt);
       // Retire the temporary animated sky after the crossfade releases its layers.
-      setTimeout(() => document.getElementById('sky-warmup')?.remove(), isStill() ? 0 : 1900);
+      setTimeout(() => document.getElementById('sky-warmup')?.remove(), isStill() ? 0 : 2300);   // clear of the 1.8s fade
     }
     if (PROFILE) {
       canvas.dataset.frameCount = ++frameCount;

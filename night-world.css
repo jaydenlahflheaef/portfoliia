@@ -109,7 +109,10 @@ button:focus-visible, a:focus-visible { outline: 1px solid #f4d6a7; outline-offs
   to   { transform: scale(1.2); opacity: .92; }
 }
 /* hand off: the pre-sky dissolves as the real galaxy comes up */
-#galaxy-canvas[data-ready="true"] + #sky-warmup { opacity: 0; }
+/* General sibling, not adjacent: #sky-events sits between the canvas and this
+   layer, so `+` silently stopped matching when that was added and the pre-sky
+   jumped straight from full opacity to removed. */
+#galaxy-canvas[data-ready="true"] ~ #sky-warmup { opacity: 0; }
 #vm-group { -webkit-user-select: none; user-select: none; }
 #vm-group image { pointer-events: none; }
 #vm-hit { outline: none; -webkit-tap-highlight-color: transparent; }
