@@ -191,14 +191,33 @@ body[data-view="vending"] #scene-view { transform: scale(1.15); }
 /* The navbar stays up in the machine view — it is the way back to the street.
    Everything else in the world UI still clears out. */
 body[data-view="vending"] .world-ui:not(#night-header) { opacity: 0; pointer-events: none; }
+/* In the machine view the bar sits over a scrolling gallery, and a gradient
+   alone is not enough: crisp horizontal edges (the cabinet brand panel's 3px
+   border especially) stay legible as they pass through it. A blur turns them
+   into a soft band. Scoped to this view only — over the street it would mean
+   re-blurring the animating galaxy every frame for no benefit. */
+body[data-view="vending"] #night-header {
+  -webkit-backdrop-filter: blur(7px); backdrop-filter: blur(7px);
+  background: linear-gradient(to bottom,
+    rgba(9,6,24,.80), rgba(9,6,24,.42) 52%, rgba(9,6,24,0));
+}
 /* above #front-view (z-index 60); the artwork dialog is in the top layer and
    still covers it. The bar itself must not swallow clicks meant for the
    cabinet underneath, so only its controls take pointer events. */
 #night-header { z-index: 70; pointer-events: none; }
 #night-header a, #night-header button { pointer-events: auto; }
 /* drop the machine's own toolbar clear of the bar so the two stack */
-/* cabinet raised now the toolbar is gone, but kept clear of the navbar text */
-body[data-view="vending"] #front-view { padding-top: 72px; }
+/* cabinet raised now the toolbar is gone, but kept clear of the navbar text.
+   The scroll container also fades out at its top edge: the navbar is a
+   gradient rather than an opaque bar, so without this, hard horizontal edges
+   in the cabinet (the brand panel's 3px border especially) slide straight
+   through it as you scroll and read as a dark line crossing the screen. The
+   fade ends just past the padding, so nothing is dimmed at rest. */
+body[data-view="vending"] #front-view {
+  padding-top: 72px;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 2px, #000 86px);
+          mask-image: linear-gradient(to bottom, transparent 2px, #000 86px);
+}
 body #front-view { background: #0c1758; transition: opacity .9s ease; }
 #front-svg { transform: scale(1.035); transition: transform 1.4s cubic-bezier(.2,.7,.2,1); }
 #front-view.visible #front-svg { transform: scale(1); }
