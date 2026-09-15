@@ -3,21 +3,36 @@
   <desc>Code-built Japanese art vending machine with six demo paintings. Lettering, cabinet panels and short leveling feet share the street perspective; soft contact shadows anchor the feet to the pavement.</desc>
   <defs>
     <linearGradient id="enamel" x1="540" y1="330" x2="622" y2="520" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#d6d6c6" />
-      <stop offset=".45" stop-color="#b9beb1" />
-      <stop offset="1" stop-color="#858f86" />
+      <stop stop-color="#c2b1d6" />
+      <stop offset=".45" stop-color="#a295b4" />
+      <stop offset="1" stop-color="#756782" />
     </linearGradient>
     <linearGradient id="side" x1="496" y1="0" x2="541" y2="0" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#4a5557" />
-      <stop offset=".17" stop-color="#79847d" />
-      <stop offset=".83" stop-color="#7f8b80" />
-      <stop offset="1" stop-color="#485b5b" />
+      <stop stop-color="#4b4260" />
+      <stop offset=".17" stop-color="#746681" />
+      <stop offset=".83" stop-color="#786c8c" />
+      <stop offset="1" stop-color="#4c425f" />
     </linearGradient>
+    <!-- Sky-facing panels catch lavender light, with violet occlusion below. -->
+    <linearGradient id="side-sky-light" x1="518" y1="328" x2="518" y2="538" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#c69aff" stop-opacity=".3" />
+      <stop offset=".5" stop-color="#70548d" stop-opacity=".06" />
+      <stop offset="1" stop-color="#1c122d" stop-opacity=".34" />
+    </linearGradient>
+    <linearGradient id="front-sky-light" x1="570" y1="328" x2="598" y2="525" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#be8af5" stop-opacity=".16" />
+      <stop offset=".45" stop-color="#5a3974" stop-opacity=".04" />
+      <stop offset="1" stop-color="#20152f" stop-opacity=".3" />
+    </linearGradient>
+    <radialGradient id="display-spill" cx="580" cy="390" r="110" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fff0ce" stop-opacity=".28" />
+      <stop offset="1" stop-color="#fff0ce" stop-opacity="0" />
+    </radialGradient>
     <linearGradient id="metal" x1="0" y1="0" x2="1" y2=".7">
-      <stop stop-color="#dce0d4" />
-      <stop offset=".32" stop-color="#798c86" />
-      <stop offset=".55" stop-color="#c4cdc2" />
-      <stop offset="1" stop-color="#3d5353" />
+      <stop stop-color="#ded3ec" />
+      <stop offset=".32" stop-color="#84748e" />
+      <stop offset=".55" stop-color="#b6afc4" />
+      <stop offset="1" stop-color="#3e364e" />
     </linearGradient>
     <linearGradient id="window" x1="0" y1="0" x2="0" y2="1">
       <stop stop-color="#f1f3d9" />
@@ -31,9 +46,9 @@
       <stop offset="1" stop-color="#fff" stop-opacity=".18" />
     </linearGradient>
     <linearGradient id="recess" x1="0" y1="0" x2="0" y2="1">
-      <stop stop-color="#040f16" />
-      <stop offset=".7" stop-color="#132a31" />
-      <stop offset="1" stop-color="#415958" />
+      <stop stop-color="#0b0918" />
+      <stop offset=".7" stop-color="#241c33" />
+      <stop offset="1" stop-color="#51435f" />
     </linearGradient>
     <radialGradient id="ground-shadow">
       <stop offset="0" stop-color="#040713" stop-opacity=".7" />
@@ -71,8 +86,8 @@
     <polygon points="545.293,539.311 544.381,539.328 543.244,539.585 542.051,540.044 540.983,540.639 540.201,541.279 539.827,541.867 539.924,542.312 540.477,542.544 541.403,542.527 542.557,542.263 543.76,541.795 544.827,541.194 545.595,540.555 545.951,539.974 545.844,539.538" fill="#394343" />
   </g>
   <g>
-    <path d="M500 327.728 580.737 325.633 615.26 325.8 542 328Z" fill="#94a49e" stroke="#3b5154" stroke-width=".7" />
-    <path d="M500 327.728 542 328 542 538 500 532.008Z" fill="url(#side)" stroke="#233e46" stroke-width=".8" />
+    <path d="M500 327.728 580.737 325.633 615.26 325.8 542 328Z" fill="#baa4db" stroke="#cdb1ed" stroke-width=".7" />
+    <path d="M500 327.728 542 328 542 538 500 532.008Z" fill="url(#side)" stroke="#35263f" stroke-width=".8" />
     <path d="M503 332 538 332.3 538 532 503 527Z" stroke="#b1bcad" opacity=".35" stroke-width=".6" fill="none" />
     <path d="M505 340L505 519 533 523" stroke="#304b50" opacity=".5" stroke-width=".5" fill="none" />
     <path d="M510 347.4L531 347.8 531 395 510 393.9Z" fill="#244b50" opacity=".8" />
@@ -85,9 +100,11 @@
     <path d="M513 414l14 .6M513 418l11 .5M513 422l14 .6" stroke="#4b675e" stroke-width=".8" />
     <path d="M509 497l23 2.7M509 502l23 2.8M509 507l23 2.9M509 512l23 3" stroke="#29464a" stroke-width="1.4" />
     <path d="M501 333l3 1-1 7M501 520l4 3 7 1M539 334v9M532 533l7 1" stroke="#c5c7ad" stroke-width=".8" opacity=".4" />
+    <path d="M500 327.728 542 328 542 538 500 532.008Z" fill="url(#side-sky-light)" />
   </g>
-  <polygon points="542.000,328.000 615.260,325.800 615.260,489.600 542.000,538.000" fill="url(#enamel)" stroke="#2b434a" stroke-width="0.95" />
-  <polyline points="543.403,330.471 543.585,533.821 614.112,487.893" fill="none" stroke="#d9dfca" stroke-width="0.75" opacity="0.65" />
+  <polygon points="542.000,328.000 615.260,325.800 615.260,489.600 542.000,538.000" fill="url(#enamel)" stroke="#3a2c48" stroke-width="0.95" />
+  <polygon points="542.000,328.000 615.260,325.800 615.260,489.600 542.000,538.000" fill="url(#display-spill)" />
+  <polyline points="543.403,330.471 543.585,533.821 614.112,487.893" fill="none" stroke="#e0c5fa" stroke-width="0.75" opacity="0.65" />
   <polyline points="614.112,327.154 614.112,487.398" fill="none" stroke="#344f53" stroke-width="1" opacity="0.8" />
   <polygon points="546.174,332.440 612.663,329.521 612.663,486.350 546.174,529.024" fill="none" stroke="#66796f" stroke-width="0.5" />
   <polygon points="547.087,333.020 612.079,330.038 612.079,344.465 547.087,351.005" fill="#315458" stroke="#afbaaa" stroke-width="0.6" />
@@ -219,4 +236,6 @@
   <polygon points="543.687,516.207 545.165,515.941 545.075,523.277 544.332,521.237" fill="#536e65" opacity="0.7" />
   <polygon points="611.197,483.629 613.767,480.700 613.824,483.960 612.371,485.544" fill="#536e65" opacity="0.65" />
   <polyline points="546.631,531.626 568.775,517.605 569.567,515.162" fill="none" stroke="#d1d4b9" stroke-width="0.7" opacity="0.65" />
+  <!-- Shade only the exterior: the cutout leaves the internally lit art clear. -->
+  <path d="M542 328 615.26 325.8 615.26 489.6 542 538Z M546.998 356.804 612.022 349.111 612.022 431.369 546.998 459.406Z" fill="url(#front-sky-light)" fill-rule="evenodd" />
 </svg>

@@ -4,25 +4,35 @@ body[data-view="vending"] #billboard, body[data-view="vending"] #vm-group { opac
 #billboard, #vm-group { transition: none; }
 body #front-view { background: transparent; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; outline: none; visibility: hidden; contain: layout style; transition: opacity .14s ease, visibility 0s .14s; }
 body #front-view.visible { visibility: visible; transition-delay: 0s; }
-#front-view::before { content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none; background: linear-gradient(#090e190d 0%, #090e1938 36%, #060a11c9 100%); }
+/* Keep the ambient wash on the fixed street. Layout containment makes a
+   fixed child of #front-view move with that element's scrolling content. */
+body[data-view="vending"] #scene-view::after {
+  content: ''; position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  background: linear-gradient(#110b210d 0%, #140d2b26 36%, #0f091a8c 100%);
+}
 .sr-only { position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
 .arrival-note { margin: 12px 0 20px; color: #dfd2e7; font: italic 25px/1.4 Georgia, serif; }
 .art-cabinet {
   position: relative; width: min(1100px, calc(100% - 96px)); margin: 12px auto 0; padding: 18px 22px 20px;
-  border-radius: 11px 10px 4px 4px; border: 1px solid #c5cdc3;
-  background: linear-gradient(90deg, #6d8082 0, #acb7ae 1.2%, #d3d6c5 3.2%, #bac3b6 5%, #c8cbb9 55%, #acb4a6 95.5%, #728685 98%, #526a70 100%);
-  box-shadow: inset 0 2px 1px #fffdeaaa, inset 0 -5px 1px #4a6062, 7px 3px 0 #354c56, 12px 5px 0 #223642, 0 25px 55px #010709c9;
-  color: #304a4b;
+  border-radius: 11px 10px 4px 4px; border: 1px solid #b7a2ce;
+  /* Sky light catches the crown and folded edges; the lower shell falls
+     into violet shade. The display has its own warm internal light. */
+  background:
+    radial-gradient(ellipse at 62% 0%, #c090f35c, #c090f300 62%),
+    linear-gradient(180deg, #ddc4ff33, #70558d0a 28%, #38264f47 72%, #1d142e85),
+    linear-gradient(90deg, #574969 0, #9d8dae 1.2%, #cfc0dd 3.2%, #a99ab9 5%, #b9adc4 55%, #a094b0 95.5%, #6c5d80 98%, #483958 100%);
+  box-shadow: inset 0 2px 1px #efdbffb3, inset 0 -5px 2px #30233f, inset 2px 0 2px #d9bdff5c, 7px 3px 0 #3c2f50, 12px 5px 0 #241c36, 0 25px 55px #0b041bd1;
+  color: #3c304b;
 }
-.art-cabinet::before { content: ''; position: absolute; inset: 6px 7px 7px; pointer-events: none; border: 1px solid #526a6138; border-radius: 7px; background: repeating-linear-gradient(0deg, transparent 0 5px, #ffffff04 5px 6px); }
-.art-cabinet::after { content: ''; position: absolute; z-index: -1; left: 20px; right: 12px; height: 20px; bottom: -13px; border-radius: 2px; background: linear-gradient(90deg, #373f3e 0 16%, transparent 16% 80%, #373f3e 80% 100%); }
-.cabinet-brand { position: relative; display: flex; justify-content: space-between; align-items: center; padding: 12px 24px 10px; margin: 0 2px 16px; border-radius: 2px; background: linear-gradient(100deg, #183d44, #355454 65%, #25444c); border: 1px solid #294449; border-bottom: 3px solid #984f45; box-shadow: inset 0 1px #adc2b570, 0 2px 0 #f1ecce77; color: #e8e8cf; }
+.art-cabinet::before { content: ''; position: absolute; inset: 6px 7px 7px; pointer-events: none; border: 1px solid #ead5ff33; border-radius: 7px; background: repeating-linear-gradient(0deg, transparent 0 5px, #ffffff04 5px 6px); }
+.art-cabinet::after { content: ''; position: absolute; z-index: -1; left: 20px; right: 12px; height: 20px; bottom: -13px; border-radius: 2px; background: linear-gradient(90deg, #282033 0 16%, transparent 16% 80%, #282033 80% 100%); }
+.cabinet-brand { position: relative; display: flex; justify-content: space-between; align-items: center; padding: 12px 24px 10px; margin: 0 2px 16px; border-radius: 2px; background: linear-gradient(180deg, #b18add38, #21132f47), linear-gradient(100deg, #293948, #434b55 65%, #303a4b); border: 1px solid #49405e; border-bottom: 3px solid #8f5969; box-shadow: inset 0 1px #d9c1ef70, 0 2px 0 #e8d6ed66; color: #e8e8cf; }
 .cabinet-brand h2 { font: 400 24px/1.3 'Hiragino Kaku Gothic ProN', 'Yu Gothic', sans-serif; letter-spacing: .35em; }
 .cabinet-brand p { font: 8px/1.8 'Trebuchet MS', sans-serif; letter-spacing: 2.8px; }
 .cabinet-brand-note { font: 8px/1.5 'Trebuchet MS', sans-serif; letter-spacing: 1.4px; text-align: right; color: #bac4b3; }
 .cabinet-brand-note b { font: 21px/1.3 Georgia, serif; letter-spacing: 1px; color: #eae6c7; }
 .cabinet-content { position: relative; display: grid; grid-template-columns: minmax(0,1fr) 82px; gap: 15px; }
-.display-case { position: relative; padding: 28px 24px 14px; border: 5px solid #405456; border-bottom-width: 8px; border-radius: 4px 4px 2px 2px; background: #e3e9df; box-shadow: inset 0 2px 4px #172e3826, 0 1px 0 1px #eeebd499; }
+.display-case { position: relative; padding: 28px 24px 14px; border: 5px solid #51465f; border-bottom-width: 8px; border-radius: 4px 4px 2px 2px; background: linear-gradient(#f1edde, #e7e3e8 120px, #d9d3e0); box-shadow: inset 0 2px 4px #271b3e30, 0 1px 0 1px #e7dcef80, 0 0 16px #f5ead61a; }
 .display-case::after { content: ''; position: absolute; inset: 0; pointer-events: none; border: 1px solid #f6ffed66; border-right: 3px solid #f6ffed66; background: linear-gradient(112deg, #f3ffef0d 4%, #f3ffef2b 5%, #f3ffef05 8%, transparent 8% 75%, #f3ffef10 75% 77%, transparent 77%); }
 .display-tube { position: absolute; left: 8px; right: 8px; top: 4px; height: 5px; border-radius: 3px; background: #f6ffe6; box-shadow: 0 3px 13px 5px #f3ffda7a; }
 .painting-grid { columns: 3; column-gap: 18px; }
@@ -56,34 +66,34 @@ body #front-view.visible { visibility: visible; transition-delay: 0s; }
 .display-caption { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding-top: 16px; font: 7px/1.4 'Trebuchet MS', sans-serif; color: #496467; }
 .display-caption > span:last-child { font-size: 6px; letter-spacing: .8px; }
 .cabinet-controls { display: flex; flex-direction: column; align-items: center; padding-top: 7px; }
-.selection-lcd { width: 100%; padding: 12px 3px 8px; text-align: center; border: 3px solid #58615a; background: #173631; color: #b7d99f; box-shadow: inset 0 2px 6px #0008, 0 1px #f3eac17a; }
+.selection-lcd { width: 100%; padding: 12px 3px 8px; text-align: center; border: 3px solid #625574; background: #173631; color: #b7d99f; box-shadow: inset 0 2px 6px #0008, 0 1px #e5d3f17a; }
 .selection-lcd > span { display: block; font: 30px/1.2 monospace; letter-spacing: 3px; text-shadow: 0 0 6px #b5ffac55; }
 .selection-lcd small { display: block; font: 7px/1.8 sans-serif; letter-spacing: .5px; }
 .payment-details { width: 100%; text-align: center; margin-top: 24px; }
-.payment-details p { font: 8px/1.4 sans-serif; color: #465951; margin-bottom: 6px; }
-.coin-plate { display: grid; place-items: center; height: 55px; width: 43px; margin: auto; border: 1px solid #78857a; border-radius: 3px; background: linear-gradient(100deg, #707d72, #dce1cc 25%, #94a08d 45%, #627567 55%, #a3ae99); box-shadow: inset 1px 1px #e3e6cf, 0 1px 1px #677668; }
+.payment-details p { font: 8px/1.4 sans-serif; color: #44354f; margin-bottom: 6px; }
+.coin-plate { display: grid; place-items: center; height: 55px; width: 43px; margin: auto; border: 1px solid #8c7d9e; border-radius: 3px; background: linear-gradient(100deg, #796a8a, #e2d6ee 25%, #a398b4 45%, #665774 55%, #b0a0c0); box-shadow: inset 1px 1px #ebdcf5, 0 1px 1px #534260; }
 .coin-slot { display: block; width: 7px; height: 35px; border-radius: 4px; background: #122c2c; border: 1px solid #65756a; box-shadow: inset 2px 1px #061e24; transform: rotate(15deg); }
-.coin-values { font: 7px/1.8 monospace; margin-top: 7px; color: #647262; }
+.coin-values { font: 7px/1.8 monospace; margin-top: 7px; color: #51445f; }
 .coin-return { display: flex; align-items: center; gap: 6px; justify-content: center; margin-top: 13px; }
 .coin-return > span { display: grid; place-items: center; width: 27px; height: 24px; border-radius: 4px; background: linear-gradient(#a58a54, #775b39); border: 1px solid #715839; color: #d8c398; box-shadow: inset 0 1px #ecd9a1; font-size: 17px; }
 .coin-return small { font: 7px sans-serif; }
 .bill-slot { width: 67px; height: 18px; margin: 18px auto 2px; border: 4px solid #596d62; background: #152f30; box-shadow: inset 0 2px #092125, 0 1px #e2e4c5; }
-.bill-note { font: 7px monospace; color: #5b6c5a; }
+.bill-note { font: 7px monospace; color: #51445f; }
 .free-viewing { width: 75px; margin: 23px 0 0; padding: 10px 4px 8px; text-align: center; color: #655e47; background: #eadfb6; border: 1px solid #b5aa81; transform: rotate(-3deg); box-shadow: 1px 2px 2px #56685733; }
 .free-viewing b { font: 11px/1.5 serif; display: block; }
 .free-viewing > span { display: block; margin-top: 6px; font: 7px/1.5 'Trebuchet MS', sans-serif; letter-spacing: .5px; }
 .cabinet-keyhole { display: block; width: 17px; height: 17px; margin: 22px 0 16px; border: 3px solid #86917d; border-radius: 50%; background: linear-gradient(90deg,#b2baa2 35%,#243e39 36% 49%,#b2baa2 50%); box-shadow: 0 0 0 1px #657968; }
-.service-label { margin-top: auto; font: 6px/1.8 monospace; text-align: center; color: #748173; }
+.service-label { margin-top: auto; font: 6px/1.8 monospace; text-align: center; color: #dacbe7; }
 .cabinet-bottom { position: relative; display: grid; grid-template-columns: 150px 1fr; gap: 20px; align-items: center; padding: 24px 4px 5px; }
 .cabinet-note { padding: 13px 12px; background: #d9cb9f; border: 1px solid #b1a582; transform: rotate(-2deg); box-shadow: 0 1px 2px #5e675329; }
 .cabinet-note::before { content: ''; position: absolute; width: 48px; height: 13px; left: 42px; top: -6px; background: #e6dcc4a1; transform: rotate(4deg); }
 .cabinet-note > span { display: block; font: 13px/1.5 serif; color: #766145; }
 .cabinet-note small { font: italic 10px/1.5 Georgia, serif; color: #857458; }
-.retrieval-tray { position: relative; height: 74px; border: 6px solid #607064; border-bottom-width: 9px; border-radius: 2px; background: linear-gradient(#10292e,#10292e 66%,#2b4140 67%,#163132 85%,#09262e); box-shadow: inset 0 7px 8px #0009, 0 1px #e5e5c1, 0 -1px #f1efd055; text-align: center; }
+.retrieval-tray { position: relative; height: 74px; border: 6px solid #665672; border-bottom-width: 9px; border-radius: 2px; background: linear-gradient(#130f22,#130f22 66%,#393047 67%,#211b30 85%,#110e1d); box-shadow: inset 0 7px 8px #080310b3, 0 1px #c9b4dd99, 0 -1px #e8d3f555; text-align: center; }
 .retrieval-tray > span { position: relative; top: 15px; color: #809387; font: 10px/1.4 sans-serif; letter-spacing: 3px; }
 .retrieval-tray i { position: absolute; bottom: 8px; left: 12px; right: 12px; height: 2px; background: #6b817155; }
-.cabinet-vent { grid-column: 1 / -1; height: 15px; margin-top: 2px; background: repeating-linear-gradient(0deg, #354f441f 0 1px, transparent 1px 4px); border-top: 1px solid #435f4b3b; }
-.cabinet-screw { position: absolute; z-index: 2; width: 6px; height: 6px; border-radius: 50%; background: linear-gradient(135deg, #e0e1c8, #6d8272); box-shadow: 0 0 0 1px #7e917b; }
+.cabinet-vent { grid-column: 1 / -1; height: 15px; margin-top: 2px; background: repeating-linear-gradient(0deg, #25192f55 0 1px, transparent 1px 4px); border-top: 1px solid #24182e55; }
+.cabinet-screw { position: absolute; z-index: 2; width: 6px; height: 6px; border-radius: 50%; background: linear-gradient(135deg, #e7d4f3, #756185); box-shadow: 0 0 0 1px #8e789e; }
 .cabinet-screw::before { content: ''; position: absolute; top: 2px; left: 1px; width: 4px; height: 1px; background: #455f4d; transform: rotate(35deg); }
 .screw-tl { top: 10px; left: 11px; }.screw-tr { top: 10px; right: 11px; }.screw-bl { bottom: 10px; left: 11px; }.screw-br { bottom: 10px; right: 11px; }
 .machine-ground-note { margin: 35px 0 40px; text-align: center; font: italic 17px/1.5 Georgia, serif; color: #d1becf; }
